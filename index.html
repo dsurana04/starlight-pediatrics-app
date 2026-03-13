@@ -627,6 +627,22 @@ tr:hover td { background: var(--sp-warm); }
 .tab:hover { color: var(--sp-text); }
 .tab.active { color: var(--sp-navy); border-bottom-color: var(--sp-gold); }
 
+/* ── Pill Nav (Messages page) ── */
+.pill-nav { display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;padding:4px;background:var(--sp-warm);border-radius:12px; }
+.pill-nav .pill { padding:9px 16px;font-size:13px;font-weight:600;color:var(--sp-muted);cursor:pointer;border-radius:8px;transition:all 0.15s;white-space:nowrap;display:flex;align-items:center;gap:6px; }
+.pill-nav .pill:hover { color:var(--sp-text);background:rgba(255,255,255,0.6); }
+.pill-nav .pill.active { color:white;background:var(--sp-navy);box-shadow:0 2px 8px rgba(36,92,123,0.2); }
+.pill-nav .pill .pill-icon { font-size:15px; }
+.pill-nav .pill .pill-badge { font-size:10px;padding:1px 6px;border-radius:10px;font-weight:700;background:rgba(255,255,255,0.25); }
+.pill-nav .pill.active .pill-badge { background:rgba(255,255,255,0.25); }
+.pill-nav .pill:not(.active) .pill-badge { background:var(--sp-border);color:var(--sp-muted); }
+
+/* ── Sortable Table Headers ── */
+th[onclick] { cursor:pointer;user-select:none;position:relative; }
+th[onclick]:hover { color:var(--sp-navy);background:var(--sp-warm); }
+th .sort-arrow { font-size:10px;margin-left:3px;opacity:0.4; }
+th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .sidebar { display: none; }
@@ -1056,8 +1072,8 @@ tr:hover td { background: var(--sp-warm); }
               <th onclick="sortPatients('age')">Age</th>
               <th onclick="sortPatients('plan')">Plan</th>
               <th onclick="sortPatients('fee')">Monthly Fee</th>
-              <th>Next Wellness</th>
-              <th>Plan Change</th>
+              <th onclick="sortPatients('wellness')">Next Wellness</th>
+              <th onclick="sortPatients('change')">Plan Change</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -1422,12 +1438,12 @@ tr:hover td { background: var(--sp-warm); }
     <button class="btn btn-primary" onclick="openTemplateEditor()">+ New Template</button>
   </div>
   <div id="msgReviewBanner"></div>
-  <div class="tab-row" style="margin-bottom:16px;">
-    <div class="tab active" onclick="setMsgTab(this,'journey')">Patient Journey</div>
-    <div class="tab" onclick="setMsgTab(this,'reminders')">Smart Reminders</div>
-    <div class="tab" onclick="setMsgTab(this,'templates')">Template Library</div>
-    <div class="tab" onclick="setMsgTab(this,'reviews')">Google Reviews</div>
-    <div class="tab" onclick="setMsgTab(this,'log')">Email Log</div>
+  <div class="pill-nav" id="msgPillNav">
+    <div class="pill active" onclick="setMsgTab(this,'journey')"><span class="pill-icon">&#128205;</span> Patient Journey</div>
+    <div class="pill" onclick="setMsgTab(this,'reminders')"><span class="pill-icon">&#128276;</span> Send Now <span class="pill-badge" id="remindersBadge">0</span></div>
+    <div class="pill" onclick="setMsgTab(this,'templates')"><span class="pill-icon">&#128196;</span> Templates <span class="pill-badge" id="templatesBadge">0</span></div>
+    <div class="pill" onclick="setMsgTab(this,'reviews')"><span class="pill-icon">&#11088;</span> Reviews <span class="pill-badge" id="reviewsBadge">0</span></div>
+    <div class="pill" onclick="setMsgTab(this,'log')"><span class="pill-icon">&#128231;</span> Sent</div>
   </div>
   <div id="msgJourneySection"></div>
   <div id="msgRemindersSection" style="display:none;"></div>
@@ -2538,6 +2554,8 @@ function renderPatientTable() {
       case 'age': va = ageMonths(a.dob) || 9999; vb = ageMonths(b.dob) || 9999; break;
       case 'fee': va = getMonthlyFee(a); vb = getMonthlyFee(b); break;
       case 'plan': va = (getTier(a.dob)||{}).name||'z'; vb = (getTier(b.dob)||{}).name||'z'; break;
+      case 'wellness': { const wa = getNextWellness(a.dob); const wb = getNextWellness(b.dob); va = wa ? wa.date.getTime() : 9999999999999; vb = wb ? wb.date.getTime() : 9999999999999; break; }
+      case 'change': { const ca = getNextTierChange(a.dob); const cb = getNextTierChange(b.dob); va = ca ? ca.date.getTime() : 9999999999999; vb = cb ? cb.date.getTime() : 9999999999999; break; }
       default: va = a.firstName; vb = b.firstName;
     }
     if (va < vb) return -1 * sortDir;
@@ -2576,6 +2594,15 @@ function renderPatientTable() {
   }).join('');
 
   document.getElementById('patientCount').textContent = getActivePatients().length;
+
+  // Update sort arrows on all sortable headers
+  document.querySelectorAll('#page-patients th[onclick]').forEach(th => {
+    const field = th.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+    const arrow = field === sortField ? (sortDir === 1 ? ' ▲' : ' ▼') : '';
+    th.classList.toggle('sorted', field === sortField);
+    // Strip old arrow if present then add new one
+    th.textContent = th.textContent.replace(/ [▲▼]$/, '') + arrow;
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -3939,11 +3966,11 @@ function saveHomeVisit() {
 // ═══════════════════════════════════════════
 
 function setMsgTab(el, tab) {
-  document.querySelectorAll('#page-messages .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#msgPillNav .pill').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   ['journey', 'reminders', 'templates', 'reviews', 'log'].forEach(t => {
-    const el = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1) + 'Section');
-    if (el) el.style.display = t === tab ? 'block' : 'none';
+    const section = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1) + 'Section');
+    if (section) section.style.display = t === tab ? 'block' : 'none';
   });
 }
 
@@ -4390,6 +4417,14 @@ function renderMessages() {
       `).join('') : '<p style="font-size:13px;color:var(--sp-muted);padding:12px;">No emails sent yet. Send one from a template!</p>'}
     </div>
   `;
+
+  // Update pill badge counts
+  const rb = document.getElementById('remindersBadge');
+  if (rb) rb.textContent = reminders.length;
+  const tb = document.getElementById('templatesBadge');
+  if (tb) tb.textContent = messageTemplates.length;
+  const rvb = document.getElementById('reviewsBadge');
+  if (rvb) rvb.textContent = stats.notReviewed;
 }
 
 // ═══════════════════════════════════════════
