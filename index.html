@@ -707,6 +707,59 @@ tr:hover td { background: var(--sp-warm); }
   font-size: 11px;
   white-space: nowrap;
 }
+
+/* ── Toggle Switches ── */
+.toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 6px;
+}
+.toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--sp-text) !important;
+  margin-bottom: 0 !important;
+}
+.toggle-item:hover { background: var(--sp-warm); }
+.toggle-item input[type="checkbox"] { display: none; }
+.toggle-track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  background: var(--sp-border);
+  border-radius: 11px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.2s;
+}
+.toggle-item input[type="checkbox"]:checked + .toggle-track {
+  background: var(--sp-navy);
+}
+.toggle-item input[type="checkbox"]:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+.toggle-label { line-height: 1.3; }
 </style>
 </head>
 <body>
@@ -939,21 +992,31 @@ tr:hover td { background: var(--sp-warm); }
       </div>
       <div class="form-group">
         <label>Include in Email</label>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
-          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="emailIncWellness" checked onchange="saveSettings()"> Wellness checks to schedule
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <input type="checkbox" id="emailIncWellness" checked onchange="saveSettings()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Wellness checks to schedule</span>
           </label>
-          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="emailIncBilling" checked onchange="saveSettings()"> Billing changes (Atlas MD)
+          <label class="toggle-item">
+            <input type="checkbox" id="emailIncBilling" checked onchange="saveSettings()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Billing changes (Atlas MD)</span>
           </label>
-          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="emailIncRevenue" checked onchange="saveSettings()"> Revenue snapshot
+          <label class="toggle-item">
+            <input type="checkbox" id="emailIncRevenue" checked onchange="saveSettings()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Revenue snapshot</span>
           </label>
-          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="emailIncProspects" checked onchange="saveSettings()"> Prospect follow-ups
+          <label class="toggle-item">
+            <input type="checkbox" id="emailIncProspects" checked onchange="saveSettings()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Prospect follow-ups</span>
           </label>
-          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="emailIncScheduled" checked onchange="saveSettings()"> Already-scheduled items
+          <label class="toggle-item">
+            <input type="checkbox" id="emailIncScheduled" checked onchange="saveSettings()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Already-scheduled items</span>
           </label>
         </div>
       </div>
