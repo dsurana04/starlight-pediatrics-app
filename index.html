@@ -919,6 +919,10 @@ tr:hover td { background: var(--sp-warm); }
   <div class="sidebar-item" data-page="pricing">
     <span class="icon">&#127991;&#65039;</span> Pricing Guide
   </div>
+  <div style="border-top:1px solid rgba(255,255,255,0.08);margin:8px 12px;"></div>
+  <div class="sidebar-item" data-page="backup">
+    <span class="icon">&#128190;</span> Data & Backup
+  </div>
 </nav>
 
 <!-- ── Main Content ── -->
@@ -1295,6 +1299,59 @@ tr:hover td { background: var(--sp-warm); }
       <strong>Pegasus &#8594; Polaris:</strong> When young adult turns 19, reduce from $150 to $100. Change in EMR effective the 1st of the month after they turn 19.<br><br>
       <em style="color:var(--sp-muted);">Tip: The app automatically calculates these dates for each patient and alerts you on the Actions page.</em>
     </p>
+  </div>
+</div>
+
+<!-- ═══════ DATA & BACKUP ═══════ -->
+<div class="page" id="page-backup">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Data & Backup</h2>
+  <p style="font-size:14px;color:var(--sp-muted);margin-bottom:20px;">Your data is stored in this browser. Back it up regularly so you never lose anything.</p>
+
+  <div class="detail-grid">
+    <div class="card">
+      <div class="card-header"><h2>Backup Your Data</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:14px;">Download all patients, settings, and schedules as a file. Keep this somewhere safe (Desktop, Google Drive, etc.).</p>
+      <div id="backupStats" style="background:var(--sp-warm);border-radius:10px;padding:14px;margin-bottom:14px;font-size:13px;"></div>
+      <button class="btn btn-primary" onclick="exportBackup()" style="width:100%;justify-content:center;">&#128229; Download Backup File</button>
+      <p style="font-size:11px;color:var(--sp-muted);margin-top:10px;text-align:center;">Last backup: <span id="lastBackupDate">Never</span></p>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Restore From Backup</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:14px;">If you need to restore your data (new computer, browser reset, etc.), upload a backup file here.</p>
+      <div style="border:2px dashed var(--sp-border);border-radius:10px;padding:24px;text-align:center;margin-bottom:14px;cursor:pointer;" onclick="document.getElementById('restoreFile').click()">
+        <div style="font-size:32px;margin-bottom:8px;">&#128228;</div>
+        <div style="font-size:13px;color:var(--sp-muted);">Click to select a backup file</div>
+        <div style="font-size:11px;color:var(--sp-silver);margin-top:4px;">(.json file from a previous backup)</div>
+        <input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="importBackup(event)">
+      </div>
+      <div id="restoreStatus" style="display:none;background:#E8F5E9;border-radius:10px;padding:12px;font-size:13px;color:#2E7D32;text-align:center;"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-header"><h2>How Your Data Works</h2></div>
+    <div style="font-size:13px;line-height:1.8;color:var(--sp-text);">
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;margin-bottom:10px;">
+        <span style="font-size:20px;">&#9989;</span>
+        <div><strong>Closing the browser:</strong> Your data is safe. It stays in your browser's storage.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;margin-bottom:10px;">
+        <span style="font-size:20px;">&#9989;</span>
+        <div><strong>Restarting your computer:</strong> Your data is safe. Same browser = same data.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;margin-bottom:10px;">
+        <span style="font-size:20px;">&#9888;&#65039;</span>
+        <div><strong>Clearing browser data:</strong> This WILL delete your data. Restore from a backup file if this happens.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;margin-bottom:10px;">
+        <span style="font-size:20px;">&#9888;&#65039;</span>
+        <div><strong>Different device/browser:</strong> Each browser has its own copy. Use backup/restore to transfer.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:start;">
+        <span style="font-size:20px;">&#128161;</span>
+        <div><strong>Best practice:</strong> Download a backup every time you add or change patients. It takes 2 seconds.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2675,6 +2732,95 @@ function exportCSV() {
 }
 
 // ═══════════════════════════════════════════
+// DATA BACKUP / RESTORE
+// ═══════════════════════════════════════════
+
+function renderBackup() {
+  const stats = document.getElementById('backupStats');
+  const active = patients.filter(p => p.status === 'active').length;
+  const prospects = patients.filter(p => p.status === 'prospect').length;
+  const scheduled = Object.keys(scheduleData).length;
+  stats.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">
+      <div><div style="font-size:20px;font-weight:800;color:var(--sp-navy);">${active}</div><div style="font-size:11px;color:var(--sp-muted);">Active Patients</div></div>
+      <div><div style="font-size:20px;font-weight:800;color:var(--sp-mint);">${prospects}</div><div style="font-size:11px;color:var(--sp-muted);">Prospects</div></div>
+      <div><div style="font-size:20px;font-weight:800;color:var(--sp-gold);">${scheduled}</div><div style="font-size:11px;color:var(--sp-muted);">Scheduled Items</div></div>
+    </div>
+  `;
+  const lastBackup = localStorage.getItem('sp_last_backup');
+  document.getElementById('lastBackupDate').textContent = lastBackup || 'Never';
+}
+
+function exportBackup() {
+  const backup = {
+    version: '5',
+    exportedAt: new Date().toISOString(),
+    app: 'Starlight Pediatrics Patient Manager',
+    patients: patients,
+    schedules: scheduleData,
+    settings: {
+      email: document.getElementById('reminderEmail').value,
+      doctorName: document.getElementById('reminderDoctorName').value,
+      incWellness: document.getElementById('emailIncWellness').checked,
+      incBilling: document.getElementById('emailIncBilling').checked,
+      incRevenue: document.getElementById('emailIncRevenue').checked,
+      incProspects: document.getElementById('emailIncProspects').checked,
+      incScheduled: document.getElementById('emailIncScheduled').checked,
+    }
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `starlight-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const now = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  localStorage.setItem('sp_last_backup', now);
+  document.getElementById('lastBackupDate').textContent = now;
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.patients || !Array.isArray(backup.patients)) {
+        alert('Invalid backup file — no patient data found.');
+        return;
+      }
+      if (!confirm(`Restore ${backup.patients.length} patients from backup (${backup.exportedAt ? new Date(backup.exportedAt).toLocaleDateString() : 'unknown date'})? This will replace all current data.`)) return;
+      patients = backup.patients;
+      savePatients();
+      if (backup.schedules) {
+        scheduleData = backup.schedules;
+        saveSchedules();
+      }
+      if (backup.settings) {
+        localStorage.setItem('sp_settings', JSON.stringify(backup.settings));
+        loadSettings();
+      }
+      localStorage.setItem('sp_version', backup.version || '5');
+      renderBackup();
+      renderDashboard();
+      renderPatientTable();
+      updatePipelineBadge();
+      const statusEl = document.getElementById('restoreStatus');
+      statusEl.style.display = 'block';
+      statusEl.textContent = `Restored ${backup.patients.length} patients successfully!`;
+      setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
+    } catch (err) {
+      alert('Could not read backup file. Make sure it is a valid .json backup.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════
 // RENDER: PIPELINE
 // ═══════════════════════════════════════════
 
@@ -2786,6 +2932,7 @@ function renderPage(page) {
     case 'actions': renderActions(); break;
     case 'revenue': renderRevenue(); break;
     case 'reminders': generateEmailPreview(); break;
+    case 'backup': renderBackup(); break;
   }
 }
 
