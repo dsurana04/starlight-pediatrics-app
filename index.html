@@ -1747,7 +1747,7 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
       <label>Message Body</label>
       <textarea id="templateBody" rows="6" placeholder="Hi {{parent_name}}, this is Dr. P from Starlight Pediatrics..."></textarea>
     </div>
-    <p style="font-size:11px;color:var(--sp-muted);margin-bottom:12px;">Available tags: <code>{{patient_name}}</code> <code>{{parent_name}}</code> <code>{{age}}</code> <code>{{next_wellness}}</code> <code>{{monthly_fee}}</code> <code>{{tier_name}}</code> <code>{{google_review_link}}</code></p>
+    <p style="font-size:11px;color:var(--sp-muted);margin-bottom:12px;">Available tags: <code>{{patient_name}}</code> <code>{{patient_first}}</code> <code>{{parent_name}}</code> <code>{{parent_first}}</code> <code>{{age}}</code> <code>{{next_wellness}}</code> <code>{{monthly_fee}}</code> <code>{{tier_name}}</code> <code>{{google_review_link}}</code></p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="document.getElementById('templateEditModal').classList.remove('show')">Cancel</button>
       <button class="btn btn-primary" onclick="saveTemplate()">Save Template</button>
@@ -2065,7 +2065,7 @@ const DEFAULT_TEMPLATES = [
   { id: 't5', name: 'Happy Birthday', category: 'general', body: 'Happy Birthday to {{patient_name}}! From all of us at Starlight Pediatrics, we hope {{patient_name}} has a wonderful day. {{age}} already — they grow so fast!' },
   { id: 't11', name: 'Seasonal Check-In', category: 'general', body: 'Hi {{parent_name}}! Just checking in to see how {{patient_name}} is doing. Remember, as a Starlight family you have direct access to Dr. P — text or call anytime, no need to wait for an appointment!' },
   // Review Request
-  { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_name}},\n\nI just wanted to take a moment to say thank you for trusting me with {{patient_name}}\'s care.\n\nIf you have a moment, I would really appreciate it if you could share your experience by leaving me a Google review.\n\nYour feedback not only helps other families looking for a caring pediatric practice, but it also means so much to me so I can provide the best care possible.\n\nYou can leave me a review by clicking this link:\n{{google_review_link}}\n\nYou can also follow me on Instagram and Facebook:\nhttps://www.instagram.com/starlight.pediatrics\nhttps://www.facebook.com/starlightpediatricsatx\n\nThank you so much for your time and support!\n\nWarmly,\nDr. Yogini Prajapati\nStarlight Pediatrics' },
+  { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_first}},\n\nI just wanted to take a moment to say thank you for trusting me with {{patient_first}}\'s care.\n\nIf you have a moment, I would really appreciate it if you could share your experience by leaving me a Google review.\n\nYour feedback not only helps other families looking for a caring pediatric practice, but it also means so much to me so I can provide the best care possible.\n\nYou can leave me a review by clicking this link:\n{{google_review_link}}\n\nYou can also follow me on Instagram and Facebook:\nhttps://www.instagram.com/starlight.pediatrics\nhttps://www.facebook.com/starlightpediatricsatx\n\nThank you so much for your time and support!' },
 ];
 
 // Patient Journey — maps age milestones to email touchpoints
@@ -4076,7 +4076,9 @@ function resolveMergeTags(template, patient, options) {
   const nextWell = getNextWellness(patient.dob);
   let resolved = template
     .replace(/\{\{patient_name\}\}/g, patient.firstName + ' ' + patient.lastName)
+    .replace(/\{\{patient_first\}\}/g, patient.firstName)
     .replace(/\{\{parent_name\}\}/g, patient.parent || 'Parent')
+    .replace(/\{\{parent_first\}\}/g, (patient.parent || 'Parent').split(' ')[0])
     .replace(/\{\{age\}\}/g, ageString(patient.dob))
     .replace(/\{\{next_wellness\}\}/g, nextWell ? nextWell.label : 'upcoming')
     .replace(/\{\{monthly_fee\}\}/g, fmtMoney(fee))
