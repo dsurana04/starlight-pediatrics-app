@@ -4207,8 +4207,8 @@ function resolveMergeTags(template, patient, options) {
   let resolved = template
     .replace(/\{\{patient_name\}\}/g, patient.firstName + ' ' + patient.lastName)
     .replace(/\{\{patient_first\}\}/g, patient.firstName)
-    .replace(/\{\{parent_name\}\}/g, patient.parent || 'Parent')
-    .replace(/\{\{parent_first\}\}/g, (patient.parent || 'Parent').split(' ')[0])
+    .replace(/\{\{parent_name\}\}/g, patient.parent || patient.firstName)
+    .replace(/\{\{parent_first\}\}/g, (patient.parent || patient.firstName).split(' ')[0])
     .replace(/\{\{age\}\}/g, ageString(patient.dob))
     .replace(/\{\{next_wellness\}\}/g, nextWell ? nextWell.label : 'upcoming')
     .replace(/\{\{monthly_fee\}\}/g, fmtMoney(fee))
