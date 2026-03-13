@@ -4534,18 +4534,29 @@ function renderMessages() {
     </div>
     <div class="card" style="margin-bottom:12px;">
       <div class="card-header"><h2 style="color:var(--sp-rose);">&#9734; Haven't Reviewed Yet (${notReviewed.length})</h2></div>
-      ${notReviewed.length ? notReviewed.map(p => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--sp-border);">
-          <div>
-            <strong style="font-size:14px;">${p.firstName} ${p.lastName}</strong>
+      ${notReviewed.length ? notReviewed.map(p => {
+        const reviewLogs = (p.emailLog || []).filter(l => l.templateName === 'Google Review Request');
+        const lastSent = reviewLogs.length ? reviewLogs[0] : null;
+        const daysSince = lastSent ? Math.floor((TODAY - new Date(lastSent.date)) / 86400000) : null;
+        const canFollowUp = daysSince !== null && daysSince >= 30;
+        const recentlySent = daysSince !== null && daysSince < 30;
+        return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--sp-border);">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <strong style="font-size:14px;">${p.firstName} ${p.lastName}</strong>
+              ${canFollowUp ? '<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:#fff3cd;color:#856404;font-weight:600;">Follow up</span>' : ''}
+              ${recentlySent ? '<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:#d4edda;color:#155724;font-weight:600;">Sent ' + daysSince + 'd ago</span>' : ''}
+            </div>
             <div style="font-size:12px;color:var(--sp-muted);">${p.parent || ''} ${p.phone ? '— ' + p.phone : ''} ${p.email ? '— ' + p.email : ''}</div>
+            ${lastSent ? '<div style="font-size:11px;color:var(--sp-muted);margin-top:2px;">Last request: ' + fmtDate(new Date(lastSent.date)) + ' (' + daysSince + ' days ago)' + (reviewLogs.length > 1 ? ' — sent ' + reviewLogs.length + ' times total' : '') + '</div>' : '<div style="font-size:11px;color:var(--sp-muted);margin-top:2px;">Never sent a review request</div>'}
           </div>
           <div style="display:flex;gap:4px;">
-            <button class="btn btn-sm btn-primary" onclick="sendReviewRequest('${p.id}')" style="background:var(--sp-gold);font-size:11px;">&#11088; Send Request</button>
+            <button class="btn btn-sm btn-primary" onclick="sendReviewRequest('${p.id}')" style="background:${recentlySent ? 'var(--sp-muted)' : 'var(--sp-gold)'};font-size:11px;">${canFollowUp ? '&#128276; Follow Up' : '&#11088; Send Request'}</button>
             <button class="btn btn-sm btn-secondary" onclick="toggleGoogleReview('${p.id}')" style="font-size:11px;">Mark Reviewed</button>
           </div>
-        </div>
-      `).join('') : '<p style="font-size:13px;color:var(--sp-mint);padding:12px;">Everyone has reviewed! Amazing!</p>'}
+        </div>`;
+      }).join('') : '<p style="font-size:13px;color:var(--sp-mint);padding:12px;">Everyone has reviewed! Amazing!</p>'}
     </div>
     ${reviewed.length ? `
     <div class="card">
