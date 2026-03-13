@@ -760,6 +760,109 @@ tr:hover td { background: var(--sp-warm); }
   transform: translateX(16px);
 }
 .toggle-label { line-height: 1.3; }
+
+/* ── Pipeline Board ── */
+.pipeline-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.pipeline-col {
+  background: var(--sp-warm);
+  border-radius: var(--radius);
+  padding: 14px;
+  min-height: 200px;
+}
+.pipeline-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--sp-border);
+}
+.pipeline-col-header h3 {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--sp-muted);
+}
+.pipeline-col-header .col-count {
+  background: var(--sp-border);
+  color: var(--sp-muted);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.pipeline-card {
+  background: white;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(27,77,110,0.06);
+  border: 1px solid rgba(232,221,214,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pipeline-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.pipeline-card .pc-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--sp-navy);
+  margin-bottom: 4px;
+}
+.pipeline-card .pc-detail {
+  font-size: 12px;
+  color: var(--sp-muted);
+  line-height: 1.5;
+}
+.pipeline-card .pc-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.pipeline-card .pc-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+.pipeline-card .pc-tag.due { background: #FDF8F2; color: var(--sp-gold-rich); border: 1px solid #E8DDD6; }
+.pipeline-card .pc-tag.phone { background: #EFF8FC; color: var(--sp-sky); border: 1px solid #d8edf5; }
+.pipeline-card .pc-tag.referral { background: #F0F8F5; color: var(--sp-mint); border: 1px solid #d5ebe3; }
+.pipeline-card .pc-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+.pipeline-card .pc-actions button {
+  flex: 1;
+  padding: 5px 0;
+  border: 1px solid var(--sp-border);
+  border-radius: 6px;
+  background: white;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--sp-muted);
+  transition: all 0.15s;
+}
+.pipeline-card .pc-actions button:hover { background: var(--sp-navy); color: white; border-color: var(--sp-navy); }
+.pipeline-card .pc-actions button.convert-btn { color: var(--sp-mint); border-color: var(--sp-mint); }
+.pipeline-card .pc-actions button.convert-btn:hover { background: var(--sp-mint); color: white; }
+@media (max-width: 768px) {
+  .pipeline-board { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -796,6 +899,10 @@ tr:hover td { background: var(--sp-warm); }
   <div class="sidebar-item" data-page="patients">
     <span class="icon">&#128101;</span> Patients
     <span class="badge" id="patientCount">0</span>
+  </div>
+  <div class="sidebar-item" data-page="pipeline">
+    <span class="icon">&#127919;</span> Pipeline
+    <span class="badge" id="pipelineCount">0</span>
   </div>
   <div class="sidebar-item" data-page="billing">
     <span class="icon">&#128176;</span> Billing
@@ -891,6 +998,16 @@ tr:hover td { background: var(--sp-warm); }
     <button class="btn btn-secondary btn-sm" onclick="closePatientDetail()" style="margin-bottom:16px;">&#8592; Back to List</button>
     <div id="patientDetailContent"></div>
   </div>
+</div>
+
+<!-- ═══════ PIPELINE ═══════ -->
+<div class="page" id="page-pipeline">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);">Prospect Pipeline</h2>
+    <button class="btn btn-primary" onclick="openAddProspect()">+ Add Prospect</button>
+  </div>
+  <div class="kpi-row" id="pipelineKpis"></div>
+  <div class="pipeline-board" id="pipelineBoard"></div>
 </div>
 
 <!-- ═══════ BILLING ═══════ -->
@@ -1214,10 +1331,31 @@ tr:hover td { background: var(--sp-warm); }
       </div>
       <div class="form-group">
         <label>Status</label>
-        <select id="pStatus">
+        <select id="pStatus" onchange="togglePipelineFields()">
           <option value="active">Active Member</option>
           <option value="prospect">Prospect</option>
         </select>
+      </div>
+    </div>
+    <div id="pipelineFields" style="display:none;">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pipeline Stage</label>
+          <select id="pPipelineStage">
+            <option value="inquiry">Inquiry</option>
+            <option value="meet-and-greet">Meet &amp; Greet</option>
+            <option value="scheduled-visit">Scheduled Visit</option>
+            <option value="ready-to-enroll">Ready to Enroll</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Due Date (if expecting)</label>
+          <input type="date" id="pDueDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Referral Source</label>
+        <input type="text" id="pReferralSource" placeholder="e.g., word of mouth, Instagram, pediatrician referral...">
       </div>
     </div>
     <div class="form-row">
@@ -1325,10 +1463,10 @@ const SEED_PATIENTS = [
   { id: 'p14', firstName: 'Charlie Zinn', lastName: 'Tinlin', dob: '2021-04-29', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
   { id: 'p15', firstName: 'Max', lastName: 'Smith', dob: '2014-06-14', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
   { id: 'p16', firstName: 'Olena', lastName: 'Kozma', dob: '2023-09-02', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
-  { id: 'p17', firstName: 'Montgomery', lastName: 'Jackson', dob: '2025-07-24', status: 'prospect', parent: '', phone: '', email: '', notes: 'Charged 1 time visit fee', feeOverride: null, notesList: [] },
-  { id: 'p18', firstName: 'Alexandria', lastName: 'Caces', dob: '', status: 'prospect', parent: '', phone: '', email: '', notes: 'Baby born - interested, will see at 2 mo. Home birth.', feeOverride: null, notesList: [] },
-  { id: 'p19', firstName: 'Riley', lastName: 'W', dob: '', status: 'prospect', parent: '', phone: '503-539-7030', email: '', notes: 'Due April 27', feeOverride: null, notesList: [] },
-  { id: 'p20', firstName: 'Sena', lastName: 'Milliman', dob: '', status: 'prospect', parent: '', phone: '(917) 941-4975', email: '', notes: 'Westlake. Due April 27. Enrolled.', feeOverride: null, notesList: [] },
+  { id: 'p17', firstName: 'Montgomery', lastName: 'Jackson', dob: '2025-07-24', status: 'prospect', parent: '', phone: '', email: '', notes: 'Charged 1 time visit fee', feeOverride: null, notesList: [], pipelineStage: 'meet-and-greet', dueDate: '', referralSource: '' },
+  { id: 'p18', firstName: 'Alexandria', lastName: 'Caces', dob: '', status: 'prospect', parent: '', phone: '', email: '', notes: 'Baby born - interested, will see at 2 mo. Home birth.', feeOverride: null, notesList: [], pipelineStage: 'scheduled-visit', dueDate: '', referralSource: '' },
+  { id: 'p19', firstName: 'Riley', lastName: 'W', dob: '', status: 'prospect', parent: '', phone: '503-539-7030', email: '', notes: 'Due April 27', feeOverride: null, notesList: [], pipelineStage: 'inquiry', dueDate: '2026-04-27', referralSource: '' },
+  { id: 'p20', firstName: 'Sena', lastName: 'Milliman', dob: '', status: 'prospect', parent: '', phone: '(917) 941-4975', email: '', notes: 'Westlake. Due April 27. Enrolled.', feeOverride: null, notesList: [], pipelineStage: 'ready-to-enroll', dueDate: '2026-04-27', referralSource: '' },
 ];
 
 let patients = [];
@@ -1343,11 +1481,11 @@ function loadPatients() {
   const version = localStorage.getItem('sp_version');
   const saved = localStorage.getItem('sp_patients');
   // Re-seed if version changed (pricing tier updates)
-  if (saved && version === '4') {
+  if (saved && version === '5') {
     patients = JSON.parse(saved);
   } else {
     patients = JSON.parse(JSON.stringify(SEED_PATIENTS));
-    localStorage.setItem('sp_version', '4');
+    localStorage.setItem('sp_version', '5');
     savePatients();
   }
 }
@@ -1903,6 +2041,11 @@ function saveNote() {
 // ADD / EDIT PATIENT
 // ═══════════════════════════════════════════
 
+function togglePipelineFields() {
+  const status = document.getElementById('pStatus').value;
+  document.getElementById('pipelineFields').style.display = status === 'prospect' ? 'block' : 'none';
+}
+
 function openAddPatient() {
   document.getElementById('modalTitle').textContent = 'Add New Patient';
   document.getElementById('editPatientId').value = '';
@@ -1910,11 +2053,34 @@ function openAddPatient() {
   document.getElementById('pLastName').value = '';
   document.getElementById('pDOB').value = '';
   document.getElementById('pStatus').value = 'active';
+  document.getElementById('pPipelineStage').value = 'inquiry';
+  document.getElementById('pDueDate').value = '';
+  document.getElementById('pReferralSource').value = '';
   document.getElementById('pParent').value = '';
   document.getElementById('pPhone').value = '';
   document.getElementById('pEmail').value = '';
   document.getElementById('pNotes').value = '';
   document.getElementById('pFeeOverride').value = '';
+  togglePipelineFields();
+  document.getElementById('patientModal').classList.add('show');
+}
+
+function openAddProspect() {
+  document.getElementById('modalTitle').textContent = 'Add New Prospect';
+  document.getElementById('editPatientId').value = '';
+  document.getElementById('pFirstName').value = '';
+  document.getElementById('pLastName').value = '';
+  document.getElementById('pDOB').value = '';
+  document.getElementById('pStatus').value = 'prospect';
+  document.getElementById('pPipelineStage').value = 'inquiry';
+  document.getElementById('pDueDate').value = '';
+  document.getElementById('pReferralSource').value = '';
+  document.getElementById('pParent').value = '';
+  document.getElementById('pPhone').value = '';
+  document.getElementById('pEmail').value = '';
+  document.getElementById('pNotes').value = '';
+  document.getElementById('pFeeOverride').value = '';
+  togglePipelineFields();
   document.getElementById('patientModal').classList.add('show');
 }
 
@@ -1927,26 +2093,34 @@ function openEditPatient(id) {
   document.getElementById('pLastName').value = p.lastName;
   document.getElementById('pDOB').value = p.dob;
   document.getElementById('pStatus').value = p.status;
+  document.getElementById('pPipelineStage').value = p.pipelineStage || 'inquiry';
+  document.getElementById('pDueDate').value = p.dueDate || '';
+  document.getElementById('pReferralSource').value = p.referralSource || '';
   document.getElementById('pParent').value = p.parent || '';
   document.getElementById('pPhone').value = p.phone || '';
   document.getElementById('pEmail').value = p.email || '';
   document.getElementById('pNotes').value = p.notes || '';
   document.getElementById('pFeeOverride').value = p.feeOverride || '';
+  togglePipelineFields();
   document.getElementById('patientModal').classList.add('show');
 }
 
 function savePatient() {
   const id = document.getElementById('editPatientId').value;
+  const status = document.getElementById('pStatus').value;
   const data = {
     firstName: document.getElementById('pFirstName').value.trim(),
     lastName: document.getElementById('pLastName').value.trim(),
     dob: document.getElementById('pDOB').value,
-    status: document.getElementById('pStatus').value,
+    status: status,
     parent: document.getElementById('pParent').value.trim(),
     phone: document.getElementById('pPhone').value.trim(),
     email: document.getElementById('pEmail').value.trim(),
     notes: document.getElementById('pNotes').value.trim(),
     feeOverride: document.getElementById('pFeeOverride').value ? Number(document.getElementById('pFeeOverride').value) : null,
+    pipelineStage: status === 'prospect' ? document.getElementById('pPipelineStage').value : '',
+    dueDate: status === 'prospect' ? document.getElementById('pDueDate').value : '',
+    referralSource: status === 'prospect' ? document.getElementById('pReferralSource').value.trim() : '',
   };
 
   if (!data.firstName || !data.lastName) {
@@ -1967,6 +2141,10 @@ function savePatient() {
   closeModal();
   renderPatientTable();
   renderDashboard();
+  updatePipelineBadge();
+  // Re-render pipeline if on that page
+  const activePage = document.querySelector('.sidebar-item.active');
+  if (activePage && activePage.dataset.page === 'pipeline') renderPipeline();
 }
 
 function deletePatient(id) {
@@ -1975,6 +2153,9 @@ function deletePatient(id) {
   savePatients();
   renderPatientTable();
   renderDashboard();
+  updatePipelineBadge();
+  const activePage = document.querySelector('.sidebar-item.active');
+  if (activePage && activePage.dataset.page === 'pipeline') renderPipeline();
 }
 
 function closeModal() {
@@ -2503,6 +2684,104 @@ function exportCSV() {
 }
 
 // ═══════════════════════════════════════════
+// RENDER: PIPELINE
+// ═══════════════════════════════════════════
+
+const PIPELINE_STAGES = [
+  { key: 'inquiry', label: 'Inquiry', icon: '💬', color: 'var(--sp-sky)' },
+  { key: 'meet-and-greet', label: 'Meet & Greet', icon: '🤝', color: 'var(--sp-gold)' },
+  { key: 'scheduled-visit', label: 'Scheduled Visit', icon: '📅', color: 'var(--sp-mint)' },
+  { key: 'ready-to-enroll', label: 'Ready to Enroll', icon: '⭐', color: 'var(--sp-rose)' },
+];
+
+function getProspects() {
+  return patients.filter(p => p.status === 'prospect');
+}
+
+function updatePipelineBadge() {
+  document.getElementById('pipelineCount').textContent = getProspects().length;
+}
+
+function moveProspectStage(id, newStage) {
+  const p = patients.find(x => x.id === id);
+  if (!p) return;
+  p.pipelineStage = newStage;
+  savePatients();
+  renderPipeline();
+}
+
+function convertToActive(id) {
+  const p = patients.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`Convert ${p.firstName} ${p.lastName} to an active member?`)) return;
+  p.status = 'active';
+  p.pipelineStage = '';
+  savePatients();
+  renderPipeline();
+  renderDashboard();
+  updatePipelineBadge();
+}
+
+function renderPipeline() {
+  const prospects = getProspects();
+  updatePipelineBadge();
+
+  // KPIs
+  const kpiEl = document.getElementById('pipelineKpis');
+  const dueSoon = prospects.filter(p => {
+    if (!p.dueDate) return false;
+    const d = parseDate(p.dueDate);
+    if (!d) return false;
+    const diff = (d - TODAY) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 60;
+  }).length;
+
+  kpiEl.innerHTML = `
+    <div class="kpi"><div class="kpi-value">${prospects.length}</div><div class="kpi-label">Total Prospects</div></div>
+    <div class="kpi"><div class="kpi-value">${prospects.filter(p => (p.pipelineStage || 'inquiry') === 'ready-to-enroll').length}</div><div class="kpi-label">Ready to Enroll</div></div>
+    <div class="kpi"><div class="kpi-value">${dueSoon}</div><div class="kpi-label">Due Within 60 Days</div></div>
+    <div class="kpi"><div class="kpi-value">${prospects.filter(p => (p.pipelineStage || 'inquiry') === 'scheduled-visit').length}</div><div class="kpi-label">Visits Scheduled</div></div>
+  `;
+
+  // Kanban board
+  const board = document.getElementById('pipelineBoard');
+  board.innerHTML = PIPELINE_STAGES.map(stage => {
+    const stageProspects = prospects.filter(p => (p.pipelineStage || 'inquiry') === stage.key);
+    return `
+      <div class="pipeline-col">
+        <div class="pipeline-col-header">
+          <h3>${stage.icon} ${stage.label}</h3>
+          <span class="col-count">${stageProspects.length}</span>
+        </div>
+        ${stageProspects.length === 0 ? '<div style="text-align:center;padding:24px 8px;color:var(--sp-muted);font-size:13px;">No prospects</div>' : ''}
+        ${stageProspects.map(p => {
+          const stageIdx = PIPELINE_STAGES.findIndex(s => s.key === stage.key);
+          const prevStage = stageIdx > 0 ? PIPELINE_STAGES[stageIdx - 1] : null;
+          const nextStage = stageIdx < PIPELINE_STAGES.length - 1 ? PIPELINE_STAGES[stageIdx + 1] : null;
+          const age = p.dob ? ageString(p.dob) : '';
+          return `
+            <div class="pipeline-card">
+              <div class="pc-name">${p.firstName} ${p.lastName}</div>
+              <div class="pc-detail">${p.notes || 'No notes'}</div>
+              <div class="pc-meta">
+                ${age ? `<span class="pc-tag">${age}</span>` : ''}
+                ${p.dueDate ? `<span class="pc-tag due">Due ${fmtDate(parseDate(p.dueDate))}</span>` : ''}
+                ${p.phone ? `<span class="pc-tag phone">${p.phone}</span>` : ''}
+                ${p.referralSource ? `<span class="pc-tag referral">${p.referralSource}</span>` : ''}
+              </div>
+              <div class="pc-actions">
+                ${prevStage ? `<button onclick="moveProspectStage('${p.id}','${prevStage.key}')" title="Move to ${prevStage.label}">← ${prevStage.label}</button>` : ''}
+                ${nextStage ? `<button onclick="moveProspectStage('${p.id}','${nextStage.key}')" title="Move to ${nextStage.label}">${nextStage.label} →</button>` : ''}
+                ${stage.key === 'ready-to-enroll' ? `<button class="convert-btn" onclick="convertToActive('${p.id}')">✓ Enroll</button>` : ''}
+                <button onclick="openEditPatient('${p.id}')" title="Edit">✏️</button>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
 // PAGE ROUTER
 // ═══════════════════════════════════════════
 
@@ -2510,6 +2789,7 @@ function renderPage(page) {
   switch (page) {
     case 'dashboard': renderDashboard(); break;
     case 'patients': renderPatientTable(); break;
+    case 'pipeline': renderPipeline(); break;
     case 'billing': renderBilling(); break;
     case 'wellness': renderWellness(); break;
     case 'actions': renderActions(); break;
@@ -2529,6 +2809,7 @@ loadSettings();
 loadSchedules();
 renderDashboard();
 renderPatientTable();
+updatePipelineBadge();
 
 // Update action badge
 document.getElementById('actionCount').textContent = getAllActions().filter(a => a.urgency === 'urgent').length;
