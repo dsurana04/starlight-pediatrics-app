@@ -1755,6 +1755,21 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
   </div>
 </div>
 
+<!-- ═══════ EMAIL PREVIEW MODAL ═══════ -->
+<div class="modal-overlay" id="emailPreviewModal">
+  <div class="modal" style="width:640px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <h2 style="margin:0;">Email Preview</h2>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-primary btn-sm" id="previewSendBtn" onclick="sendPreviewedEmail()">&#128231; Send Email</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('emailPreviewModal').classList.remove('show')">Close</button>
+      </div>
+    </div>
+    <div id="previewMeta" style="font-size:12px;color:var(--sp-muted);margin-bottom:12px;padding:8px 12px;background:var(--sp-warm);border-radius:6px;"></div>
+    <div id="previewFrame" style="border:1px solid var(--sp-border);border-radius:8px;overflow:hidden;"></div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════
 // DATA LAYER
@@ -3658,6 +3673,7 @@ function sendEmailNow() {
 
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
       to_email: cfg.email,
+      from_name: 'Yogini Prajapati, MD',
       subject: subject,
       message_html: emailContent.innerHTML,
     }, EMAILJS_PUBLIC_KEY)
@@ -4084,50 +4100,120 @@ function copyResolvedMessage(templateId, patientId) {
   });
 }
 
-function sendEmailToParent(templateId, patientId) {
+// Build professional HTML email with logo, CAN-SPAM compliance
+function buildEmailHtml(bodyText) {
+  const logoUrl = 'https://starlight-pediatrics.netlify.app/logo-mark.png';
+  return `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f7f4f1;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f7f4f1;">
+<tr><td align="center" style="padding:24px 16px;">
+  <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <!-- Header with logo -->
+    <tr><td style="background:linear-gradient(135deg,#245C7B 0%,#1a4a63 100%);padding:28px 32px;text-align:center;">
+      <img src="${logoUrl}" alt="Starlight Pediatrics" width="48" height="48" style="display:block;margin:0 auto 12px;border-radius:50%;background:white;padding:4px;">
+      <h1 style="color:#ffffff;font-size:20px;font-weight:700;margin:0;letter-spacing:0.3px;">Starlight Pediatrics</h1>
+      <p style="color:#BB9973;font-size:13px;margin:6px 0 0;font-weight:500;">Direct Primary Care for Children</p>
+    </td></tr>
+    <!-- Body -->
+    <tr><td style="padding:32px 32px 24px;">
+      <div style="font-size:15px;line-height:1.8;color:#2C2421;white-space:pre-wrap;">${bodyText}</div>
+    </td></tr>
+    <!-- Signature -->
+    <tr><td style="padding:0 32px 28px;">
+      <table role="presentation" cellspacing="0" cellpadding="0"><tr>
+        <td style="padding-right:16px;vertical-align:top;">
+          <div style="width:3px;height:48px;background:#BB9973;border-radius:2px;"></div>
+        </td>
+        <td>
+          <p style="font-size:14px;color:#245C7B;font-weight:700;margin:0;">Yogini Prajapati, MD</p>
+          <p style="font-size:12px;color:#8a7e78;margin:2px 0 0;">Founder, Starlight Pediatrics</p>
+          <p style="font-size:12px;color:#8a7e78;margin:2px 0 0;">yogini.prajapati@gmail.com</p>
+        </td>
+      </tr></table>
+    </td></tr>
+    <!-- Social links -->
+    <tr><td style="padding:0 32px 24px;text-align:center;">
+      <a href="https://www.instagram.com/starlight.pediatrics" style="font-size:12px;color:#245C7B;text-decoration:none;margin:0 8px;">Instagram</a>
+      <span style="color:#ddd;">|</span>
+      <a href="https://www.facebook.com/starlightpediatricsatx" style="font-size:12px;color:#245C7B;text-decoration:none;margin:0 8px;">Facebook</a>
+      <span style="color:#ddd;">|</span>
+      <a href="https://starlightpediatricsatx.com" style="font-size:12px;color:#245C7B;text-decoration:none;margin:0 8px;">Website</a>
+    </td></tr>
+    <!-- CAN-SPAM footer -->
+    <tr><td style="background:#f7f4f1;padding:20px 32px;border-top:1px solid #ebe5e0;">
+      <p style="font-size:11px;color:#a09890;margin:0;text-align:center;line-height:1.6;">
+        Starlight Pediatrics &bull; Austin, TX<br>
+        You are receiving this email because you are a patient of Starlight Pediatrics.<br>
+        <a href="mailto:yogini.prajapati@gmail.com?subject=Unsubscribe" style="color:#245C7B;text-decoration:underline;">Unsubscribe</a> from future emails.
+      </p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
+// Store current preview state for send
+let _previewState = null;
+
+function previewEmail(templateId, patientId) {
   const tmpl = messageTemplates.find(t => t.id === templateId);
   const p = patients.find(x => x.id === patientId);
   if (!tmpl || !p) return;
   if (!p.email) { alert(p.firstName + ' has no email address on file. Add one in Edit Patient.'); return; }
-  if (!isEmailJSConfigured()) { alert('EmailJS not configured. Use Copy instead.'); return; }
 
   const resolved = resolveMergeTags(tmpl.body, p, { appendReviewNudge: tmpl.category !== 'review' });
   const subject = 'Starlight Pediatrics — ' + tmpl.name;
+  const htmlBody = buildEmailHtml(resolved);
 
-  // Build HTML email
-  const htmlBody = `
-    <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:20px;">
-      <div style="text-align:center;margin-bottom:16px;">
-        <h2 style="color:#245C7B;margin:0;">Starlight Pediatrics</h2>
-        <p style="color:#BB9973;font-size:13px;margin:4px 0 0;">Dr. Yogini Prajapati</p>
-      </div>
-      <div style="font-size:15px;line-height:1.7;color:#2C2421;white-space:pre-wrap;">${resolved}</div>
-      <div style="margin-top:24px;padding:14px;background:#F4EEEA;border-radius:8px;border-left:3px solid #BB9973;">
-        <p style="font-size:12px;color:#8a7e78;margin:0;">Starlight Pediatrics — Direct Primary Care for Children<br>Dr. Yogini Prajapati | drp@starlightpediatrics.com</p>
-      </div>
-    </div>
+  _previewState = { templateId, patientId, subject, htmlBody, tmplName: tmpl.name };
+
+  document.getElementById('previewMeta').innerHTML = `
+    <strong>From:</strong> Yogini Prajapati, MD &lt;yogini.prajapati@gmail.com&gt;<br>
+    <strong>To:</strong> ${p.parent || p.firstName} &lt;${p.email}&gt;<br>
+    <strong>Subject:</strong> ${subject}
   `;
+  document.getElementById('previewFrame').innerHTML = `<iframe id="previewIframe" style="width:100%;height:600px;border:none;" srcdoc="${htmlBody.replace(/"/g, '&quot;')}"></iframe>`;
+  document.getElementById('previewSendBtn').textContent = '📨 Send Email';
+  document.getElementById('previewSendBtn').disabled = false;
+  document.getElementById('emailPreviewModal').classList.add('show');
+}
 
-  const btn = event?.target;
-  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+function sendPreviewedEmail() {
+  if (!_previewState) return;
+  if (!isEmailJSConfigured()) { alert('EmailJS not configured.'); return; }
+  const p = patients.find(x => x.id === _previewState.patientId);
+  if (!p) return;
+
+  const btn = document.getElementById('previewSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
 
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
     to_email: p.email,
-    subject: subject,
-    message_html: htmlBody,
+    from_name: 'Yogini Prajapati, MD',
+    subject: _previewState.subject,
+    message_html: _previewState.htmlBody,
   }, EMAILJS_PUBLIC_KEY)
   .then(function() {
-    if (btn) { btn.disabled = false; btn.textContent = 'Sent!'; setTimeout(() => { btn.textContent = 'Send'; }, 2000); }
-    // Log the email
+    btn.textContent = 'Sent!';
     if (!p.emailLog) p.emailLog = [];
-    p.emailLog.unshift({ date: new Date().toISOString(), templateName: tmpl.name });
+    p.emailLog.unshift({ date: new Date().toISOString(), templateName: _previewState.tmplName });
     savePatients();
-    alert('Email sent to ' + p.email + '!');
+    setTimeout(() => { document.getElementById('emailPreviewModal').classList.remove('show'); }, 1500);
   })
   .catch(function(err) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
-    alert('Failed to send: ' + (err.text || err) + '. Try Copy instead.');
+    btn.disabled = false;
+    btn.textContent = 'Send Email';
+    alert('Failed to send: ' + (err.text || err));
   });
+}
+
+function sendEmailToParent(templateId, patientId) {
+  // Now opens preview instead of sending directly
+  previewEmail(templateId, patientId);
 }
 
 function toggleGoogleReview(patientId) {
@@ -4387,8 +4473,8 @@ function renderMessages() {
             </details>
           </div>
           <div style="display:flex;flex-direction:column;gap:4px;min-width:80px;">
-            <button class="btn btn-sm btn-primary" onclick="copyResolvedMessage('${r.tmplId}', '${r.patient.id}')" style="font-size:11px;">&#128203; Copy</button>
-            ${r.patient.email ? `<button class="btn btn-sm btn-secondary" onclick="sendEmailToParent('${r.tmplId}', '${r.patient.id}')" style="font-size:11px;">&#128231; Send</button>` : ''}
+            ${r.patient.email ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${r.tmplId}', '${r.patient.id}')" style="font-size:11px;">&#128065; Preview</button>` : ''}
+            <button class="btn btn-sm btn-secondary" onclick="copyResolvedMessage('${r.tmplId}', '${r.patient.id}')" style="font-size:11px;">&#128203; Copy</button>
           </div>
         </div>
       `).join('')}
@@ -4415,8 +4501,8 @@ function renderMessages() {
             <select id="tmplPatient_${t.id}" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--sp-border);">
               ${active.map(p => `<option value="${p.id}">${p.firstName} ${p.lastName}</option>`).join('')}
             </select>
-            <button class="btn btn-sm btn-primary" onclick="copyResolvedMessage('${t.id}', document.getElementById('tmplPatient_${t.id}').value)" style="font-size:11px;">&#128203; Copy</button>
-            <button class="btn btn-sm btn-secondary" onclick="sendEmailToParent('${t.id}', document.getElementById('tmplPatient_${t.id}').value)" style="font-size:11px;">&#128231; Send Email</button>
+            <button class="btn btn-sm btn-primary" onclick="previewEmail('${t.id}', document.getElementById('tmplPatient_${t.id}').value)" style="font-size:11px;">&#128065; Preview</button>
+            <button class="btn btn-sm btn-secondary" onclick="copyResolvedMessage('${t.id}', document.getElementById('tmplPatient_${t.id}').value)" style="font-size:11px;">&#128203; Copy</button>
           </div>
         </div>
       `).join('')}
@@ -4866,6 +4952,7 @@ function autoSendMonthlyEmail() {
 
     emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
       to_email: cfg.email,
+      from_name: 'Yogini Prajapati, MD',
       subject: subject,
       message_html: emailContent.innerHTML,
     }, EMAILJS_PUBLIC_KEY)
