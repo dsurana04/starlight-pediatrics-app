@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Starlight.MD — Parent App</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1B3A4B;
+    --navy-deep: #0F2433;
+    --sky: #2E6B8A;
+    --gold: #C9A227;
+    --gold-bright: #D4AF37;
+    --gold-light: #FBF5E0;
+    --mint: #4D8E7F;
+    --mint-light: #E8F2EF;
+    --rose: #B0616F;
+    --rose-light: #FDE8EB;
+    --bg: #F6F3F0;
+    --card: #FFFFFF;
+    --text: #1E1A17;
+    --muted: #8A7F76;
+    --border: #E5DBD6;
+    --warm: #EAE3DF;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 12px rgba(27,58,75,0.08);
+    --shadow-lg: 0 8px 32px rgba(27,58,75,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #000;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Phone Frame ── */
+  .phone {
+    width: 390px; height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 12px #1a1a1a, 0 0 0 14px #333, 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  /* Dynamic Island */
+  .phone::before {
+    content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 126px; height: 36px; background: #000; border-radius: 20px; z-index: 999;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    height: 54px; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 28px 4px; font-size: 14px; font-weight: 700;
+    color: var(--text); background: transparent; position: relative; z-index: 10;
+  }
+  .status-bar.light { color: white; }
+
+  /* ── Screens ── */
+  .screen { position: absolute; top: 0; left: 0; right: 0; bottom: 88px; display: none; overflow-y: auto; -webkit-overflow-scrolling: touch; background: var(--bg); }
+  .screen.active { display: block; }
+  .screen#loginScreen { bottom: 0; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ── Login Screen ── */
+  #loginScreen {
+    background: linear-gradient(165deg, var(--navy-deep) 0%, var(--navy) 40%, var(--sky) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 32px;
+  }
+  #loginScreen.active { display: flex; }
+  .login-logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 16px; background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); display: flex; align-items: center; justify-content: center; }
+  .login-logo img { height: 52px; border-radius: 10px; }
+  .login-brand { color: white; font-size: 28px; font-weight: 300; margin-bottom: 4px; }
+  .login-brand strong { font-weight: 900; color: var(--gold-bright); }
+  .login-sub { color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; }
+  .login-input {
+    width: 100%; padding: 16px 20px; border: none; border-radius: 14px;
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+    color: white; font-size: 16px; font-family: inherit; font-weight: 600;
+    margin-bottom: 12px; outline: none;
+  }
+  .login-input::placeholder { color: rgba(255,255,255,0.35); }
+  .login-input:focus { background: rgba(255,255,255,0.18); }
+  .login-btn {
+    width: 100%; padding: 16px; border: none; border-radius: 14px;
+    background: var(--gold); color: var(--navy-deep); font-size: 16px;
+    font-weight: 800; font-family: inherit; cursor: pointer; margin-top: 8px;
+    transition: transform 0.15s;
+  }
+  .login-btn:active { transform: scale(0.97); }
+  .login-forgot { color: var(--gold-bright); font-size: 13px; font-weight: 600; margin-top: 20px; cursor: pointer; }
+  .login-divider { width: 100%; height: 1px; background: rgba(255,255,255,0.1); margin: 28px 0; position: relative; }
+  .login-divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: transparent; padding: 0 12px; color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 600; }
+  .login-biometric {
+    display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .login-biometric svg { width: 28px; height: 28px; fill: var(--gold-bright); }
+
+  /* ── Tab Bar ── */
+  .tab-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 88px;
+    background: white; border-top: 1px solid var(--border);
+    display: none; align-items: flex-start; justify-content: space-around;
+    padding-top: 8px; z-index: 100;
+  }
+  .tab-bar.visible { display: flex; }
+  .tab-bar .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 10px; font-weight: 700; color: var(--muted); cursor: pointer;
+    padding: 4px 8px; transition: color 0.15s;
+  }
+  .tab-bar .tab.active { color: var(--navy); }
+  .tab-bar .tab .tab-icon { font-size: 24px; height: 28px; display: flex; align-items: center; }
+  .tab-bar .tab.active .tab-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); margin-top: 2px; }
+
+  /* ── Page Header ── */
+  .page-header {
+    padding: 60px 24px 16px;
+    background: white;
+  }
+  .page-header h1 { font-size: 28px; font-weight: 900; color: var(--navy-deep); }
+  .page-header .subtitle { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+  /* ── Content Area ── */
+  .content { padding: 0 20px 24px; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card); border-radius: var(--radius); padding: 20px;
+    margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .card-title { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .card-action { font-size: 13px; font-weight: 700; color: var(--sky); cursor: pointer; }
+
+  /* ── Home Screen ── */
+  .home-hero {
+    background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+    padding: 64px 24px 24px; color: white; position: relative;
+  }
+  .home-hero::after {
+    content: ''; position: absolute; bottom: -20px; left: 0; right: 0; height: 40px;
+    background: var(--bg); border-radius: 24px 24px 0 0; z-index: 1;
+  }
+  .home-greeting { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.6); }
+  .home-child-name { font-size: 28px; font-weight: 900; margin: 2px 0 4px; }
+  .home-age { font-size: 13px; color: var(--gold-bright); font-weight: 700; }
+  .home-avatar {
+    position: absolute; top: 60px; right: 24px;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 900; color: var(--navy-deep);
+    border: 3px solid rgba(255,255,255,0.2);
+  }
+
+  .quick-actions {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;
+    margin: 0 20px 14px; position: relative; z-index: 5;
+  }
+  .quick-action {
+    background: white; border-radius: 14px; padding: 14px 8px;
+    text-align: center; box-shadow: var(--shadow); cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .quick-action:active { transform: scale(0.95); }
+  .quick-action .qa-icon { font-size: 24px; margin-bottom: 4px; }
+  .quick-action .qa-label { font-size: 10px; font-weight: 800; color: var(--navy); }
+
+  .home-next-appt {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--gold-light); border: 1px solid var(--gold);
+    border-radius: var(--radius); padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+  .home-next-appt .appt-icon { font-size: 32px; }
+  .home-next-appt .appt-info .appt-label { font-size: 10px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+  .home-next-appt .appt-info .appt-date { font-size: 16px; font-weight: 800; color: var(--navy-deep); }
+  .home-next-appt .appt-info .appt-type { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+  /* ── Growth Chart ── */
+  .growth-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .growth-tab {
+    padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    background: var(--warm); color: var(--muted); cursor: pointer;
+  }
+  .growth-tab.active { background: var(--navy); color: white; }
+
+  .growth-chart-container {
+    background: white; border-radius: var(--radius); padding: 16px 16px 48px;
+    box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+  .growth-chart {
+    width: 100%; height: 220px; position: relative;
+    border-left: 2px solid var(--border); border-bottom: 2px solid var(--border);
+  }
+  .growth-percentile {
+    position: absolute; left: 0; right: 0; height: 1px;
+    border-top: 1px dashed var(--border);
+  }
+  .growth-percentile .pct-label {
+    position: absolute; right: 4px; top: -10px;
+    font-size: 9px; font-weight: 700; color: var(--muted);
+  }
+  .growth-dot {
+    position: absolute; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold); border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--gold), var(--shadow);
+    transform: translate(-50%, -50%);
+  }
+  .growth-line {
+    position: absolute; background: var(--gold); height: 2px;
+    transform-origin: left center;
+  }
+  .growth-stat-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .growth-stat {
+    flex: 1; background: white; border-radius: var(--radius-sm); padding: 14px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .growth-stat .gs-value { font-size: 22px; font-weight: 900; color: var(--navy-deep); }
+  .growth-stat .gs-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .growth-stat .gs-pct { font-size: 11px; font-weight: 800; color: var(--mint); margin-top: 2px; }
+
+  /* ── Visit History ── */
+  .visit-item {
+    display: flex; gap: 14px; padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .visit-item:last-child { border-bottom: none; }
+  .visit-dot-col { display: flex; flex-direction: column; align-items: center; width: 40px; flex-shrink: 0; }
+  .visit-dot {
+    width: 36px; height: 36px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .visit-dot.well { background: var(--mint-light); }
+  .visit-dot.sick { background: var(--rose-light); }
+  .visit-dot.phone { background: var(--gold-light); }
+  .visit-dot.home { background: #E8E4F2; }
+  .visit-info { flex: 1; min-width: 0; }
+  .visit-type { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .visit-type.well { color: var(--mint); }
+  .visit-type.sick { color: var(--rose); }
+  .visit-type.phone { color: var(--gold); }
+  .visit-type.home { color: #7c5cbf; }
+  .visit-title { font-size: 15px; font-weight: 800; color: var(--navy-deep); margin: 2px 0; }
+  .visit-summary { font-size: 12px; color: var(--muted); font-weight: 500; line-height: 1.5; word-wrap: break-word; }
+  .visit-date { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 4px; }
+
+  /* ── Immunizations ── */
+  .imm-group { margin-bottom: 20px; }
+  .imm-group-title { font-size: 12px; font-weight: 800; color: var(--navy); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .imm-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .imm-item:last-child { border-bottom: none; }
+  .imm-check {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .imm-check.done { background: var(--mint); color: white; }
+  .imm-check.upcoming { background: var(--warm); color: var(--muted); }
+  .imm-name { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); }
+  .imm-date { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .imm-dose { font-size: 10px; font-weight: 800; color: var(--sky); background: #E8EEF2; padding: 2px 8px; border-radius: 8px; }
+
+  /* ── Messages ── */
+  .msg-thread { padding: 16px 0; }
+  .msg-bubble {
+    max-width: 82%; padding: 12px 16px; border-radius: 18px;
+    margin-bottom: 8px; font-size: 14px; line-height: 1.5; font-weight: 500;
+    position: relative;
+  }
+  .msg-bubble.doctor {
+    background: white; color: var(--text); border-bottom-left-radius: 4px;
+    margin-right: auto; box-shadow: var(--shadow);
+  }
+  .msg-bubble.parent {
+    background: var(--navy); color: white; border-bottom-right-radius: 4px;
+    margin-left: auto;
+  }
+  .msg-sender { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .msg-bubble.doctor .msg-sender { color: var(--gold); }
+  .msg-bubble.parent .msg-sender { color: var(--gold-bright); }
+  .msg-time { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; margin: 16px 0 8px; }
+  .msg-input-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 10px 16px; background: white; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; align-items: center; z-index: 10;
+  }
+  .msg-input {
+    flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 20px;
+    font-size: 14px; font-family: inherit; outline: none; background: var(--bg);
+  }
+  .msg-send-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--navy); color: white; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Billing ── */
+  .plan-card {
+    background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+    border-radius: var(--radius); padding: 24px; color: white; margin-bottom: 14px;
+    position: relative; overflow: hidden;
+  }
+  .plan-card::after {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(201,162,39,0.1);
+  }
+  .plan-name-tag { font-size: 10px; font-weight: 900; color: var(--gold-bright); letter-spacing: 2px; text-transform: uppercase; }
+  .plan-price { font-size: 36px; font-weight: 900; margin: 4px 0; }
+  .plan-price span { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.5); }
+  .plan-detail { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; }
+
+  .payment-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .payment-item:last-child { border-bottom: none; }
+  .pay-date { font-size: 14px; font-weight: 700; color: var(--text); }
+  .pay-amount { font-size: 14px; font-weight: 800; color: var(--navy); }
+  .pay-status { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 8px; }
+  .pay-status.paid { background: var(--mint-light); color: var(--mint); }
+
+  /* ── Wellness Timeline ── */
+  .wellness-item {
+    display: flex; gap: 14px; align-items: flex-start; padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .wellness-item:last-child { border-bottom: none; }
+  .wellness-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    flex-shrink: 0;
+  }
+  .wellness-icon.done { background: var(--mint-light); }
+  .wellness-icon.upcoming { background: var(--gold-light); }
+  .wellness-icon.overdue { background: var(--rose-light); }
+  .wellness-info { flex: 1; }
+  .wellness-label { font-size: 14px; font-weight: 800; color: var(--navy-deep); }
+  .wellness-date { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .wellness-badge {
+    font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 8px;
+    display: inline-block; margin-top: 4px;
+  }
+  .wellness-badge.done { background: var(--mint-light); color: var(--mint); }
+  .wellness-badge.upcoming { background: var(--gold-light); color: var(--gold); }
+
+  /* ── Documents ── */
+  .doc-item {
+    display: flex; align-items: center; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+  }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    flex-shrink: 0;
+  }
+  .doc-icon.lab { background: #E8E4F2; }
+  .doc-icon.form { background: var(--mint-light); }
+  .doc-icon.letter { background: var(--gold-light); }
+  .doc-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .doc-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .doc-arrow { color: var(--muted); font-size: 18px; margin-left: auto; }
+
+  /* ── Profile Menu ── */
+  .profile-item {
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    background: white; border-radius: var(--radius); margin-bottom: 8px;
+    box-shadow: var(--shadow); cursor: pointer;
+  }
+  .profile-icon { font-size: 22px; width: 32px; text-align: center; }
+  .profile-label { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+  .profile-arrow { color: var(--muted); }
+
+  /* ── Empty state helper ── */
+  .section-divider { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 20px 0 8px; }
+
+  /* ── Book Visit ── */
+  .visit-type-picker { display: flex; gap: 10px; margin-bottom: 18px; }
+  .visit-type-btn {
+    flex: 1; padding: 16px 8px; border-radius: 14px; text-align: center; cursor: pointer;
+    border: 2px solid var(--border); background: white; transition: all 0.2s;
+  }
+  .visit-type-btn.selected { border-color: var(--navy); background: var(--navy); color: white; }
+  .visit-type-btn .vtb-icon { font-size: 24px; margin-bottom: 4px; }
+  .visit-type-btn .vtb-label { font-size: 11px; font-weight: 800; }
+  .visit-type-btn.selected .vtb-label { color: white; }
+
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+  .cal-header { font-size: 10px; font-weight: 800; color: var(--muted); text-align: center; padding: 4px 0; }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--text); border-radius: 12px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cal-day:hover { background: var(--warm); }
+  .cal-day.empty { pointer-events: none; }
+  .cal-day.past { color: var(--border); pointer-events: none; }
+  .cal-day.selected { background: var(--navy); color: white; font-weight: 900; }
+  .cal-day.today { border: 2px solid var(--gold); }
+
+  .time-slots { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+  .time-slot {
+    padding: 12px 8px; border-radius: 12px; text-align: center; font-size: 13px; font-weight: 700;
+    border: 2px solid var(--border); background: white; cursor: pointer; color: var(--text);
+    transition: all 0.15s;
+  }
+  .time-slot.selected { border-color: var(--navy); background: var(--navy); color: white; }
+  .time-slot:active { transform: scale(0.95); }
+
+  .btn-primary {
+    width: 100%; padding: 16px; border: none; border-radius: 14px;
+    background: var(--navy); color: white; font-size: 16px; font-weight: 800;
+    font-family: inherit; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ── Send Photo ── */
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .photo-card {
+    border-radius: 14px; overflow: hidden; background: white; box-shadow: var(--shadow); cursor: pointer;
+    transition: transform 0.15s; position: relative;
+  }
+  .photo-card:active { transform: scale(0.97); }
+  .photo-card .photo-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
+    background: linear-gradient(135deg, var(--warm), var(--border));
+  }
+  .photo-card .photo-label { padding: 10px 12px; font-size: 11px; font-weight: 700; color: var(--text); }
+  .photo-card .photo-date { font-size: 10px; color: var(--muted); font-weight: 600; }
+  .photo-card.selected { outline: 3px solid var(--navy); outline-offset: -3px; }
+  .photo-card.selected::after {
+    content: '\2713'; position: absolute; top: 8px; right: 8px;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: white;
+    font-size: 14px; display: flex; align-items: center; justify-content: center;
+  }
+
+  .photo-placeholder {
+    width: 100%; aspect-ratio: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+    background: linear-gradient(135deg, var(--warm), #E5DBD6); color: var(--muted);
+  }
+  .photo-placeholder .pp-icon { font-size: 32px; }
+  .photo-placeholder .pp-text { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .note-textarea {
+    width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px;
+    font-size: 14px; font-family: inherit; font-weight: 500; resize: none; outline: none;
+    background: white; color: var(--text); min-height: 80px;
+  }
+  .note-textarea:focus { border-color: var(--navy); }
+
+  /* ── Refill Rx ── */
+  .rx-card {
+    background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 12px;
+    box-shadow: var(--shadow); display: flex; gap: 14px; align-items: flex-start;
+  }
+  .rx-icon {
+    width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .rx-info { flex: 1; min-width: 0; }
+  .rx-name { font-size: 15px; font-weight: 800; color: var(--navy-deep); }
+  .rx-detail { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .rx-status { display: inline-block; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 8px; margin-top: 6px; }
+  .rx-status.active { background: var(--mint-light); color: var(--mint); }
+  .rx-status.completed { background: var(--warm); color: var(--muted); }
+  .rx-refill-btn {
+    padding: 10px 16px; border: none; border-radius: 12px; font-size: 12px; font-weight: 800;
+    font-family: inherit; cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    background: var(--navy); color: white;
+  }
+  .rx-refill-btn:active { transform: scale(0.95); }
+  .rx-refill-btn.requested { background: var(--mint-light); color: var(--mint); pointer-events: none; }
+
+  /* ── Success Toast ── */
+  .toast {
+    position: absolute; top: 60px; left: 20px; right: 20px; padding: 16px 20px;
+    background: var(--navy); color: white; border-radius: 14px; font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px; z-index: 200; box-shadow: var(--shadow-lg);
+    transform: translateY(-120%); transition: transform 0.3s ease;
+  }
+  .toast.show { transform: translateY(0); }
+  .toast .toast-icon { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ════════════ LOGIN SCREEN ════════════ -->
+  <div class="screen active" id="loginScreen">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 32px;">
+      <div class="login-logo"><img src="logo-mark.png" alt="Starlight"></div>
+      <div class="login-brand">Starlight<strong>.MD</strong></div>
+      <div class="login-sub">Parent Portal</div>
+
+      <input class="login-input" type="email" placeholder="Email" value="dsurana01@gmail.com">
+      <input class="login-input" type="password" placeholder="Password" value="**********">
+      <button class="login-btn" onclick="doLogin()">Sign In</button>
+      <div class="login-forgot">Forgot password?</div>
+
+      <div class="login-divider"><span>or</span></div>
+      <div class="login-biometric" onclick="doLogin()">
+        <svg viewBox="0 0 24 24"><path d="M12 1C8.1 1 5 4.1 5 8v1H3v12h18V9h-2V8c0-3.9-3.1-7-7-7zm0 2c2.8 0 5 2.2 5 5v1H7V8c0-2.8 2.2-5 5-5zm0 9c1.1 0 2 .9 2 2 0 .7-.4 1.4-1 1.7V18h-2v-2.3c-.6-.3-1-1-1-1.7 0-1.1.9-2 2-2z"/></svg>
+        Sign in with Face ID
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ HOME ════════════ -->
+  <div class="screen" id="homeScreen">
+    <div class="home-hero">
+      <div class="home-avatar">RS</div>
+      <div class="home-greeting">Good morning, Deepak</div>
+      <div class="home-child-name">Riya Surana</div>
+      <div class="home-age">8 years old &middot; Pegasus Plan</div>
+    </div>
+
+    <div class="quick-actions" style="margin-top:-6px;">
+      <div class="quick-action" onclick="goTo('messagesScreen')">
+        <div class="qa-icon">&#x1F4AC;</div>
+        <div class="qa-label">Message<br>Dr. P</div>
+      </div>
+      <div class="quick-action" onclick="goTo('bookVisitScreen')">
+        <div class="qa-icon">&#x1F4C5;</div>
+        <div class="qa-label">Book<br>Visit</div>
+      </div>
+      <div class="quick-action" onclick="goTo('sendPhotoScreen')">
+        <div class="qa-icon">&#x1F4F7;</div>
+        <div class="qa-label">Send<br>Photo</div>
+      </div>
+      <div class="quick-action" onclick="goTo('refillRxScreen')">
+        <div class="qa-icon">&#x1F48A;</div>
+        <div class="qa-label">Refill<br>Rx</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="home-next-appt">
+        <div class="appt-icon">&#x1F4C5;</div>
+        <div class="appt-info">
+          <div class="appt-label">Next Appointment</div>
+          <div class="appt-date">April 8, 2026 at 10:00 AM</div>
+          <div class="appt-type">Annual Well-Child Check (8 years)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+          <div class="card-action" onclick="goTo('visitsScreen')">See All</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:40px;height:40px;border-radius:12px;background:var(--rose-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">&#x1F912;</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;font-weight:800;color:var(--rose);text-transform:uppercase;letter-spacing:0.5px;">Sick Visit</div>
+            <div style="font-size:15px;font-weight:800;color:var(--navy-deep);margin:2px 0;">Strep Throat</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:500;line-height:1.5;">Rapid strep positive. Amoxicillin prescribed. Feeling better in 24hrs.</div>
+            <div style="font-size:11px;color:var(--muted);font-weight:700;margin-top:4px;">Feb 18, 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Growth Snapshot</div>
+          <div class="card-action" onclick="goTo('growthScreen')">Details</div>
+        </div>
+        <div class="growth-stat-row" style="margin:0;">
+          <div class="growth-stat" style="box-shadow:none;background:var(--bg);">
+            <div class="gs-value">49"</div>
+            <div class="gs-label">Height</div>
+            <div class="gs-pct">55th percentile</div>
+          </div>
+          <div class="growth-stat" style="box-shadow:none;background:var(--bg);">
+            <div class="gs-value">48 lb</div>
+            <div class="gs-label">Weight</div>
+            <div class="gs-pct">40th percentile</div>
+          </div>
+          <div class="growth-stat" style="box-shadow:none;background:var(--bg);">
+            <div class="gs-value">15.9</div>
+            <div class="gs-label">BMI</div>
+            <div class="gs-pct">35th percentile</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Membership</div>
+          <div class="card-action" onclick="goTo('billingScreen')">Details</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--navy);">Pegasus Plan (5-18 yrs)</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:600;">Next billing: April 1, 2026</div>
+          </div>
+          <div style="font-size:22px;font-weight:900;color:var(--gold);">$150<span style="font-size:12px;color:var(--muted);font-weight:600;">/mo</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ GROWTH CHARTS ════════════ -->
+  <div class="screen" id="growthScreen">
+    <div class="page-header">
+      <h1>Growth Charts</h1>
+      <div class="subtitle">Riya Surana &middot; 8 years old</div>
+    </div>
+
+    <div class="content">
+      <div class="growth-stat-row">
+        <div class="growth-stat">
+          <div class="gs-value">49"</div>
+          <div class="gs-label">Height</div>
+          <div class="gs-pct">55th percentile</div>
+        </div>
+        <div class="growth-stat">
+          <div class="gs-value">48 lb</div>
+          <div class="gs-label">Weight</div>
+          <div class="gs-pct">40th percentile</div>
+        </div>
+        <div class="growth-stat">
+          <div class="gs-value">15.9</div>
+          <div class="gs-label">BMI</div>
+          <div class="gs-pct">35th pct</div>
+        </div>
+      </div>
+
+      <div class="growth-tabs">
+        <div class="growth-tab active">Height</div>
+        <div class="growth-tab">Weight</div>
+        <div class="growth-tab">BMI</div>
+      </div>
+
+      <div class="growth-chart-container">
+        <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;">HEIGHT FOR AGE (Girls, 2-20 yrs) &middot; CDC</div>
+        <div class="growth-chart">
+          <!-- Percentile lines -->
+          <div class="growth-percentile" style="bottom:85%;"><div class="pct-label">97th</div></div>
+          <div class="growth-percentile" style="bottom:70%;"><div class="pct-label">75th</div></div>
+          <div class="growth-percentile" style="bottom:50%;"><div class="pct-label">50th</div></div>
+          <div class="growth-percentile" style="bottom:30%;"><div class="pct-label">25th</div></div>
+          <div class="growth-percentile" style="bottom:15%;"><div class="pct-label">3rd</div></div>
+
+          <!-- Shaded band for 25th-75th -->
+          <div style="position:absolute;left:0;right:0;bottom:30%;height:40%;background:rgba(77,142,127,0.06);"></div>
+
+          <!-- Data points (height at various ages, plotted ~55th percentile) -->
+          <div class="growth-dot" style="left:5%;bottom:18%;" title="2yr: 34in"></div>
+          <div class="growth-dot" style="left:15%;bottom:26%;" title="3yr: 37in"></div>
+          <div class="growth-dot" style="left:25%;bottom:34%;" title="4yr: 40in"></div>
+          <div class="growth-dot" style="left:35%;bottom:41%;" title="5yr: 43in"></div>
+          <div class="growth-dot" style="left:50%;bottom:48%;" title="6yr: 45in"></div>
+          <div class="growth-dot" style="left:65%;bottom:53%;" title="7yr: 47in"></div>
+          <div class="growth-dot" style="left:85%;bottom:58%;" title="8yr: 49in"></div>
+
+          <!-- Age labels -->
+          <div style="position:absolute;bottom:-18px;left:5%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">2</div>
+          <div style="position:absolute;bottom:-18px;left:15%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">3</div>
+          <div style="position:absolute;bottom:-18px;left:25%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">4</div>
+          <div style="position:absolute;bottom:-18px;left:35%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">5</div>
+          <div style="position:absolute;bottom:-18px;left:50%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">6</div>
+          <div style="position:absolute;bottom:-18px;left:65%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">7</div>
+          <div style="position:absolute;bottom:-18px;left:85%;font-size:9px;font-weight:700;color:var(--muted);transform:translateX(-50%);">8</div>
+          <div style="position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:var(--muted);letter-spacing:1px;">AGE (YEARS)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Growth History</div>
+        <table style="width:100%;font-size:12px;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 8</td>
+            <td style="padding:8px 0;color:var(--muted);">49 in</td>
+            <td style="padding:8px 0;color:var(--muted);">48 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Feb 2026</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 7</td>
+            <td style="padding:8px 0;color:var(--muted);">47 in</td>
+            <td style="padding:8px 0;color:var(--muted);">44 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2024</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 6</td>
+            <td style="padding:8px 0;color:var(--muted);">45 in</td>
+            <td style="padding:8px 0;color:var(--muted);">40 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2023</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 5</td>
+            <td style="padding:8px 0;color:var(--muted);">43 in</td>
+            <td style="padding:8px 0;color:var(--muted);">37 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2022</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 4</td>
+            <td style="padding:8px 0;color:var(--muted);">40 in</td>
+            <td style="padding:8px 0;color:var(--muted);">34 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2021</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 3</td>
+            <td style="padding:8px 0;color:var(--muted);">37 in</td>
+            <td style="padding:8px 0;color:var(--muted);">30 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2020</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;font-weight:800;color:var(--navy);">Age 2</td>
+            <td style="padding:8px 0;color:var(--muted);">34 in</td>
+            <td style="padding:8px 0;color:var(--muted);">26 lb</td>
+            <td style="padding:8px 0;font-weight:700;color:var(--mint);">Oct 2019</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ MESSAGES ════════════ -->
+  <div class="screen" id="messagesScreen">
+    <div class="page-header" style="padding-bottom:8px;">
+      <h1>Messages</h1>
+      <div class="subtitle">Dr. Yogini Prajapati &middot; Starlight Pediatrics</div>
+    </div>
+
+    <div style="padding:0 20px 70px;overflow-y:auto;flex:1;">
+      <div class="msg-thread">
+
+        <div class="msg-time">February 18, 2026</div>
+
+        <div class="msg-bubble parent">
+          <div class="msg-sender">Deepak</div>
+          Hi Dr. P! Riya woke up with a sore throat and says it hurts to swallow. She feels warm but I don't have a thermometer handy. Should I bring her in?
+        </div>
+
+        <div class="msg-bubble doctor">
+          <div class="msg-sender">Dr. Prajapati</div>
+          Hi Deepak! Definitely bring her in. Strep has been going around at schools lately. I can see her at 11:30 today if that works? In the meantime, ibuprofen for the pain and lots of fluids.
+        </div>
+
+        <div class="msg-bubble parent">
+          <div class="msg-sender">Deepak</div>
+          11:30 is perfect. We'll be there. Thank you!
+        </div>
+
+        <div class="msg-bubble doctor">
+          <div class="msg-sender">Dr. Prajapati</div>
+          Just finished seeing Riya. Rapid strep came back positive, so I started her on amoxicillin (250mg 3x daily for 10 days). She should start feeling better within 24 hours. Keep her home from school tomorrow. She can go back Thursday if fever-free for 24hrs. Let me know if anything changes!
+        </div>
+
+        <div class="msg-bubble parent">
+          <div class="msg-sender">Deepak</div>
+          Thank you so much! She already seems a little better after the first dose. Love that we could get same-day care. This is why we switched to DPC!
+        </div>
+
+        <div class="msg-time">February 20, 2026</div>
+
+        <div class="msg-bubble parent">
+          <div class="msg-sender">Deepak</div>
+          Quick update - Riya is feeling way better! Fever gone since yesterday morning. She wants to go back to school tomorrow. All good?
+        </div>
+
+        <div class="msg-bubble doctor">
+          <div class="msg-sender">Dr. Prajapati</div>
+          That's wonderful! Yes, she can go back tomorrow since she's been fever-free for 24+ hours. Just make sure she finishes the full 10 days of amoxicillin even though she feels better. So glad she bounced back fast!
+        </div>
+
+        <div class="msg-time">March 5, 2026</div>
+
+        <div class="msg-bubble doctor">
+          <div class="msg-sender">Dr. Prajapati</div>
+          Hi Deepak! Just a heads up — Riya's annual well-child check is coming up in about a month. I'd love to get her in for her 8-year checkup. She'll need a vision screening and we'll do a full growth assessment. Want me to put her down for April 8 at 10am?
+        </div>
+
+        <div class="msg-bubble parent">
+          <div class="msg-sender">Deepak</div>
+          That works! She'll be excited to see how tall she's gotten. Booking it!
+        </div>
+
+        <div class="msg-bubble doctor">
+          <div class="msg-sender">Dr. Prajapati</div>
+          She's grown so much this year! See you both on April 8th.
+        </div>
+
+      </div>
+    </div>
+
+    <div class="msg-input-bar">
+      <input class="msg-input" placeholder="Message Dr. Prajapati...">
+      <button class="msg-send-btn">&#x2191;</button>
+    </div>
+
+  </div>
+
+  <!-- ════════════ BILLING ════════════ -->
+  <div class="screen" id="billingScreen">
+    <div class="page-header">
+      <h1>Billing</h1>
+      <div class="subtitle">Membership & Payment History</div>
+    </div>
+
+    <div class="content">
+      <div class="plan-card">
+        <div class="plan-name-tag">Pegasus Plan</div>
+        <div class="plan-price">$150 <span>/month</span></div>
+        <div class="plan-detail">Ages 5-18 &middot; Unlimited visits &middot; Same-day access &middot; 24/7 messaging</div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.15);display:flex;justify-content:space-between;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;">Member since Oct 2024</div>
+          <div style="font-size:11px;color:var(--gold-bright);font-weight:800;">Active</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">What's Included</div>
+        <div style="font-size:13px;line-height:2;color:var(--text);">
+          <div>&#x2713; Unlimited office visits</div>
+          <div>&#x2713; Same-day sick appointments</div>
+          <div>&#x2713; 24/7 direct messaging with Dr. P</div>
+          <div>&#x2713; Annual well-child exams</div>
+          <div>&#x2713; Vision & hearing screenings</div>
+          <div>&#x2713; Growth tracking & development assessment</div>
+          <div>&#x2713; School & sports physicals</div>
+          <div>&#x2713; Vaccine administration</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Payment History</div>
+        <div class="payment-item">
+          <div><div class="pay-date">March 1, 2026</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+        <div class="payment-item">
+          <div><div class="pay-date">February 1, 2026</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+        <div class="payment-item">
+          <div><div class="pay-date">January 1, 2026</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+        <div class="payment-item">
+          <div><div class="pay-date">December 1, 2025</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+        <div class="payment-item">
+          <div><div class="pay-date">November 1, 2025</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+        <div class="payment-item">
+          <div><div class="pay-date">October 1, 2025</div></div>
+          <div style="text-align:right;"><div class="pay-amount">$150.00</div><div class="pay-status paid">Paid</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div style="font-size:13px;color:var(--muted);font-weight:600;margin-bottom:8px;">Total saved vs. traditional pediatrician</div>
+        <div style="font-size:28px;font-weight:900;color:var(--mint);">$1,240+</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;">Based on 6 visits + 2 sick visits in 6 months</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ MORE (Visits, Immunizations, Wellness, Docs) ════════════ -->
+  <div class="screen" id="moreScreen">
+    <div class="page-header">
+      <h1>More</h1>
+      <div class="subtitle">Riya Surana's complete health record</div>
+    </div>
+
+    <div class="content">
+      <div class="profile-item" onclick="goTo('visitsScreen')">
+        <div class="profile-icon">&#x1FA7A;</div>
+        <div class="profile-label">Visit History</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item" onclick="goTo('wellnessScreen')">
+        <div class="profile-icon">&#x2705;</div>
+        <div class="profile-label">Wellness Checks</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item" onclick="goTo('immScreen')">
+        <div class="profile-icon">&#x1F489;</div>
+        <div class="profile-label">Immunizations</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item" onclick="goTo('docsScreen')">
+        <div class="profile-icon">&#x1F4C4;</div>
+        <div class="profile-label">Documents & Records</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+
+      <div class="section-divider" style="margin-top:12px;">Account</div>
+
+      <div class="profile-item">
+        <div class="profile-icon">&#x1F464;</div>
+        <div class="profile-label">Family Profile</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-icon">&#x1F514;</div>
+        <div class="profile-label">Notifications</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-icon">&#x1F3E5;</div>
+        <div class="profile-label">About Starlight Pediatrics</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item" onclick="goTo('loginScreen')" style="margin-top:12px;">
+        <div class="profile-icon">&#x1F6AA;</div>
+        <div class="profile-label" style="color:var(--rose);">Sign Out</div>
+        <div class="profile-arrow"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ VISIT HISTORY ════════════ -->
+  <div class="screen" id="visitsScreen">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Visit History</h1>
+      </div>
+      <div class="subtitle">All visits for Riya Surana</div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot sick">&#x1F912;</div></div>
+          <div class="visit-info">
+            <div class="visit-type sick">Sick Visit</div>
+            <div class="visit-title">Strep Throat</div>
+            <div class="visit-summary">Rapid strep positive. Amoxicillin 250mg 3x/day x 10 days. Follow up if not improving in 48hrs.</div>
+            <div class="visit-date">Feb 18, 2026</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot phone">&#x1F4F1;</div></div>
+          <div class="visit-info">
+            <div class="visit-type phone">Phone Consult</div>
+            <div class="visit-title">Stomach Bug Follow-Up</div>
+            <div class="visit-summary">Parents called re: mild stomach bug from last week. Resolved. Eating normally. No follow-up needed.</div>
+            <div class="visit-date">Jan 8, 2026</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot sick">&#x1F912;</div></div>
+          <div class="visit-info">
+            <div class="visit-type sick">Sick Visit</div>
+            <div class="visit-title">Stomach Bug (Viral Gastroenteritis)</div>
+            <div class="visit-summary">Nausea, vomiting x 2 days. No fever. Pedialyte recommended. BRAT diet. Expected to resolve 3-5 days.</div>
+            <div class="visit-date">Jan 3, 2026</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot well">&#x2705;</div></div>
+          <div class="visit-info">
+            <div class="visit-type well">Well-Child Check</div>
+            <div class="visit-title">7-Year Annual Checkup</div>
+            <div class="visit-summary">Height 47in (55th pct), Weight 44lb (42nd pct). Vision 20/20 both eyes. Development on track. All milestones met. Discussed nutrition, screen time, physical activity.</div>
+            <div class="visit-date">Oct 15, 2024</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot sick">&#x1F912;</div></div>
+          <div class="visit-info">
+            <div class="visit-type sick">Sick Visit</div>
+            <div class="visit-title">Ear Infection (Otitis Media)</div>
+            <div class="visit-summary">Left ear infection. Amoxicillin 400mg 2x/day x 10 days. Ibuprofen for pain. Recheck if not better in 72hrs.</div>
+            <div class="visit-date">Mar 12, 2024</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot well">&#x2705;</div></div>
+          <div class="visit-info">
+            <div class="visit-type well">Well-Child Check</div>
+            <div class="visit-title">6-Year Annual Checkup</div>
+            <div class="visit-summary">Height 45in (53rd pct), Weight 40lb (38th pct). Vision screening normal. Ready for 1st grade. Flu vaccine given.</div>
+            <div class="visit-date">Oct 10, 2023</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot well">&#x2705;</div></div>
+          <div class="visit-info">
+            <div class="visit-type well">Well-Child Check</div>
+            <div class="visit-title">5-Year Annual Checkup + Kindergarten Physical</div>
+            <div class="visit-summary">Height 43in, Weight 37lb. DTaP #5, IPV #4, MMR #2, Varicella #2 administered. School forms completed. Development excellent.</div>
+            <div class="visit-date">Sep 20, 2022</div>
+          </div>
+        </div>
+
+        <div class="visit-item">
+          <div class="visit-dot-col"><div class="visit-dot well">&#x2705;</div></div>
+          <div class="visit-info">
+            <div class="visit-type well">Well-Child Check</div>
+            <div class="visit-title">4-Year Annual Checkup</div>
+            <div class="visit-summary">Height 40in, Weight 34lb. On track. DTaP #4, IPV #3, Flu vaccine administered.</div>
+            <div class="visit-date">Oct 5, 2021</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ IMMUNIZATIONS ════════════ -->
+  <div class="screen" id="immScreen">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Immunizations</h1>
+      </div>
+      <div class="subtitle">CDC recommended schedule &middot; All up to date</div>
+    </div>
+
+    <div class="content">
+      <div style="background:var(--mint-light);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:24px;">&#x2705;</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--mint);">Fully Vaccinated</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;">All vaccines current per CDC schedule. Next due: Flu (Fall 2026)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="imm-group">
+          <div class="imm-group-title">Hepatitis B (HepB)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">Birth</div><div class="imm-date">Oct 1, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">1 mo</div><div class="imm-date">Nov 5, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 3</div><div class="imm-dose">6 mo</div><div class="imm-date">Apr 3, 2018</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">DTaP (Diphtheria, Tetanus, Pertussis)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">2 mo</div><div class="imm-date">Dec 4, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4 mo</div><div class="imm-date">Feb 5, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 3</div><div class="imm-dose">6 mo</div><div class="imm-date">Apr 3, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 4</div><div class="imm-dose">15 mo</div><div class="imm-date">Jan 10, 2019</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 5</div><div class="imm-dose">4-6 yr</div><div class="imm-date">Sep 20, 2022</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">IPV (Polio)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">2 mo</div><div class="imm-date">Dec 4, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4 mo</div><div class="imm-date">Feb 5, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 3</div><div class="imm-dose">6-18 mo</div><div class="imm-date">Oct 5, 2021</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 4</div><div class="imm-dose">4-6 yr</div><div class="imm-date">Sep 20, 2022</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">MMR (Measles, Mumps, Rubella)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">12 mo</div><div class="imm-date">Oct 8, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4-6 yr</div><div class="imm-date">Sep 20, 2022</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">Varicella (Chickenpox)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">12 mo</div><div class="imm-date">Oct 8, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4-6 yr</div><div class="imm-date">Sep 20, 2022</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">PCV13 (Pneumococcal)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">2 mo</div><div class="imm-date">Dec 4, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4 mo</div><div class="imm-date">Feb 5, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 3</div><div class="imm-dose">6 mo</div><div class="imm-date">Apr 3, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 4</div><div class="imm-dose">12-15 mo</div><div class="imm-date">Jan 10, 2019</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">Hib (Haemophilus influenzae type b)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">2 mo</div><div class="imm-date">Dec 4, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4 mo</div><div class="imm-date">Feb 5, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 3</div><div class="imm-dose">12-15 mo</div><div class="imm-date">Jan 10, 2019</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">Rotavirus (RV)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">2 mo</div><div class="imm-date">Dec 4, 2017</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">4 mo</div><div class="imm-date">Feb 5, 2018</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">Hepatitis A (HepA)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 1</div><div class="imm-dose">12 mo</div><div class="imm-date">Oct 8, 2018</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">Dose 2</div><div class="imm-dose">18 mo</div><div class="imm-date">Apr 15, 2019</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title">Influenza (Annual Flu Shot)</div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">2025-2026</div><div class="imm-date">Oct 3, 2025</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">2024-2025</div><div class="imm-date">Oct 15, 2024</div></div>
+          <div class="imm-item"><div class="imm-check done">&#x2713;</div><div class="imm-name">2023-2024</div><div class="imm-date">Oct 10, 2023</div></div>
+        </div>
+
+        <div class="imm-group">
+          <div class="imm-group-title" style="color:var(--gold);">Upcoming</div>
+          <div class="imm-item"><div class="imm-check upcoming">&#x23F3;</div><div class="imm-name">Tdap Booster</div><div class="imm-dose">11-12 yr</div><div class="imm-date">Due ~2029</div></div>
+          <div class="imm-item"><div class="imm-check upcoming">&#x23F3;</div><div class="imm-name">HPV (2-dose series)</div><div class="imm-dose">11-12 yr</div><div class="imm-date">Due ~2029</div></div>
+          <div class="imm-item"><div class="imm-check upcoming">&#x23F3;</div><div class="imm-name">Meningococcal (MenACWY)</div><div class="imm-dose">11-12 yr</div><div class="imm-date">Due ~2029</div></div>
+          <div class="imm-item"><div class="imm-check upcoming">&#x23F3;</div><div class="imm-name">Flu Shot 2026-2027</div><div class="imm-dose">Annual</div><div class="imm-date">Due Fall 2026</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ WELLNESS CHECKS ════════════ -->
+  <div class="screen" id="wellnessScreen">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Wellness Checks</h1>
+      </div>
+      <div class="subtitle">AAP recommended well-child schedule</div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="wellness-item">
+          <div class="wellness-icon upcoming">&#x1F4C5;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">8-Year Annual Check</div>
+            <div class="wellness-date">Scheduled: April 8, 2026</div>
+            <div class="wellness-badge upcoming">Upcoming</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">7-Year Annual Check</div>
+            <div class="wellness-date">Completed: Oct 15, 2024</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">6-Year Annual Check</div>
+            <div class="wellness-date">Completed: Oct 10, 2023</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">5-Year Annual Check + Kindergarten Physical</div>
+            <div class="wellness-date">Completed: Sep 20, 2022</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">4-Year Annual Check</div>
+            <div class="wellness-date">Completed: Oct 5, 2021</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">30-Month Check</div>
+            <div class="wellness-date">Completed: Apr 8, 2020</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">24-Month Check</div>
+            <div class="wellness-date">Completed: Oct 3, 2019</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">18-Month Check</div>
+            <div class="wellness-date">Completed: Apr 15, 2019</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">15-Month Check</div>
+            <div class="wellness-date">Completed: Jan 10, 2019</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+
+        <div class="wellness-item">
+          <div class="wellness-icon done">&#x2705;</div>
+          <div class="wellness-info">
+            <div class="wellness-label">12-Month Check</div>
+            <div class="wellness-date">Completed: Oct 8, 2018</div>
+            <div class="wellness-badge done">Complete</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ DOCUMENTS ════════════ -->
+  <div class="screen" id="docsScreen">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Documents</h1>
+      </div>
+      <div class="subtitle">Records, forms, and lab results</div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="card-title">Lab Results</div>
+        <div class="doc-item">
+          <div class="doc-icon lab">&#x1F9EA;</div>
+          <div style="flex:1;"><div class="doc-name">Rapid Strep Test</div><div class="doc-meta">Feb 18, 2026 &middot; Positive</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon lab">&#x1F9EA;</div>
+          <div style="flex:1;"><div class="doc-name">CBC Panel</div><div class="doc-meta">Oct 15, 2024 &middot; Normal</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon lab">&#x1F9EA;</div>
+          <div style="flex:1;"><div class="doc-name">Lead Screening</div><div class="doc-meta">Oct 8, 2018 &middot; Normal (&lt;3.5 mcg/dL)</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Forms & Letters</div>
+        <div class="doc-item">
+          <div class="doc-icon form">&#x1F4DD;</div>
+          <div style="flex:1;"><div class="doc-name">School Physical Form (2025-2026)</div><div class="doc-meta">Completed Oct 15, 2024</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon form">&#x1F4DD;</div>
+          <div style="flex:1;"><div class="doc-name">Immunization Record (for school)</div><div class="doc-meta">Updated Oct 2025</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon letter">&#x2709;&#xFE0F;</div>
+          <div style="flex:1;"><div class="doc-name">Return-to-School Letter</div><div class="doc-meta">Feb 20, 2026 &middot; Strep clearance</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon form">&#x1F4DD;</div>
+          <div style="flex:1;"><div class="doc-name">Sports Physical Clearance</div><div class="doc-meta">Oct 15, 2024 &middot; Cleared for all sports</div></div>
+          <div class="doc-arrow">&#x203A;</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ BOOK VISIT ════════════ -->
+  <div class="screen" id="bookVisitScreen">
+    <div class="toast" id="bookToast"><span class="toast-icon">&#x2705;</span>Visit request sent to Dr. Prajapati!</div>
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('homeScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Book a Visit</h1>
+      </div>
+      <div class="subtitle">Starlight Pediatrics &middot; Dr. Prajapati</div>
+    </div>
+    <div class="content">
+      <div class="card-title">What type of visit?</div>
+      <div class="visit-type-picker">
+        <div class="visit-type-btn selected" onclick="selectVisitType(this)">
+          <div class="vtb-icon">&#x2705;</div>
+          <div class="vtb-label">Well-Child</div>
+        </div>
+        <div class="visit-type-btn" onclick="selectVisitType(this)">
+          <div class="vtb-icon">&#x1F912;</div>
+          <div class="vtb-label">Sick Visit</div>
+        </div>
+        <div class="visit-type-btn" onclick="selectVisitType(this)">
+          <div class="vtb-icon">&#x1F3C3;</div>
+          <div class="vtb-label">Sports Physical</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title" style="margin:0;">April 2026</div>
+          <div style="display:flex;gap:12px;">
+            <span style="cursor:pointer;font-size:16px;color:var(--sky);">&#x2190;</span>
+            <span style="cursor:pointer;font-size:16px;color:var(--sky);">&#x2192;</span>
+          </div>
+        </div>
+        <div class="calendar-grid">
+          <div class="cal-header">Su</div><div class="cal-header">Mo</div><div class="cal-header">Tu</div><div class="cal-header">We</div><div class="cal-header">Th</div><div class="cal-header">Fr</div><div class="cal-header">Sa</div>
+          <div class="cal-day empty"></div><div class="cal-day empty"></div><div class="cal-day empty"></div>
+          <div class="cal-day past">1</div><div class="cal-day past">2</div><div class="cal-day past">3</div><div class="cal-day past">4</div>
+          <div class="cal-day past">5</div><div class="cal-day past">6</div><div class="cal-day past">7</div><div class="cal-day selected" onclick="selectDay(this)">8</div><div class="cal-day" onclick="selectDay(this)">9</div><div class="cal-day" onclick="selectDay(this)">10</div><div class="cal-day" onclick="selectDay(this)">11</div>
+          <div class="cal-day" onclick="selectDay(this)">12</div><div class="cal-day today" onclick="selectDay(this)">13</div><div class="cal-day" onclick="selectDay(this)">14</div><div class="cal-day" onclick="selectDay(this)">15</div><div class="cal-day" onclick="selectDay(this)">16</div><div class="cal-day" onclick="selectDay(this)">17</div><div class="cal-day" onclick="selectDay(this)">18</div>
+          <div class="cal-day" onclick="selectDay(this)">19</div><div class="cal-day" onclick="selectDay(this)">20</div><div class="cal-day" onclick="selectDay(this)">21</div><div class="cal-day" onclick="selectDay(this)">22</div><div class="cal-day" onclick="selectDay(this)">23</div><div class="cal-day" onclick="selectDay(this)">24</div><div class="cal-day" onclick="selectDay(this)">25</div>
+          <div class="cal-day" onclick="selectDay(this)">26</div><div class="cal-day" onclick="selectDay(this)">27</div><div class="cal-day" onclick="selectDay(this)">28</div><div class="cal-day" onclick="selectDay(this)">29</div><div class="cal-day" onclick="selectDay(this)">30</div><div class="cal-day empty"></div><div class="cal-day empty"></div>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:4px;">Select a time</div>
+      <div class="time-slots">
+        <div class="time-slot" onclick="selectTime(this)">9:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">9:30 AM</div>
+        <div class="time-slot selected" onclick="selectTime(this)">10:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">10:30 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">11:00 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">11:30 AM</div>
+        <div class="time-slot" onclick="selectTime(this)">1:00 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">1:30 PM</div>
+        <div class="time-slot" onclick="selectTime(this)">2:00 PM</div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div class="card-title">Notes for Dr. P (optional)</div>
+        <textarea class="note-textarea" placeholder="Any symptoms, concerns, or questions..."></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="submitBooking()">Request Appointment</button>
+    </div>
+  </div>
+
+  <!-- ════════════ SEND PHOTO ════════════ -->
+  <div class="screen" id="sendPhotoScreen">
+    <div class="toast" id="photoToast"><span class="toast-icon">&#x1F4F8;</span>Photo sent to Dr. Prajapati!</div>
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('homeScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Send Photo</h1>
+      </div>
+      <div class="subtitle">Share a photo with Dr. Prajapati</div>
+    </div>
+    <div class="content">
+      <div class="card" style="text-align:center;padding:24px;cursor:pointer;border:2px dashed var(--border);" onclick="document.getElementById('photoUpload').click()">
+        <div style="font-size:40px;margin-bottom:8px;">&#x1F4F7;</div>
+        <div style="font-size:14px;font-weight:800;color:var(--navy);">Take or Upload Photo</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px;">Tap to open camera or gallery</div>
+        <input type="file" id="photoUpload" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="card-title" style="margin-top:4px;">Recent Photos</div>
+      <div class="photo-grid">
+        <div class="photo-card" onclick="togglePhoto(this)">
+          <div class="photo-placeholder" style="background:linear-gradient(135deg, #FFE4E1, #FFB4A2);">
+            <div class="pp-icon">&#x1F48E;</div>
+            <div class="pp-text">Throat</div>
+          </div>
+          <div class="photo-label">Sore Throat<div class="photo-date">Feb 18, 2026</div></div>
+        </div>
+        <div class="photo-card" onclick="togglePhoto(this)">
+          <div class="photo-placeholder" style="background:linear-gradient(135deg, #E8F2EF, #B5D8CC);">
+            <div class="pp-icon">&#x1F9B4;</div>
+            <div class="pp-text">Knee</div>
+          </div>
+          <div class="photo-label">Scraped Knee<div class="photo-date">Jan 22, 2026</div></div>
+        </div>
+        <div class="photo-card" onclick="togglePhoto(this)">
+          <div class="photo-placeholder" style="background:linear-gradient(135deg, #FBF5E0, #E8D5A0);">
+            <div class="pp-icon">&#x1F9B7;</div>
+            <div class="pp-text">Teeth</div>
+          </div>
+          <div class="photo-label">Loose Tooth<div class="photo-date">Dec 10, 2025</div></div>
+        </div>
+        <div class="photo-card" onclick="togglePhoto(this)">
+          <div class="photo-placeholder" style="background:linear-gradient(135deg, #E8E4F2, #C5B3E6);">
+            <div class="pp-icon">&#x1F441;&#xFE0F;</div>
+            <div class="pp-text">Eye</div>
+          </div>
+          <div class="photo-label">Pink Eye Check<div class="photo-date">Nov 3, 2025</div></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div class="card-title">Message to Dr. P</div>
+        <textarea class="note-textarea" placeholder="Describe what you'd like Dr. P to look at...">Hi Dr. P, can you take a look at this and let me know if we need to come in?</textarea>
+      </div>
+
+      <button class="btn-primary" onclick="submitPhoto()">Send to Dr. Prajapati</button>
+    </div>
+  </div>
+
+  <!-- ════════════ REFILL RX ════════════ -->
+  <div class="screen" id="refillRxScreen">
+    <div class="toast" id="rxToast"><span class="toast-icon">&#x1F48A;</span>Refill request submitted!</div>
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('homeScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Prescriptions</h1>
+      </div>
+      <div class="subtitle">Riya Surana's medications</div>
+    </div>
+    <div class="content">
+      <div style="background:var(--gold-light);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">&#x1F4CB;</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:800;color:var(--navy);">Pharmacy on File</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;">CVS Pharmacy &middot; 1250 S Congress Ave, Austin TX</div>
+        </div>
+      </div>
+
+      <div class="card-title">Active Prescriptions</div>
+
+      <div class="rx-card">
+        <div class="rx-icon" style="background:var(--rose-light);">&#x1F48A;</div>
+        <div class="rx-info">
+          <div class="rx-name">Amoxicillin 250mg</div>
+          <div class="rx-detail">3x daily for 10 days &middot; Oral suspension</div>
+          <div class="rx-detail">Prescribed: Feb 18, 2026 &middot; Dr. Prajapati</div>
+          <div class="rx-status active">Active &middot; Day 8 of 10</div>
+        </div>
+      </div>
+
+      <div class="rx-card">
+        <div class="rx-icon" style="background:var(--mint-light);">&#x1F489;</div>
+        <div class="rx-info">
+          <div class="rx-name">Children's Ibuprofen 100mg</div>
+          <div class="rx-detail">As needed for pain/fever &middot; Chewable</div>
+          <div class="rx-detail">Prescribed: Feb 18, 2026 &middot; Dr. Prajapati</div>
+          <div class="rx-status active">Active &middot; PRN</div>
+        </div>
+        <button class="rx-refill-btn" onclick="requestRefill(this)">Request Refill</button>
+      </div>
+
+      <div class="card-title" style="margin-top:8px;">Past Prescriptions</div>
+
+      <div class="rx-card" style="opacity:0.7;">
+        <div class="rx-icon" style="background:var(--warm);">&#x1F48A;</div>
+        <div class="rx-info">
+          <div class="rx-name">Amoxicillin 400mg</div>
+          <div class="rx-detail">2x daily for 10 days &middot; Ear infection</div>
+          <div class="rx-detail">Prescribed: Mar 12, 2024 &middot; Dr. Prajapati</div>
+          <div class="rx-status completed">Completed</div>
+        </div>
+      </div>
+
+      <div class="rx-card" style="opacity:0.7;">
+        <div class="rx-icon" style="background:var(--warm);">&#x1F9F4;</div>
+        <div class="rx-info">
+          <div class="rx-name">Pedialyte (OTC)</div>
+          <div class="rx-detail">As needed for dehydration &middot; Recommended</div>
+          <div class="rx-detail">Recommended: Jan 3, 2026 &middot; Dr. Prajapati</div>
+          <div class="rx-status completed">OTC &middot; Completed</div>
+        </div>
+      </div>
+
+      <div class="rx-card" style="opacity:0.7;">
+        <div class="rx-icon" style="background:var(--warm);">&#x1F48A;</div>
+        <div class="rx-info">
+          <div class="rx-name">Children's Zyrtec 5mg</div>
+          <div class="rx-detail">1x daily &middot; Seasonal allergies (spring 2024)</div>
+          <div class="rx-detail">Prescribed: Apr 5, 2024 &middot; Dr. Prajapati</div>
+          <div class="rx-status completed">Completed</div>
+        </div>
+        <button class="rx-refill-btn" onclick="requestRefill(this)">Request Refill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SHARED TAB BAR ════════════ -->
+  <div class="tab-bar" id="mainTabBar">
+    <div class="tab active" data-screen="homeScreen" onclick="goTo('homeScreen')"><div class="tab-icon">&#x1F3E0;</div>Home<div class="tab-dot"></div></div>
+    <div class="tab" data-screen="growthScreen" onclick="goTo('growthScreen')"><div class="tab-icon">&#x1F4C8;</div>Growth</div>
+    <div class="tab" data-screen="messagesScreen" onclick="goTo('messagesScreen')"><div class="tab-icon">&#x1F4AC;</div>Messages</div>
+    <div class="tab" data-screen="billingScreen" onclick="goTo('billingScreen')"><div class="tab-icon">&#x1F4B3;</div>Billing</div>
+    <div class="tab" data-screen="moreScreen" onclick="goTo('moreScreen')"><div class="tab-icon">&#x2022;&#x2022;&#x2022;</div>More</div>
+  </div>
+
+</div> <!-- end .phone -->
+
+<script>
+// Map sub-screens to their parent tab
+const tabMap = {
+  homeScreen: 'homeScreen',
+  growthScreen: 'growthScreen',
+  messagesScreen: 'messagesScreen',
+  billingScreen: 'billingScreen',
+  moreScreen: 'moreScreen',
+  visitsScreen: 'moreScreen',
+  wellnessScreen: 'moreScreen',
+  immScreen: 'moreScreen',
+  docsScreen: 'moreScreen',
+  bookVisitScreen: 'homeScreen',
+  sendPhotoScreen: 'homeScreen',
+  refillRxScreen: 'homeScreen'
+};
+
+function doLogin() {
+  goTo('homeScreen');
+}
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  document.getElementById(screenId).scrollTop = 0;
+
+  const tabBar = document.getElementById('mainTabBar');
+  if (screenId === 'loginScreen') {
+    tabBar.classList.remove('visible');
+  } else {
+    tabBar.classList.add('visible');
+  }
+
+  const parentTab = tabMap[screenId] || 'homeScreen';
+  tabBar.querySelectorAll('.tab').forEach(t => {
+    t.classList.remove('active');
+    const dot = t.querySelector('.tab-dot');
+    if (dot) dot.remove();
+  });
+  const activeTab = tabBar.querySelector(`[data-screen="${parentTab}"]`);
+  if (activeTab) {
+    activeTab.classList.add('active');
+    const dot = document.createElement('div');
+    dot.className = 'tab-dot';
+    activeTab.appendChild(dot);
+  }
+}
+
+// ── Book Visit ──
+function selectVisitType(el) {
+  el.parentElement.querySelectorAll('.visit-type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectDay(el) {
+  el.closest('.calendar-grid').querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectTime(el) {
+  el.parentElement.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function submitBooking() {
+  showToast('bookToast');
+  setTimeout(() => goTo('homeScreen'), 1800);
+}
+
+// ── Send Photo ──
+function togglePhoto(el) {
+  el.classList.toggle('selected');
+}
+function submitPhoto() {
+  showToast('photoToast');
+  setTimeout(() => goTo('messagesScreen'), 1800);
+}
+
+// ── Refill Rx ──
+function requestRefill(btn) {
+  btn.textContent = 'Requested';
+  btn.classList.add('requested');
+  showToast('rxToast');
+}
+
+// ── Toast ──
+function showToast(id) {
+  const toast = document.getElementById(id);
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+
+</body>
+</html>
