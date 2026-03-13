@@ -3988,7 +3988,6 @@ function renderPipeline() {
                 ${stage.key === 'ready-to-enroll' ? `<button class="convert-btn" onclick="convertToActive('${p.id}')">✓ Enroll</button>` : ''}
                 <button onclick="openEditPatient('${p.id}')" title="Edit">✏️</button>
               </div>
-              ${renderNurtureStrip(p)}
             </div>`;
         }).join('')}
       </div>`;
