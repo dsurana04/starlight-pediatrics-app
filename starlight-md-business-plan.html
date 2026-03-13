@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starlight.MD — Business Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sp-navy: #1B3A4B;
+    --sp-navy-deep: #0F2433;
+    --sp-sky: #2E6B8A;
+    --sp-gold: #C9A227;
+    --sp-gold-rich: #A8871E;
+    --sp-gold-bright: #D4AF37;
+    --sp-gold-light: #FBF5E0;
+    --sp-mint: #4D8E7F;
+    --sp-mint-light: #E8F2EF;
+    --sp-rose: #B0616F;
+    --sp-rose-light: #F5E5E8;
+    --sp-silver: #BFBBBD;
+    --sp-border: #E0D8D2;
+    --sp-warm: #EAE3DF;
+    --sp-bg: #F6F3F0;
+    --sp-card: #FFFFFF;
+    --sp-text: #1E1A17;
+    --sp-muted: #6B5F56;
+    --radius: 14px;
+    --shadow: 0 2px 16px rgba(27,58,75,0.07);
+    --shadow-lg: 0 12px 40px rgba(27,58,75,0.13);
+    --shadow-gold: 0 4px 20px rgba(201,162,39,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--sp-bg);
+    color: var(--sp-text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── Navigation ── */
+  .top-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: #FFFFFF;
+    color: var(--sp-navy);
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 28px; height: 64px;
+    box-shadow: 0 1px 0 var(--sp-border), 0 4px 20px rgba(27,58,75,0.06);
+    border-bottom: 3px solid var(--sp-gold);
+  }
+  .top-bar .logo { font-size: 22px; letter-spacing: -0.5px; }
+  .top-bar .logo .light { font-weight: 300; color: var(--sp-navy); }
+  .top-bar .logo .bold { font-weight: 900; color: var(--sp-gold); letter-spacing: 3px; font-size: 13px; text-transform: uppercase; }
+  .top-bar .tag {
+    font-size: 10px; background: var(--sp-navy-deep); color: var(--sp-gold-bright);
+    padding: 3px 10px; border-radius: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .top-bar .logo-img { height: 36px; margin-right: 6px; border-radius: 4px; }
+  .top-bar .conf-label { font-size: 12px; color: var(--sp-muted); font-weight: 600; }
+
+  .sidebar {
+    position: fixed; top: 64px; left: 0; bottom: 0; width: 270px;
+    background: var(--sp-navy-deep); border-right: none;
+    overflow-y: auto; padding: 20px 0;
+  }
+  .sidebar a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 24px; color: rgba(255,255,255,0.55); text-decoration: none;
+    font-size: 13px; font-weight: 600; transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .sidebar a:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.9); }
+  .sidebar a.active { color: var(--sp-gold-bright); background: rgba(201,162,39,0.1); border-left-color: var(--sp-gold); font-weight: 800; }
+  .sidebar .section-label {
+    padding: 20px 24px 8px; font-size: 10px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 2px; color: var(--sp-gold);
+  }
+
+  .main { margin-left: 270px; margin-top: 64px; padding: 36px 52px 80px; max-width: 960px; }
+
+  /* ── Section ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Typography ── */
+  h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; color: var(--sp-navy-deep); }
+  h2 { font-size: 22px; font-weight: 900; margin: 40px 0 14px; padding-bottom: 10px; border-bottom: 3px solid var(--sp-gold); color: var(--sp-navy-deep); }
+  h3 { font-size: 17px; font-weight: 800; margin: 28px 0 8px; color: var(--sp-navy); }
+  h4 { font-size: 14px; font-weight: 800; margin: 16px 0 6px; color: var(--sp-gold); text-transform: uppercase; letter-spacing: 1px; }
+  p { margin-bottom: 12px; }
+  .subtitle { font-size: 17px; color: var(--sp-muted); margin-bottom: 24px; font-weight: 400; }
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 700; }
+  blockquote {
+    border-left: 4px solid var(--sp-gold); background: var(--sp-gold-light);
+    padding: 16px 20px; margin: 16px 0; border-radius: 0 var(--radius) var(--radius) 0;
+    font-style: italic; color: var(--sp-text);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, var(--sp-navy-deep) 0%, var(--sp-navy) 50%, var(--sp-sky) 100%);
+    color: white; padding: 56px 48px; border-radius: var(--radius);
+    margin-bottom: 36px; position: relative; overflow: hidden;
+    box-shadow: 0 16px 48px rgba(15,36,51,0.25);
+  }
+  .hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(201,162,39,0.08) 100%);
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -40%; right: -10%; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 60%);
+    border-radius: 50%;
+  }
+  .hero h1 { font-size: 40px; color: white; margin-bottom: 6px; position: relative; }
+  .hero .subtitle { color: rgba(255,255,255,0.65); margin-bottom: 0; font-size: 18px; position: relative; }
+  .hero .tag-line { font-size: 13px; color: var(--sp-gold-bright); font-weight: 800; margin-bottom: 14px; letter-spacing: 2px; text-transform: uppercase; position: relative; }
+  .hero .logo-hero { height: 52px; margin-bottom: 20px; border-radius: 6px; position: relative; }
+  .hero .gold-rule { width: 60px; height: 3px; background: var(--sp-gold-bright); border-radius: 2px; margin: 16px 0; position: relative; }
+
+  /* ── Stat Cards ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin: 24px 0 32px; }
+  .stat-card {
+    background: var(--sp-card); border: 1px solid var(--sp-border); border-radius: var(--radius);
+    padding: 24px 20px; text-align: center; box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s; border-top: 3px solid transparent;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .stat-card .number { font-size: 34px; font-weight: 900; color: var(--sp-navy); }
+  .stat-card .number.mint { color: var(--sp-mint); }
+  .stat-card .number.gold { color: var(--sp-gold); }
+  .stat-card .number.rose { color: var(--sp-rose); }
+  .stat-card .number.sky { color: var(--sp-sky); }
+  .stat-card .label { font-size: 11px; color: var(--sp-muted); margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Info Cards ── */
+  .info-card {
+    background: var(--sp-mint-light); border-left: 5px solid var(--sp-mint);
+    padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(77,142,127,0.08);
+  }
+  .info-card.gold { background: var(--sp-gold-light); border-left-color: var(--sp-gold); box-shadow: var(--shadow-gold); }
+  .info-card.rose { background: var(--sp-rose-light); border-left-color: var(--sp-rose); box-shadow: 0 2px 8px rgba(176,97,111,0.08); }
+  .info-card.navy { background: #E4EDF3; border-left-color: var(--sp-navy); box-shadow: 0 2px 8px rgba(27,58,75,0.08); }
+  .info-card .card-title { font-weight: 900; margin-bottom: 6px; font-size: 15px; color: var(--sp-navy); }
+  .info-card p { margin-bottom: 6px; font-size: 13.5px; line-height: 1.7; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; box-shadow: var(--shadow); border-radius: var(--radius); overflow: hidden; }
+  th { background: var(--sp-navy-deep); color: rgba(255,255,255,0.9); padding: 12px 16px; text-align: left; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--sp-border); background: white; }
+  tr:hover td { background: var(--sp-gold-light); }
+  th:first-child { border-radius: var(--radius) 0 0 0; }
+  th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .check { color: var(--sp-mint); font-weight: 800; }
+  .cross { color: var(--sp-rose); }
+  .partial { color: var(--sp-gold); font-weight: 700; }
+
+  /* ── Team Cards ── */
+  .team-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin: 24px 0; }
+  .team-card {
+    background: var(--sp-card); border: 1px solid var(--sp-border); border-radius: var(--radius);
+    padding: 32px; box-shadow: var(--shadow); border-left: 4px solid var(--sp-gold);
+    transition: box-shadow 0.2s;
+  }
+  .team-card:hover { box-shadow: var(--shadow-lg); }
+  .team-card .name { font-size: 20px; font-weight: 900; color: var(--sp-navy); }
+  .team-card .role { font-size: 14px; color: var(--sp-gold); font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .team-card .bio { font-size: 13.5px; color: var(--sp-muted); line-height: 1.8; }
+  .team-card .cred {
+    display: inline-block; background: var(--sp-navy-deep); padding: 4px 12px;
+    border-radius: 20px; font-size: 10px; font-weight: 800; color: var(--sp-gold-bright);
+    margin: 12px 5px 0 0; letter-spacing: 0.3px;
+  }
+
+  /* ── Timeline ── */
+  .timeline { position: relative; margin: 24px 0 24px 20px; padding-left: 28px; border-left: 4px solid var(--sp-gold); }
+  .timeline-item { margin-bottom: 24px; position: relative; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -34px; top: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--sp-gold-bright); border: 3px solid white; box-shadow: 0 0 0 3px var(--sp-gold), var(--shadow-gold);
+  }
+  .timeline-item .phase { font-size: 11px; font-weight: 900; color: var(--sp-gold); text-transform: uppercase; letter-spacing: 1.5px; }
+  .timeline-item .title { font-weight: 900; font-size: 16px; margin: 2px 0 6px; color: var(--sp-navy-deep); }
+  .timeline-item .desc { font-size: 13px; color: var(--sp-muted); }
+
+  /* ── Pricing Cards ── */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 20px 0; }
+  .pricing-card {
+    background: var(--sp-card); border: 2px solid var(--sp-border); border-radius: var(--radius);
+    padding: 28px 24px; text-align: center; box-shadow: var(--shadow); transition: all 0.2s;
+  }
+  .pricing-card.featured { border-color: var(--sp-gold); box-shadow: var(--shadow-gold), var(--shadow-lg); transform: scale(1.04); position: relative; }
+  .pricing-card.featured::before { content: 'MOST POPULAR'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--sp-gold); color: var(--sp-navy-deep); padding: 3px 14px; border-radius: 10px; font-size: 9px; font-weight: 900; letter-spacing: 1px; }
+  .pricing-card .plan-name { font-size: 13px; font-weight: 900; color: var(--sp-gold); text-transform: uppercase; letter-spacing: 2px; }
+  .pricing-card .price { font-size: 40px; font-weight: 900; color: var(--sp-navy); margin: 8px 0; }
+  .pricing-card .price span { font-size: 14px; color: var(--sp-muted); font-weight: 500; }
+  .pricing-card .feat { font-size: 12px; color: var(--sp-muted); text-align: left; margin: 5px 0; }
+  .pricing-card .feat::before { content: '\2713 '; color: var(--sp-mint); font-weight: 800; }
+
+  /* ── Flywheel ── */
+  .flywheel {
+    display: flex; justify-content: center; align-items: center;
+    margin: 32px 0; position: relative;
+  }
+  .flywheel-ring {
+    width: 340px; height: 340px; border-radius: 50%;
+    border: 3px dashed var(--sp-border); position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .flywheel-center {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sp-navy-deep), var(--sp-navy));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sp-gold-bright); font-weight: 900; font-size: 14px; text-align: center;
+    box-shadow: 0 8px 32px rgba(15,36,51,0.3);
+    border: 3px solid var(--sp-gold);
+  }
+  .flywheel-node {
+    position: absolute; width: 110px; padding: 12px;
+    background: white; border: 2px solid var(--sp-gold); border-radius: var(--radius);
+    font-size: 11px; font-weight: 800; text-align: center; color: var(--sp-navy-deep);
+    box-shadow: var(--shadow), var(--shadow-gold);
+  }
+  .flywheel-node:nth-child(2) { top: -15px; left: 50%; transform: translateX(-50%); }
+  .flywheel-node:nth-child(3) { top: 50%; right: -60px; transform: translateY(-50%); }
+  .flywheel-node:nth-child(4) { bottom: -15px; left: 50%; transform: translateX(-50%); }
+  .flywheel-node:nth-child(5) { top: 50%; left: -60px; transform: translateY(-50%); }
+
+  /* ── Financial Chart (CSS) ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 200px; margin: 20px 0; padding: 0 8px; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .bar {
+    width: 100%; border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, var(--sp-navy-deep) 0%, var(--sp-navy) 100%);
+    transition: height 0.5s; min-height: 4px;
+    box-shadow: 0 2px 8px rgba(27,58,75,0.2);
+  }
+  .bar.projected { background: linear-gradient(180deg, var(--sp-gold-bright) 0%, var(--sp-gold) 100%); box-shadow: var(--shadow-gold); }
+  .bar-label { font-size: 11px; color: var(--sp-muted); margin-top: 6px; font-weight: 800; }
+  .bar-value { font-size: 12px; font-weight: 900; color: var(--sp-navy-deep); margin-bottom: 4px; }
+
+  /* ── Moat Diagram ── */
+  .moat-stack { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+  .moat-layer {
+    padding: 14px 24px; display: flex; align-items: center; gap: 12px;
+    font-size: 13px; font-weight: 700;
+  }
+  .moat-layer:nth-child(1) { background: var(--sp-navy); color: white; border-radius: var(--radius) var(--radius) 0 0; }
+  .moat-layer:nth-child(2) { background: var(--sp-sky); color: white; }
+  .moat-layer:nth-child(3) { background: var(--sp-mint); color: white; }
+  .moat-layer:nth-child(4) { background: var(--sp-gold); color: var(--sp-navy); }
+  .moat-layer:nth-child(5) { background: var(--sp-gold-light); color: var(--sp-navy); border-radius: 0 0 var(--radius) var(--radius); }
+  .moat-icon { font-size: 20px; }
+
+  /* ── Atlas.md Comparison ── */
+  .atlas-compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 20px 0;
+    border: 2px solid var(--sp-border); border-radius: var(--radius); overflow: hidden;
+  }
+  .atlas-col { padding: 20px; }
+  .atlas-col.atlas { background: #F0ECEC; }
+  .atlas-col.starlight { background: var(--sp-gold-light); }
+  .atlas-col .col-header {
+    font-size: 15px; font-weight: 900; margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 3px solid;
+  }
+  .atlas-col.atlas .col-header { color: #888; border-color: #ccc; }
+  .atlas-col.starlight .col-header { color: var(--sp-navy); border-color: var(--sp-gold); }
+  .atlas-col ul { list-style: none; margin: 0; padding: 0; }
+  .atlas-col li { padding: 4px 0; font-size: 12px; }
+  .atlas-col.atlas li::before { content: '\2717 '; color: var(--sp-rose); font-weight: 700; }
+  .atlas-col.starlight li::before { content: '\2713 '; color: var(--sp-mint); font-weight: 700; }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; margin-left: 0; }
+  .checklist li { padding: 6px 0; font-size: 13px; }
+  .checklist li::before { content: '\2610 '; font-size: 14px; }
+  .checklist li.done::before { content: '\2611 '; color: var(--sp-mint); }
+
+  /* ── Print ── */
+  @media print {
+    .top-bar, .sidebar { display: none; }
+    .main { margin: 0; padding: 20px; }
+    .section { display: block !important; page-break-inside: avoid; }
+    .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .atlas-compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+  <img src="logo-mark.png" class="logo-img" alt="Starlight">
+  <div class="logo">
+    <span class="light">Starlight</span><span class="bold">.MD</span>
+  </div>
+  <div class="tag">Business Plan</div>
+  <div style="flex:1;"></div>
+  <div style="font-size:12px;opacity:0.6;">March 2026 &middot; Confidential</div>
+</div>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="section-label">Overview</div>
+  <a href="#exec" class="active" onclick="go('exec',this)">Executive Summary</a>
+  <a href="#problem" onclick="go('problem',this)">Problem & Opportunity</a>
+  <a href="#product" onclick="go('product',this)">Product Overview</a>
+
+  <div class="section-label">Market</div>
+  <a href="#atlas" onclick="go('atlas',this)">Atlas.md Deep Dive</a>
+  <a href="#competitive" onclick="go('competitive',this)">Competitive Landscape</a>
+  <a href="#moat" onclick="go('moat',this)">Competitive Moat</a>
+  <a href="#market" onclick="go('market',this)">Market Sizing</a>
+
+  <div class="section-label">Business</div>
+  <a href="#pricing" onclick="go('pricing',this)">Pricing Strategy</a>
+  <a href="#gtm" onclick="go('gtm',this)">Go-to-Market</a>
+  <a href="#financials" onclick="go('financials',this)">Financial Projections</a>
+
+  <div class="section-label">Company</div>
+  <a href="#team" onclick="go('team',this)">Team</a>
+  <a href="#formation" onclick="go('formation',this)">Company Formation</a>
+  <a href="#roadmap" onclick="go('roadmap',this)">Product Roadmap</a>
+  <a href="#risks" onclick="go('risks',this)">Risks & Mitigation</a>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- EXECUTIVE SUMMARY -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section active" id="exec">
+  <div class="hero">
+    <img src="logo-full.png" class="logo-hero" alt="Starlight Pediatrics">
+    <div class="tag-line">The Operating System for Direct Primary Care</div>
+    <h1 style="color:white;">Starlight.MD</h1>
+    <div class="gold-rule"></div>
+    <p class="subtitle">Purpose-built practice management for DPC physicians who refuse to compromise on patient care.</p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number mint">25,000+</div>
+      <div class="label">DPC Physicians in the U.S.</div>
+    </div>
+    <div class="stat-card">
+      <div class="number gold">$2.4B</div>
+      <div class="label">DPC Market by 2028</div>
+    </div>
+    <div class="stat-card">
+      <div class="number rose">0</div>
+      <div class="label">Purpose-Built DPC Platforms</div>
+    </div>
+    <div class="stat-card">
+      <div class="number sky">85%</div>
+      <div class="label">DPC Docs Using Cobbled Tools</div>
+    </div>
+  </div>
+
+  <h2>The Thesis</h2>
+  <p>Direct Primary Care is the fastest-growing movement in American medicine. Over <strong>25,000 physicians</strong> have left fee-for-service to practice membership-based, insurance-free medicine. Yet not a single platform is purpose-built for how they actually run their practices.</p>
+
+  <p>DPC doctors juggle 4–7 disconnected tools: a generic EMR, a separate billing system, a CRM spreadsheet, a messaging app, a scheduling tool, and maybe a Google Sheet for revenue tracking. They spend <strong>40% of their non-clinical time</strong> on administrative tasks that should be automated.</p>
+
+  <p><strong>Starlight.MD</strong> is the all-in-one operating system built by a DPC doctor, for DPC doctors. It combines patient management, membership billing, pipeline CRM, automated communications, wellness scheduling, revenue analytics, and clinical workflows — all in a single platform designed from the ground up for the DPC model.</p>
+
+  <div class="info-card">
+    <div class="card-title">Why We Win</div>
+    <p>We're not adapting a fee-for-service EMR for DPC. We started with a real DPC pediatric practice — <strong>Starlight Pediatrics in Austin, TX</strong> — and built exactly what the doctor needed. Our CMO, Dr. Yogini Prajapati, currently uses Atlas.md as her EMR and had to commission an entirely separate platform (which became Starlight.MD) because Atlas.md couldn't handle her practice management, pipeline, communications, or revenue needs. Every feature exists because she needed it on real patients.</p>
+  </div>
+
+  <h2>What We've Already Built</h2>
+  <p>Starlight.MD isn't a pitch deck — it's a <strong>working product</strong> currently managing a live DPC pediatric practice with 21 patients, processing real revenue, and sending real patient communications. Our prototype includes:</p>
+  <ul>
+    <li><strong>14-page practice management platform</strong> with dashboard, patient management, pipeline CRM, billing, wellness scheduling, actions, revenue analytics, messaging hub, pricing guide, practice reports, and data backup</li>
+    <li><strong>17 email templates</strong> with merge tags, CAN-SPAM compliance, and professional HTML formatting</li>
+    <li><strong>5-step automated nurture sequences</strong> for prospect conversion</li>
+    <li><strong>Age-based tier pricing engine</strong> with automatic plan change detection and alerts</li>
+    <li><strong>Google Review tracking</strong> with 30-day follow-up cadence</li>
+    <li><strong>Newborn home visit checklist</strong> with structured clinical assessment</li>
+    <li><strong>Revenue simulator</strong> with what-if scenario modeling</li>
+    <li><strong>4-layer data protection</strong> with auto-backup and recovery</li>
+  </ul>
+
+  <h2>The Ask</h2>
+  <p>We're raising a <strong>$500K pre-seed round</strong> to hire 2 engineers, achieve HIPAA compliance, migrate to a cloud backend, onboard 50 DPC practices in a 6-month pilot, and prove product-market fit before a Series A.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- PROBLEM & OPPORTUNITY -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="problem">
+  <h1>Problem & Opportunity</h1>
+  <p class="subtitle">DPC is booming. The tools haven't kept up.</p>
+
+  <h2>The DPC Movement</h2>
+  <p>Direct Primary Care eliminates insurance middlemen entirely. Patients pay a monthly membership fee directly to their doctor in exchange for unlimited access, longer visits, same-day appointments, and 24/7 communication. No copays. No claim forms. No prior authorizations.</p>
+
+  <p>The model works — DPC practices report <strong>40% lower overhead</strong> than traditional practices, <strong>93% physician satisfaction</strong>, and <strong>20% fewer ER visits</strong> among their patient panels. The movement has grown from ~1,000 practices in 2018 to over <strong>2,500+ practices in 2026</strong>.</p>
+
+  <h2>The Tool Problem</h2>
+  <p>Despite this growth, DPC doctors are forced to use tools built for a fundamentally different business model:</p>
+
+  <table>
+    <tr><th>What DPC Needs</th><th>What Exists Today</th><th>The Gap</th></tr>
+    <tr><td>Membership billing (monthly/annual)</td><td>Insurance claim processors</td><td>Completely wrong billing model</td></tr>
+    <tr><td>Pipeline CRM for prospects</td><td>Nothing — spreadsheets</td><td>No conversion tracking</td></tr>
+    <tr><td>Patient communication hub</td><td>Personal texting + email</td><td>No templates, no tracking, no automation</td></tr>
+    <tr><td>Revenue analytics (MRR/ARR)</td><td>Accounting software</td><td>Not integrated with patient data</td></tr>
+    <tr><td>Wellness scheduling (preventive)</td><td>Sick-visit focused schedulers</td><td>DPC is wellness-first, not sick-first</td></tr>
+    <tr><td>Family billing (sibling discounts)</td><td>Individual patient billing</td><td>DPC family plans are common</td></tr>
+    <tr><td>Age-based tier pricing</td><td>Fixed fee schedules</td><td>Pediatric DPC has age-tier models</td></tr>
+    <tr><td>Practice growth tools</td><td>Separate marketing platforms</td><td>No referral tracking or review automation</td></tr>
+  </table>
+
+  <div class="info-card gold">
+    <div class="card-title">Dr. P's "Duct Tape Stack" — Before Starlight.MD</div>
+    <p>Here's what Dr. Yogini Prajapati actually uses today to run Starlight Pediatrics: <strong>Atlas.md</strong> ($300/mo, EMR + basic billing) + <strong>personal iPhone</strong> (texting parents) + <strong>Gmail</strong> (email communication) + <strong>Google Sheets</strong> (revenue tracking, prospect pipeline) + <strong>Wix</strong> (website) + <strong>Instagram/Facebook</strong> (marketing). That's 6 disconnected tools — and she still had to build a custom app to fill the gaps Atlas.md couldn't cover.</p>
+  </div>
+
+  <h2>Why Now</h2>
+  <ol>
+    <li><strong>DPC legislation expanding:</strong> 38 states now have DPC-enabling laws (up from 25 in 2020)</li>
+    <li><strong>Employer adoption:</strong> Self-insured employers are adding DPC as a benefit, driving 2x patient panel growth</li>
+    <li><strong>Physician burnout crisis:</strong> 53% of physicians report burnout; DPC is the #1 cited alternative</li>
+    <li><strong>AI-native advantage:</strong> We can build intelligent automation (nurture sequences, wellness predictions, revenue optimization) that legacy EMRs like Atlas.md can't retrofit into 2012-era code</li>
+    <li><strong>Pediatric DPC is the wedge:</strong> The fastest-growing DPC segment (30% YoY) with zero purpose-built tools</li>
+    <li><strong>Post-COVID trust shift:</strong> Parents want direct physician relationships, not impersonal health systems</li>
+    <li><strong>Working prototype:</strong> Unlike every other DPC tool idea, we already have a production system managing a real practice</li>
+  </ol>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- PRODUCT OVERVIEW -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="product">
+  <h1>Product Overview</h1>
+  <p class="subtitle">Everything a DPC practice needs. Nothing it doesn't.</p>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number mint">14</div>
+      <div class="label">Integrated Modules</div>
+    </div>
+    <div class="stat-card">
+      <div class="number gold">17</div>
+      <div class="label">Email Templates</div>
+    </div>
+    <div class="stat-card">
+      <div class="number sky">16</div>
+      <div class="label">Journey Milestones</div>
+    </div>
+    <div class="stat-card">
+      <div class="number rose">4</div>
+      <div class="label">Data Protection Layers</div>
+    </div>
+  </div>
+
+  <h2>Core Modules</h2>
+
+  <h3>1. Smart Dashboard</h3>
+  <p>At-a-glance KPIs: active patients, MRR, upcoming wellness checks, overdue payments, pipeline prospects, and referral leaderboard. Actionable alerts with one-click resolution (mark paid, schedule check, send reminder).</p>
+
+  <h3>2. Patient Management</h3>
+  <p>Full patient profiles with dynamic table views for active patients vs. prospects. Contact info, visit history, payment status, family linking, email log, timestamped notes. Sortable columns, search, and filter by status.</p>
+
+  <h3>3. Prospect Pipeline (CRM)</h3>
+  <p>Kanban board with 4-stage workflow: Inquiry → Meet & Greet → Scheduled Visit → Ready to Enroll. Inline follow-up date editing, due date tracking, and one-click enrollment. Pipeline-specific columns (phone, email, follow-up date) replace irrelevant clinical fields.</p>
+
+  <h3>4. Membership Billing</h3>
+  <p>Age-based tier pricing engine (5 tiers from newborn to young adult). Automatic plan change detection with EMR alerts. Payment status tracking with overdue dashboards. Family discount calculations (25% sibling, $500/mo cap, 5% annual prepay).</p>
+
+  <h3>5. Wellness Scheduling</h3>
+  <p>AAP guideline-based scheduling for 9 well-child checkpoints (2–30 months). Calendar view with scheduling modal, doctor notes, and completion tracking. Auto-generates reminder emails for upcoming checks.</p>
+
+  <h3>6. Communication Hub</h3>
+  <p>Six-tab messaging center:</p>
+  <ul>
+    <li><strong>Patient Journey</strong> — Visual birth-to-childhood timeline with 16 milestones and auto-triggered templates</li>
+    <li><strong>Send Now</strong> — Smart reminders based on real patient data (wellness due, billing changes, newborn check-ins)</li>
+    <li><strong>Templates</strong> — 17 professionally written templates across 5 categories with merge tags</li>
+    <li><strong>Reviews</strong> — Google Review tracking with 30-day follow-up cadence and send history</li>
+    <li><strong>Nurture</strong> — 5-step automated prospect drip campaign (Day 0, 2, 5, 10, 21)</li>
+    <li><strong>Sent Log</strong> — Complete email audit trail per patient</li>
+  </ul>
+
+  <h3>7. Revenue Analytics</h3>
+  <p>MRR/ARR calculations, 6-month forecast, 12-month projection table, revenue by tier, historical data with year filtering, and a growth simulator with what-if sliders for tier-level patient changes.</p>
+
+  <h3>8. Clinical Workflows</h3>
+  <p>Visit logging with type classification (well-child, sick, home visit, phone consult). Newborn home visit checklist with 20 structured assessment items across 5 categories. Color-coded visit timeline.</p>
+
+  <h3>9. Practice Report</h3>
+  <p>Printable/PDF-ready practice summary: patient census, revenue metrics, wellness compliance, pipeline status, referral attribution. One-click print with optimized print CSS.</p>
+
+  <h3>10. Website Lead Capture</h3>
+  <p>Embeddable HTML form snippet for Wix/Squarespace. URL parameter-based auto-import with duplicate detection. New leads auto-enter pipeline as inquiries with "Website" referral source.</p>
+
+  <div class="info-card">
+    <div class="card-title">Professional Email System</div>
+    <p>All emails use a unified HTML template with Starlight Pediatrics logo header, branded gradient, CAN-SPAM compliant footer, social links (Instagram, Facebook, website), and professional signature. Preview-before-send modal ensures nothing goes out without review. Powered by EmailJS (200 free emails/month, zero backend required).</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- ATLAS.MD DEEP DIVE -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="atlas">
+  <h1>Atlas.md Deep Dive</h1>
+  <p class="subtitle">Our CMO's current EMR — and why she needed something more.</p>
+
+  <div class="info-card navy">
+    <div class="card-title">Insider Perspective</div>
+    <p>Dr. Yogini Prajapati has been using Atlas.md ($300/month) since launching Starlight Pediatrics. She knows the platform intimately — its strengths, its gaps, and exactly where it fails DPC pediatric practices. This section reflects real-world usage, not marketing claims.</p>
+  </div>
+
+  <h2>What Atlas.md Is</h2>
+  <p><strong>Founded:</strong> 2012 in Wichita, KS &middot; <strong>Funding:</strong> Bootstrapped &middot; <strong>Customers:</strong> ~400 DPC practices &middot; <strong>Price:</strong> $300/mo per provider + 2.1% payment processing</p>
+  <p>Atlas.md is a cloud-based EMR and billing platform specifically built for Direct Primary Care. It was one of the first DPC-specific tools and remains the most commonly used EMR among DPC practices. It handles clinical charting, basic billing, and patient messaging.</p>
+
+  <h2>What Atlas.md Does Well</h2>
+  <table>
+    <tr><th>Capability</th><th>Details</th></tr>
+    <tr><td><strong>Clinical Charting</strong></td><td>Clean, pen-and-paper feel. AI-powered SOAP notes. Diagnosis suggestions with ICD-10 lookup. Voice transcription for notes.</td></tr>
+    <tr><td><strong>Patient Messaging</strong></td><td>Direct video calling from EMR. Text message integration with auto-archive to charts. Unlimited fax, phone, email, text tracking.</td></tr>
+    <tr><td><strong>Prescriptions</strong></td><td>In-office dispensing. Pharmacy integration. Direct ePrescribing. CC pharmacy on emails.</td></tr>
+    <tr><td><strong>Lab Integration</strong></td><td>Quest, LabCorp, and 100+ regional labs via ELLKAY partnership. Results import directly to charts.</td></tr>
+    <tr><td><strong>Family Scheduling</strong></td><td>Recent addition: family member self-scheduling via Patient Hub and Patient App. Single family account.</td></tr>
+    <tr><td><strong>DPC Workflow</strong></td><td>Built ground-up for subscription model. Membership management. Not a retrofitted insurance EMR.</td></tr>
+  </table>
+
+  <h2>Where Atlas.md Falls Short</h2>
+  <p>These are the gaps that forced Dr. P to build Starlight.MD as a companion platform:</p>
+
+  <div class="atlas-compare">
+    <div class="atlas-col atlas">
+      <div class="col-header">Atlas.md Gaps</div>
+      <ul>
+        <li>No prospect pipeline or CRM</li>
+        <li>No nurture sequences or drip campaigns</li>
+        <li>No patient journey mapping</li>
+        <li>No Google Review tracking</li>
+        <li>No MRR/ARR dashboards</li>
+        <li>No revenue forecasting or growth modeling</li>
+        <li>No age-based tier pricing automation</li>
+        <li>No plan change alerts</li>
+        <li>No family discount calculations</li>
+        <li>No AAP wellness check calendar</li>
+        <li>No newborn home visit checklists</li>
+        <li>No email template library with merge tags</li>
+        <li>No website lead capture</li>
+        <li>No referral source tracking</li>
+        <li>No practice growth analytics</li>
+        <li>Patients can't see labs in portal</li>
+        <li>Patients can't see chart notes</li>
+        <li>Dated 2012-era UI</li>
+        <li>Occasional system crashes</li>
+      </ul>
+    </div>
+    <div class="atlas-col starlight">
+      <div class="col-header">Starlight.MD Solves</div>
+      <ul>
+        <li>4-stage Kanban pipeline CRM</li>
+        <li>5-step automated nurture sequences</li>
+        <li>16-milestone patient journey timeline</li>
+        <li>Google Review tracking + 30-day follow-up</li>
+        <li>Real-time MRR/ARR dashboards</li>
+        <li>12-month forecasting + growth simulator</li>
+        <li>5-tier age-based pricing engine</li>
+        <li>Automatic plan change alerts with dates</li>
+        <li>25% sibling discount, $500/mo cap</li>
+        <li>9-checkpoint AAP wellness calendar</li>
+        <li>20-item structured home visit checklist</li>
+        <li>17 templates with 8+ merge tags</li>
+        <li>Wix/Squarespace embeddable form</li>
+        <li>Referral leaderboard on dashboard</li>
+        <li>Revenue by tier, cohort, and scenario</li>
+        <li>Full email audit trail per patient</li>
+        <li>Preview-before-send for all comms</li>
+        <li>Modern 2026 UI built with Nunito font</li>
+        <li>4-layer data protection + auto-backup</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>The Strategic Opportunity</h2>
+  <p>Atlas.md is <strong>good at clinical workflows</strong> (charting, prescriptions, lab orders) and <strong>bad at everything else</strong> (business operations, growth, communications, analytics). This creates two possible strategies:</p>
+
+  <div class="info-card gold">
+    <div class="card-title">Strategy A: Complement Atlas.md</div>
+    <p>Launch Starlight.MD as a practice management layer that sits alongside Atlas.md. Doctors keep Atlas for charting and prescriptions, use Starlight.MD for pipeline, communications, billing analytics, and growth. <strong>Faster to market, lower switching cost.</strong></p>
+  </div>
+
+  <div class="info-card">
+    <div class="card-title">Strategy B: Replace Atlas.md</div>
+    <p>Build clinical charting into Starlight.MD (Phase 3 roadmap) and offer a complete replacement. Doctors drop Atlas.md entirely and save $300/month. <strong>Higher revenue per practice, but requires clinical feature parity.</strong></p>
+  </div>
+
+  <p><strong>Our recommendation:</strong> Start with Strategy A (complement) to accelerate adoption, then execute Strategy B (replace) as we build clinical features. This mirrors how Stripe started as payments-only before expanding to Atlas (billing), Radar (fraud), and the full financial stack.</p>
+
+  <h2>What Atlas.md Users Say</h2>
+  <blockquote>"The charting is great and feels natural. But I'm still using Google Sheets to track my revenue and a spreadsheet for my prospect pipeline. For $300/month, I expected more business tools."</blockquote>
+  <blockquote>"The patient portal is basically read-only. My parents can't see lab results or visit notes. For a DPC practice where transparency is the whole point, that's a problem."</blockquote>
+  <blockquote>"I love that it's DPC-native, but the UI feels stuck in 2015. And the analytics are basically non-existent."</blockquote>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- COMPETITIVE ANALYSIS -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="competitive">
+  <h1>Competitive Landscape</h1>
+  <p class="subtitle">Every tool DPC practices use today, and where they fall short.</p>
+
+  <h2>The Landscape</h2>
+  <p>No single platform serves DPC practices end-to-end. The market is fragmented across EMRs, billing tools, and practice management suites — all built for fee-for-service medicine and retrofitted (poorly) for DPC.</p>
+
+  <h3>Direct Competitors</h3>
+  <table>
+    <tr><th>Platform</th><th>Type</th><th>DPC Focus</th><th>Price</th><th>Key Weakness</th></tr>
+    <tr>
+      <td><strong>Atlas.md</strong></td>
+      <td>DPC EMR</td>
+      <td class="check">Yes</td>
+      <td>$300/mo</td>
+      <td>Clinical-only — no CRM, no comms, no analytics, dated UI</td>
+    </tr>
+    <tr>
+      <td><strong>Hint Health</strong></td>
+      <td>DPC Billing</td>
+      <td class="check">Yes</td>
+      <td>$199–499/mo</td>
+      <td>Billing only — no EMR, no CRM, no communications</td>
+    </tr>
+    <tr>
+      <td><strong>Elation Health</strong></td>
+      <td>EMR</td>
+      <td class="partial">Partial</td>
+      <td>$349–599/mo</td>
+      <td>Fee-for-service EMR with DPC "mode" — heavy, complex, insurance-centric</td>
+    </tr>
+    <tr>
+      <td><strong>Cerbo</strong></td>
+      <td>EMR</td>
+      <td class="partial">Partial</td>
+      <td>$350+/mo</td>
+      <td>Functional medicine focus, not DPC-native. Complex. No pipeline.</td>
+    </tr>
+    <tr>
+      <td><strong>SigmaMD</strong></td>
+      <td>DPC Platform</td>
+      <td class="check">Yes</td>
+      <td>Varies</td>
+      <td>Newer entrant, less community trust. Better pediatric features than Atlas.</td>
+    </tr>
+    <tr>
+      <td><strong>Practice Better</strong></td>
+      <td>Practice Mgmt</td>
+      <td class="cross">No</td>
+      <td>$69–129/mo</td>
+      <td>Built for wellness coaches, not physicians. No clinical workflows.</td>
+    </tr>
+    <tr>
+      <td><strong>Jane App</strong></td>
+      <td>Practice Mgmt</td>
+      <td class="cross">No</td>
+      <td>$54–114/mo</td>
+      <td>Allied health focus. Insurance billing centric. No membership model.</td>
+    </tr>
+  </table>
+
+  <h2>Feature Comparison Matrix</h2>
+  <table>
+    <tr>
+      <th>Feature</th>
+      <th style="background:var(--sp-mint);">Starlight.MD</th>
+      <th>Atlas.md</th>
+      <th>Hint Health</th>
+      <th>Elation</th>
+      <th>Cerbo</th>
+    </tr>
+    <tr>
+      <td>Clinical charting (SOAP)</td>
+      <td class="partial">Roadmap</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+    </tr>
+    <tr>
+      <td>ePrescribing</td>
+      <td class="partial">Roadmap</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+    </tr>
+    <tr>
+      <td>Lab integration</td>
+      <td class="partial">Roadmap</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+    </tr>
+    <tr>
+      <td>Membership billing</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+      <td class="partial">~</td>
+      <td class="partial">~</td>
+    </tr>
+    <tr>
+      <td>Age-based tier pricing</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Auto plan-change alerts</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Prospect pipeline CRM</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Nurture sequences</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Email templates + merge tags</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="partial">~</td>
+      <td class="partial">~</td>
+    </tr>
+    <tr>
+      <td>Patient journey timeline</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Wellness scheduling (AAP)</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="partial">~</td>
+    </tr>
+    <tr>
+      <td>Revenue analytics (MRR/ARR)</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Growth simulator</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Google Review tracking</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Family linking + discounts</td>
+      <td class="check">&#10003;</td>
+      <td class="partial">~</td>
+      <td class="partial">~</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Referral tracking</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Website lead capture</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Home visit checklists</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="cross">&#10007;</td>
+      <td class="partial">~</td>
+      <td class="cross">&#10007;</td>
+    </tr>
+    <tr>
+      <td>Video visits</td>
+      <td class="partial">Roadmap</td>
+      <td class="check">&#10003;</td>
+      <td class="cross">&#10007;</td>
+      <td class="check">&#10003;</td>
+      <td class="check">&#10003;</td>
+    </tr>
+    <tr style="font-weight:700;background:var(--sp-mint-light);">
+      <td><strong>Features (of 19)</strong></td>
+      <td><strong class="check">14 + 5 roadmap</strong></td>
+      <td><strong>5</strong></td>
+      <td><strong>3</strong></td>
+      <td><strong>6</strong></td>
+      <td><strong>5</strong></td>
+    </tr>
+  </table>
+
+  <div class="info-card rose">
+    <div class="card-title">Key Insight</div>
+    <p>Atlas.md — the platform Dr. P currently pays $300/month for — has <strong>5 of 19 features</strong>. Starlight.MD already has 14, with 5 more on the roadmap. Even the most feature-rich competitor (Elation at $599/mo) only has 6. <strong>No competitor is even close to what Starlight.MD already offers for practice management.</strong></p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- COMPETITIVE MOAT -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="moat">
+  <h1>Competitive Moat</h1>
+  <p class="subtitle">Five layers of defensibility that compound over time.</p>
+
+  <div class="moat-stack">
+    <div class="moat-layer"><span class="moat-icon">&#x1F469;&#x200D;&#x2695;&#xFE0F;</span> <span><strong>Clinical Founder:</strong> Built by a practicing DPC pediatrician — not consultants guessing at workflows</span></div>
+    <div class="moat-layer"><span class="moat-icon">&#x1F4D0;</span> <span><strong>DPC-Native Architecture:</strong> Every data model, workflow, and UI designed DPC-first from day one</span></div>
+    <div class="moat-layer"><span class="moat-icon">&#x1F504;</span> <span><strong>Network Effects:</strong> Templates, workflows, and benchmarks improve with every practice added</span></div>
+    <div class="moat-layer"><span class="moat-icon">&#x1F916;</span> <span><strong>AI-Native:</strong> Built in 2026 with automation, not retrofitting 2012 Atlas.md-era code</span></div>
+    <div class="moat-layer"><span class="moat-icon">&#x1F49B;</span> <span><strong>Community Trust:</strong> DPC is a tight community — Dr. P is a known, trusted voice in pediatric DPC</span></div>
+  </div>
+
+  <h2>The Flywheel</h2>
+
+  <div class="flywheel">
+    <div class="flywheel-ring">
+      <div class="flywheel-center">Starlight<br>.MD</div>
+      <div class="flywheel-node">More DPC<br>Practices</div>
+      <div class="flywheel-node">Better<br>Templates &<br>Workflows</div>
+      <div class="flywheel-node">Higher Patient<br>Satisfaction</div>
+      <div class="flywheel-node">More<br>Referrals &<br>Reviews</div>
+    </div>
+  </div>
+
+  <p style="text-align:center;color:var(--sp-muted);font-size:13px;">Each new practice contributes templates, workflows, and benchmarks that make the platform better for everyone.</p>
+
+  <h2>Switching Cost Analysis</h2>
+  <table>
+    <tr><th>Switching Cost</th><th>Strength</th><th>Why</th></tr>
+    <tr><td>Patient data migration</td><td><strong>High</strong></td><td>Years of visit logs, notes, family relationships, communication history</td></tr>
+    <tr><td>Template library</td><td><strong>High</strong></td><td>Customized communication templates and nurture sequences take months to build</td></tr>
+    <tr><td>Workflow habits</td><td><strong>Medium-High</strong></td><td>Staff retraining is expensive for small 1-3 person practices</td></tr>
+    <tr><td>Revenue history</td><td><strong>Medium</strong></td><td>Historical analytics, forecasting baselines, and growth simulator models</td></tr>
+    <tr><td>Pipeline + nurture data</td><td><strong>Medium</strong></td><td>Prospect pipeline history and conversion patterns are practice IP</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- MARKET SIZING -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="market">
+  <h1>Market Sizing</h1>
+  <p class="subtitle">Large market, concentrated buyer, clear wedge.</p>
+
+  <h2>Total Addressable Market (TAM)</h2>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number mint">$780M</div>
+      <div class="label">TAM — All DPC Practice Software</div>
+    </div>
+    <div class="stat-card">
+      <div class="number gold">$195M</div>
+      <div class="label">SAM — DPC Practices Willing to Switch</div>
+    </div>
+    <div class="stat-card">
+      <div class="number sky">$12M</div>
+      <div class="label">SOM — Year 3 Target (500 practices)</div>
+    </div>
+  </div>
+
+  <h3>TAM Calculation</h3>
+  <table>
+    <tr><th>Segment</th><th>Practices</th><th>Avg. Annual Spend</th><th>Revenue</th></tr>
+    <tr><td>DPC Primary Care (Adult)</td><td>2,000</td><td>$3,600/yr ($300/mo)</td><td>$7.2M</td></tr>
+    <tr><td>DPC Pediatrics</td><td>400</td><td>$3,600/yr</td><td>$1.4M</td></tr>
+    <tr><td>DPC Family Medicine</td><td>600</td><td>$3,600/yr</td><td>$2.2M</td></tr>
+    <tr><td>Concierge/Hybrid Practices</td><td>12,000</td><td>$6,000/yr ($500/mo)</td><td>$72M</td></tr>
+    <tr><td>Employer DPC Programs</td><td>5,000</td><td>$12,000/yr ($1,000/mo)</td><td>$60M</td></tr>
+    <tr style="font-weight:700;background:var(--sp-mint-light);">
+      <td><strong>Total TAM</strong></td><td><strong>20,000</strong></td><td></td><td><strong>~$143M (core) — $780M (expanded)</strong></td>
+    </tr>
+  </table>
+  <p style="font-size:12px;color:var(--sp-muted);">*Expanded TAM includes adjacent membership medicine: functional medicine, integrative health, longevity practices.</p>
+
+  <h2>Wedge Strategy: Pediatric DPC First</h2>
+  <div class="info-card">
+    <div class="card-title">Why Pediatrics?</div>
+    <p><strong>1. Fastest growing DPC segment</strong> — 30% YoY growth vs. 15% for adult DPC<br>
+    <strong>2. Highest switching pain</strong> — age-based tiers, wellness schedules, and newborn workflows are uniquely complex<br>
+    <strong>3. Tight community</strong> — pediatric DPC doctors know each other; referrals spread fast<br>
+    <strong>4. We have the founder</strong> — Dr. Yogini Prajapati is a practicing pediatric DPC physician running her practice on the platform<br>
+    <strong>5. Atlas.md is weakest here</strong> — zero pediatric-specific features (no growth charts, no AAP scheduling, no newborn checklists)</p>
+  </div>
+
+  <h3>Expansion Path</h3>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="phase">Phase 1 — Now</div>
+      <div class="title">Pediatric DPC (400 practices)</div>
+      <div class="desc">Land-and-expand within the tightest, most underserved DPC niche. Complement Atlas.md initially.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 2 — Month 12</div>
+      <div class="title">Family Medicine DPC (600 practices)</div>
+      <div class="desc">Generalize age tiers and wellness protocols for all-ages DPC</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 3 — Month 18</div>
+      <div class="title">Adult DPC (2,000 practices)</div>
+      <div class="desc">Add chronic disease management, medication tracking, and adult wellness. Begin Atlas.md replacement strategy.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 4 — Month 24</div>
+      <div class="title">Concierge & Employer DPC ($72M market)</div>
+      <div class="desc">Enterprise features: multi-provider, employer dashboards, reporting</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- PRICING STRATEGY -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="pricing">
+  <h1>Pricing Strategy</h1>
+  <p class="subtitle">Simple, transparent pricing that mirrors the DPC ethos.</p>
+
+  <div class="info-card gold">
+    <div class="card-title">Pricing Philosophy</div>
+    <p>DPC doctors hate surprise fees — that's literally why they left insurance. Our pricing is flat-rate, transparent, and scales with practice size, not feature gates. Every plan gets every feature.</p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Solo</div>
+      <div class="price">$149<span>/mo</span></div>
+      <p style="font-size:12px;color:var(--sp-muted);margin-bottom:16px;">Up to 200 patients</p>
+      <div class="feat">All 14 modules</div>
+      <div class="feat">Unlimited email templates</div>
+      <div class="feat">Nurture sequences</div>
+      <div class="feat">Pipeline CRM</div>
+      <div class="feat">Revenue analytics</div>
+      <div class="feat">1 provider seat</div>
+      <div class="feat">Email support</div>
+    </div>
+    <div class="pricing-card featured">
+      <div class="plan-name">Growing</div>
+      <div class="price">$249<span>/mo</span></div>
+      <p style="font-size:12px;color:var(--sp-muted);margin-bottom:16px;">Up to 600 patients</p>
+      <div class="feat">Everything in Solo</div>
+      <div class="feat">Multi-provider (3 seats)</div>
+      <div class="feat">Employer panel support</div>
+      <div class="feat">Custom branding</div>
+      <div class="feat">Advanced analytics</div>
+      <div class="feat">Phone + chat support</div>
+      <div class="feat">Onboarding concierge</div>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Enterprise</div>
+      <div class="price">$499<span>/mo</span></div>
+      <p style="font-size:12px;color:var(--sp-muted);margin-bottom:16px;">Unlimited patients</p>
+      <div class="feat">Everything in Growing</div>
+      <div class="feat">Unlimited provider seats</div>
+      <div class="feat">Multi-location</div>
+      <div class="feat">API access</div>
+      <div class="feat">Dedicated success manager</div>
+      <div class="feat">SLA guarantee</div>
+      <div class="feat">HIPAA BAA included</div>
+    </div>
+  </div>
+
+  <h2>Pricing vs. The Current Stack</h2>
+  <table>
+    <tr><th>Platform</th><th>Monthly Cost</th><th>What You Get</th><th>Still Need to Buy</th></tr>
+    <tr style="background:var(--sp-mint-light);"><td><strong>Starlight.MD Solo</strong></td><td><strong>$149</strong></td><td><strong>Everything (practice mgmt)</strong></td><td><strong>Atlas.md for charting ($300)</strong></td></tr>
+    <tr style="background:var(--sp-gold-light);"><td><strong>Starlight.MD Solo (Phase 3+)</strong></td><td><strong>$149</strong></td><td><strong>Everything incl. charting</strong></td><td><strong>Nothing</strong></td></tr>
+    <tr><td>Atlas.md alone</td><td>$300</td><td>Charting + basic billing</td><td>CRM + comms + analytics + growth tools</td></tr>
+    <tr><td>Hint Health</td><td>$199–499</td><td>Billing only</td><td>EMR + CRM + messaging + analytics</td></tr>
+    <tr><td>Elation Health</td><td>$349–599</td><td>EMR + scheduling</td><td>DPC billing + CRM + messaging</td></tr>
+    <tr><td>Dr. P's current stack*</td><td>$300+</td><td>Atlas.md + free tools</td><td>Still missing: CRM, analytics, automation, growth</td></tr>
+  </table>
+  <p style="font-size:12px;color:var(--sp-muted);">*Dr. P's actual cost: Atlas.md ($300/mo) + free tools (Gmail, Google Sheets, personal phone). The "free" tools cost 10+ hours/week in manual work.</p>
+
+  <h2>Revenue Per Practice Economics</h2>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number mint">$2,388</div>
+      <div class="label">Annual Revenue / Practice (Solo)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number gold">$3,588</div>
+      <div class="label">Blended Annual ARPU</div>
+    </div>
+    <div class="stat-card">
+      <div class="number sky">92%</div>
+      <div class="label">Gross Margin (SaaS)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number rose">&lt;4 mo</div>
+      <div class="label">Payback Period (CAC)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- GO-TO-MARKET -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="gtm">
+  <h1>Go-to-Market Strategy</h1>
+  <p class="subtitle">Community-led growth in a tight-knit market.</p>
+
+  <h2>DPC is a Community, Not a Market</h2>
+  <p>DPC physicians are an unusually tight-knit group. They share tools on Facebook groups, recommend software at conferences, and trust peer endorsements over advertising. Our GTM strategy exploits this by leading with <strong>community, credibility, and clinical proof</strong>.</p>
+
+  <h3>Channel Strategy</h3>
+  <table>
+    <tr><th>Channel</th><th>Tactic</th><th>Expected CAC</th><th>Volume</th></tr>
+    <tr>
+      <td><strong>DPC Conferences</strong></td>
+      <td>Demo booth at DPC Summit, Hint Summit, AAFP DPC track</td>
+      <td>$200</td>
+      <td>50-100 leads/event</td>
+    </tr>
+    <tr>
+      <td><strong>DPC Facebook Groups</strong></td>
+      <td>Dr. P shares real practice screenshots + "how I run my practice" posts</td>
+      <td>$0</td>
+      <td>10-20 leads/month</td>
+    </tr>
+    <tr>
+      <td><strong>Atlas.md User Community</strong></td>
+      <td>Position as the practice management companion Atlas.md users need</td>
+      <td>$50</td>
+      <td>10-15 leads/month</td>
+    </tr>
+    <tr>
+      <td><strong>DPC Frontier Directory</strong></td>
+      <td>Listed as recommended tool; integration partnership</td>
+      <td>$50</td>
+      <td>5-10 leads/month</td>
+    </tr>
+    <tr>
+      <td><strong>Pediatric DPC Network</strong></td>
+      <td>Direct outreach to the ~400 pediatric DPC practices via Dr. P's network</td>
+      <td>$0</td>
+      <td>3-5 signups/month</td>
+    </tr>
+    <tr>
+      <td><strong>Content/SEO</strong></td>
+      <td>"How to start a DPC practice" guides, DPC revenue calculator, free templates</td>
+      <td>$30</td>
+      <td>20-30 leads/month</td>
+    </tr>
+    <tr>
+      <td><strong>DPC Residency Programs</strong></td>
+      <td>Free tier for residents planning DPC practices post-training</td>
+      <td>$0</td>
+      <td>Lifetime customers</td>
+    </tr>
+  </table>
+
+  <h2>Launch Sequence</h2>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="phase">Month 1–2</div>
+      <div class="title">Founder-Led Sales (10 practices)</div>
+      <div class="desc">Dr. P personally onboards 10 pediatric DPC practices from her network. White-glove setup. Weekly check-ins. Build case studies. Position as "the tool Atlas.md is missing."</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Month 3–4</div>
+      <div class="title">Community Launch (25 practices)</div>
+      <div class="desc">Launch in DPC Facebook groups with video testimonials from pilot practices. "Built by a DPC doc who uses Atlas.md" messaging. Free 30-day trial.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Month 5–6</div>
+      <div class="title">Conference Circuit (50 practices)</div>
+      <div class="desc">Demo at DPC Summit (Sept 2026). Announce Atlas.md integration. Partner with DPC Frontier for directory listing.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Month 7–12</div>
+      <div class="title">Scale & Expand (150 practices)</div>
+      <div class="desc">Content marketing engine. Pediatric to Family Medicine expansion. Referral program (1 month free per referral). Employer DPC outreach.</div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="card-title">The "Dr. P" Advantage</div>
+    <p>Having a practicing DPC physician as co-founder and CMO is our single biggest GTM asset. Dr. Yogini Prajapati can walk into any DPC conference, pull up her actual Atlas.md alongside Starlight.MD, and show exactly what she was missing. That authenticity cannot be manufactured or replicated by competitors.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- FINANCIAL PROJECTIONS -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="financials">
+  <h1>Financial Projections</h1>
+  <p class="subtitle">Conservative model with clear path to profitability.</p>
+
+  <h2>3-Year Revenue Projections</h2>
+
+  <div class="bar-chart">
+    <div class="bar-group">
+      <div class="bar-value">$54K</div>
+      <div class="bar" style="height:18px;"></div>
+      <div class="bar-label">Q1 '27</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$108K</div>
+      <div class="bar" style="height:36px;"></div>
+      <div class="bar-label">Q2 '27</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$180K</div>
+      <div class="bar" style="height:60px;"></div>
+      <div class="bar-label">Q3 '27</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$270K</div>
+      <div class="bar" style="height:90px;"></div>
+      <div class="bar-label">Q4 '27</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$450K</div>
+      <div class="bar" style="height:120px;"></div>
+      <div class="bar-label">H1 '28</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$810K</div>
+      <div class="bar" style="height:160px;"></div>
+      <div class="bar-label">H2 '28</div>
+    </div>
+    <div class="bar-group">
+      <div class="bar-value">$1.8M</div>
+      <div class="bar projected" style="height:200px;"></div>
+      <div class="bar-label">2029</div>
+    </div>
+  </div>
+
+  <h2>Key Assumptions</h2>
+  <table>
+    <tr><th>Metric</th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr>
+    <tr><td>Practices (end of year)</td><td>50</td><td>200</td><td>500</td></tr>
+    <tr><td>Blended ARPU (monthly)</td><td>$175</td><td>$225</td><td>$299</td></tr>
+    <tr><td>Annual Recurring Revenue</td><td>$612K</td><td>$1.26M</td><td>$1.8M</td></tr>
+    <tr><td>Monthly Churn</td><td>3%</td><td>2%</td><td>1.5%</td></tr>
+    <tr><td>Gross Margin</td><td>85%</td><td>90%</td><td>92%</td></tr>
+    <tr><td>Customer Acquisition Cost</td><td>$400</td><td>$300</td><td>$250</td></tr>
+    <tr><td>LTV:CAC Ratio</td><td>5:1</td><td>8:1</td><td>12:1</td></tr>
+    <tr style="font-weight:700;background:var(--sp-mint-light);">
+      <td><strong>Net Revenue</strong></td><td><strong>$520K</strong></td><td><strong>$1.13M</strong></td><td><strong>$1.66M</strong></td>
+    </tr>
+  </table>
+
+  <h2>Cost Structure</h2>
+  <table>
+    <tr><th>Category</th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr>
+    <tr><td>Engineering (B4M allocation + hires)</td><td>$280K</td><td>$420K</td><td>$560K</td></tr>
+    <tr><td>Sales & Marketing</td><td>$80K</td><td>$150K</td><td>$250K</td></tr>
+    <tr><td>Infrastructure (cloud, HIPAA)</td><td>$24K</td><td>$48K</td><td>$72K</td></tr>
+    <tr><td>Customer Success</td><td>$0 (founders)</td><td>$75K</td><td>$150K</td></tr>
+    <tr><td>Legal & Compliance</td><td>$30K</td><td>$15K</td><td>$15K</td></tr>
+    <tr><td>Founder Compensation</td><td>$180K</td><td>$240K</td><td>$300K</td></tr>
+    <tr style="font-weight:700;">
+      <td><strong>Total Costs</strong></td><td><strong>$594K</strong></td><td><strong>$948K</strong></td><td><strong>$1.35M</strong></td>
+    </tr>
+    <tr style="font-weight:700;background:var(--sp-mint-light);">
+      <td><strong>Net Income</strong></td><td><strong>-$74K</strong></td><td><strong>$182K</strong></td><td><strong>$310K</strong></td>
+    </tr>
+  </table>
+
+  <div class="info-card">
+    <div class="card-title">Path to Profitability</div>
+    <p>We reach cash-flow breakeven at <strong>~55 practices</strong> (Month 12). By end of Year 2, we're generating $182K in net income on $1.13M revenue. The $500K pre-seed gives us 18 months of runway — more than enough to reach profitability without needing additional funding.</p>
+  </div>
+
+  <h2>Use of Funds ($500K Pre-Seed)</h2>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="number mint">$280K</div>
+      <div class="label">Engineering (2 FTEs x 12mo)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number gold">$80K</div>
+      <div class="label">Sales & Marketing</div>
+    </div>
+    <div class="stat-card">
+      <div class="number sky">$60K</div>
+      <div class="label">HIPAA + Cloud Infra</div>
+    </div>
+    <div class="stat-card">
+      <div class="number rose">$80K</div>
+      <div class="label">Operations + Buffer</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- TEAM -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="team">
+  <h1>Team</h1>
+  <p class="subtitle">Clinical credibility meets a 35-person engineering org and enterprise product vision.</p>
+
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="name">Yogini Prajapati, MD</div>
+      <div class="role">Co-Founder & Chief Medical Officer</div>
+      <div class="bio">Board-certified pediatrician and founder of <strong>Starlight Pediatrics</strong>, a direct primary care practice in Austin, TX. Dr. P left traditional medicine to build the practice she always wanted — one where she knows every patient by name, makes house calls for newborns, and texts parents at midnight when their kid has a fever. She currently runs her practice on Atlas.md and found it so lacking in practice management, communications, and growth tools that she commissioned an entirely separate platform — which became Starlight.MD. She's not just our CMO; she's our most demanding power user, testing every feature on real patients every single day.</div>
+      <div class="cred">MD — Pediatrics</div>
+      <div class="cred">Board Certified</div>
+      <div class="cred">DPC Founder</div>
+      <div class="cred">Starlight Pediatrics, Austin TX</div>
+      <div class="cred">Atlas.md Power User</div>
+    </div>
+
+    <div class="team-card">
+      <div class="name">Deepak Surana</div>
+      <div class="role">Co-Founder & Chief Product Officer</div>
+      <div class="bio">Product leader with deep experience in enterprise SaaS, AI platforms, and market intelligence. Currently CPO at <strong>Futurum Group</strong> (a Constellation Research company) where he leads the Futurum Intelligence Platform — an AI-powered decision intelligence tool used by Fortune 500 CIOs and CTOs. Built the entire Starlight.MD prototype as a single-page application managing a live DPC practice. Brings enterprise product rigor, investor relations experience, and AI-native product thinking to healthcare.</div>
+      <div class="cred">CPO — Futurum Group</div>
+      <div class="cred">Enterprise SaaS</div>
+      <div class="cred">AI Platforms</div>
+      <div class="cred">Product-Led Growth</div>
+      <div class="cred">Investor Relations</div>
+    </div>
+
+    <div class="team-card">
+      <div class="name">Erik Bethke</div>
+      <div class="role">Co-Founder & CTO / CIO</div>
+      <div class="bio">Serial technology entrepreneur and CEO of <strong>Bike4Mind (B4M)</strong>, a 35-person AI and engineering company. Decades of experience shipping consumer-facing products and building scalable platforms from zero to one. Erik brings an entire engineering organization to Starlight.MD — not just a CTO title, but a production-ready team with AI/ML, full-stack, and DevOps capabilities. B4M's existing infrastructure, CI/CD pipelines, and AI content processing experience mean Starlight.MD can move from prototype to production-grade platform without the typical 6-month hiring ramp. Erik has final say on all technology architecture decisions and has proven his approach across multiple healthcare and AI ventures.</div>
+      <div class="cred">CEO — Bike4Mind (35-person team)</div>
+      <div class="cred">Serial Entrepreneur</div>
+      <div class="cred">AI/ML Platform Architecture</div>
+      <div class="cred">Full-Stack Engineering</div>
+      <div class="cred">DevOps & Infrastructure</div>
+      <div class="cred">Healthcare Tech Ventures</div>
+    </div>
+
+  </div>
+
+  <h2>Why This Team</h2>
+  <div class="info-card">
+    <div class="card-title">Three Pillars — No Gaps</div>
+    <p><strong>Clinical (Dr. P):</strong> A practicing DPC pediatrician who IS the user. She tests features on real patients every day and has the community trust that opens doors at every DPC conference in America.</p>
+    <p><strong>Product & Business (Deepak, CPO):</strong> Built the entire working prototype. Enterprise product experience at scale. AI-native thinking. Investor relations experience from Futurum. Drives product vision, growth strategy, and fundraising.</p>
+    <p><strong>Technology (Erik):</strong> Not just a CTO — a CEO of a 35-person engineering organization. Bike4Mind brings production-grade AI/ML, full-stack, and DevOps capacity from day one. No hiring ramp. No infrastructure buildout. We deploy the day we incorporate.</p>
+  </div>
+
+  <h3>Advisory Board (Planned)</h3>
+  <table>
+    <tr><th>Role</th><th>Profile</th><th>Why</th></tr>
+    <tr><td>DPC Policy Advisor</td><td>Physician leader in DPC legislative advocacy</td><td>Navigate state-level DPC regulations and employer DPC programs</td></tr>
+    <tr><td>Healthcare SaaS Advisor</td><td>Founder/exec from a scaled healthtech company</td><td>GTM playbook, enterprise sales, HIPAA compliance strategy</td></tr>
+    <tr><td>Pediatric DPC Network Lead</td><td>Physician running a multi-location pediatric DPC</td><td>Product validation, referrals, conference introductions</td></tr>
+  </table>
+
+  <h2>Engineering & Key Hires (Year 1)</h2>
+  <div class="info-card navy">
+    <div class="card-title">The Bike4Mind Advantage</div>
+    <p>Unlike most pre-seed startups, we don't start at zero on engineering. Erik's Bike4Mind team (35 people, AI/ML + full-stack + DevOps) can allocate dedicated resources to Starlight.MD from day one. This collapses the typical 3-6 month hiring ramp and gives us production-grade infrastructure immediately.</p>
+  </div>
+  <table>
+    <tr><th>Role</th><th>When</th><th>Source</th></tr>
+    <tr><td>Dedicated B4M Engineers (2-3)</td><td>Month 1</td><td>Bike4Mind allocation — cloud migration, HIPAA, core platform</td></tr>
+    <tr><td>Customer Success Lead</td><td>Month 6</td><td>New hire — onboarding, retention, practice setup</td></tr>
+    <tr><td>Additional Engineers (as needed)</td><td>Month 6+</td><td>New hires or B4M expansion — scaling, integrations, mobile</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- COMPANY FORMATION -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="formation">
+  <h1>Company Formation</h1>
+  <p class="subtitle">Structure, governance, and next steps.</p>
+
+  <h2>Entity Structure</h2>
+  <div class="info-card navy">
+    <div class="card-title">Delaware C-Corp</div>
+    <p>Standard venture-backable structure. Delaware C-Corp provides the cleanest path for future fundraising, employee stock options, and potential acquisition.</p>
+  </div>
+
+  <h2>Equity & Ownership</h2>
+  <div class="info-card gold">
+    <div class="card-title">Equity Split — To Be Determined</div>
+    <p>Founder equity allocation is under active discussion among 3 founders. Key considerations: (1) time commitment — full-time vs. part-time, (2) IP contribution — prototype, engineering org, clinical practice, (3) domain access — clinical credibility and community, (4) engineering capacity — Bike4Mind's 35-person team. An employee option pool (15-20%) will be reserved for early hires. Final allocation will be determined before incorporation.</p>
+  </div>
+
+  <h3>Founding Team Contributions</h3>
+  <table>
+    <tr><th>Founder</th><th>Role</th><th>Contribution</th><th>Commitment</th></tr>
+    <tr>
+      <td><strong>Deepak Surana</strong></td>
+      <td>CPO</td>
+      <td>Built entire prototype. Product vision. Growth strategy. Fundraising. Business development.</td>
+      <td>TBD</td>
+    </tr>
+    <tr>
+      <td><strong>Erik Bethke</strong></td>
+      <td>CTO / CIO</td>
+      <td>35-person Bike4Mind engineering org. Platform architecture. AI/ML infrastructure. DevOps. Production deployment.</td>
+      <td>TBD</td>
+    </tr>
+    <tr>
+      <td><strong>Yogini Prajapati, MD</strong></td>
+      <td>CMO</td>
+      <td>Clinical founder. Product validation. DPC community access. Public face. Live practice as proof-of-concept.</td>
+      <td>TBD</td>
+    </tr>
+  </table>
+
+  <h3>Vesting (Standard)</h3>
+  <ul>
+    <li><strong>4-year vesting</strong> with 1-year cliff for all founders</li>
+    <li><strong>Single-trigger acceleration</strong> on change of control</li>
+    <li><strong>83(b) elections</strong> filed at incorporation</li>
+  </ul>
+
+  <h2>Decision Rights</h2>
+  <table>
+    <tr><th>Decision Type</th><th>Who Decides</th><th>Input From</th></tr>
+    <tr><td>Company strategy & vision</td><td>All founders</td><td>Collaborative</td></tr>
+    <tr><td>Product roadmap & features</td><td>Deepak (CPO)</td><td>Yogini on clinical features</td></tr>
+    <tr><td>Clinical workflows & medical content</td><td>Yogini (CMO)</td><td>Deepak on UX implications</td></tr>
+    <tr><td>Technology architecture & infrastructure</td><td>Erik (CTO)</td><td>Deepak on product requirements</td></tr>
+    <tr><td>Engineering execution & DevOps</td><td>Erik (CTO) + Bike4Mind team</td><td>Deepak on priorities</td></tr>
+    <tr><td>Growth, pricing, conversion</td><td>Deepak (CPO)</td><td>Yogini on messaging</td></tr>
+    <tr><td>Fundraising & finance</td><td>Deepak</td><td>All (board)</td></tr>
+    <tr><td>Community & DPC partnerships</td><td>Yogini</td><td>Deepak on GTM</td></tr>
+    <tr><td>Pivots or major strategy shifts</td><td>All founders</td><td>Unanimous</td></tr>
+  </table>
+
+  <h2>Formation Checklist</h2>
+  <ul class="checklist">
+    <li>Finalize equity split among 3 founders</li>
+    <li>Incorporate Delaware C-Corp (Stripe Atlas or Clerky)</li>
+    <li>File 83(b) elections for all founders</li>
+    <li>Execute Founder IP Assignment Agreement</li>
+    <li>Set up option pool (Carta or Pulley)</li>
+    <li>Open business bank account (Mercury)</li>
+    <li>Register for EIN</li>
+    <li>Draft and sign Operating Agreement</li>
+    <li>HIPAA compliance assessment with healthcare attorney</li>
+    <li>Obtain cyber liability insurance</li>
+    <li>Register domain: starlight.md</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- PRODUCT ROADMAP -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="roadmap">
+  <h1>Product Roadmap</h1>
+  <p class="subtitle">From working prototype to Atlas.md replacement.</p>
+
+  <h2>What's Already Built (v1 — Prototype)</h2>
+  <div class="info-card">
+    <div class="card-title">Current State: Live on <a href="https://starlight-pediatrics.netlify.app" target="_blank" style="color:var(--sp-navy);">starlight-pediatrics.netlify.app</a></div>
+    <p>Single-page HTML application managing Dr. P's live practice. 14 modules, 17 templates, 5,200 lines of code. Browser localStorage for data. EmailJS for outbound. Zero server infrastructure costs. Currently used <strong>alongside</strong> Atlas.md.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="phase">Phase 1 — Months 1–3</div>
+      <div class="title">Cloud Migration & HIPAA Foundation</div>
+      <div class="desc">
+        <ul>
+          <li>Migrate from localStorage to <strong>Supabase</strong> (PostgreSQL + auth + row-level security)</li>
+          <li>HIPAA compliance: encryption at rest/transit, audit logging, BAA with Supabase</li>
+          <li>User authentication with role-based access (doctor, office staff, billing)</li>
+          <li>Multi-tenant architecture (each practice = isolated database schema)</li>
+          <li>Migrate from vanilla JS to <strong>React + TypeScript</strong> for maintainability</li>
+          <li>Atlas.md data import tool (CSV/API) for easy onboarding</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 2 — Months 4–6</div>
+      <div class="title">Payment Integration & Automation</div>
+      <div class="desc">
+        <ul>
+          <li><strong>Stripe integration</strong> for automated membership billing (replace manual payment tracking)</li>
+          <li>Auto-invoicing with dunning (failed payment retries, overdue notifications)</li>
+          <li>Family billing: single invoice for sibling groups with discount applied</li>
+          <li>Automated tier transitions when patients age across boundaries</li>
+          <li>Replace EmailJS with <strong>SendGrid/Postmark</strong> for transactional email (higher limits, better deliverability)</li>
+          <li>Two-way SMS via <strong>Twilio</strong> (appointment reminders, quick parent messages)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 3 — Months 7–9</div>
+      <div class="title">Clinical Features: Replace Atlas.md</div>
+      <div class="desc">
+        <ul>
+          <li><strong>Clinical charting</strong> — SOAP notes with AI assist (matching Atlas.md's core strength)</li>
+          <li>Appointment scheduling with patient self-booking portal</li>
+          <li>Growth charts and immunization tracking (pediatric-specific — Atlas.md doesn't have these)</li>
+          <li>Lab order tracking and result notifications</li>
+          <li>ePrescribing integration</li>
+          <li>Patient portal: parents view appointments, labs, notes, and pay bills</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="phase">Phase 4 — Months 10–12</div>
+      <div class="title">Mobile, AI & Expansion</div>
+      <div class="desc">
+        <ul>
+          <li>Mobile-responsive PWA (progressive web app) for on-the-go access</li>
+          <li><strong>AI-powered features:</strong> smart wellness predictions, revenue optimization, automated template generation</li>
+          <li>Telehealth integration (video visits — matching Atlas.md's video calling)</li>
+          <li>Generalize beyond pediatrics: configurable tier pricing for any DPC specialty</li>
+          <li>Practice benchmarking: anonymous metrics comparison across Starlight.MD practices</li>
+          <li>Full Atlas.md replacement: doctors can drop Atlas entirely</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>Tech Stack Evolution</h2>
+  <table>
+    <tr><th>Layer</th><th>Current (Prototype)</th><th>Target (Production)</th></tr>
+    <tr><td>Frontend</td><td>Vanilla HTML/CSS/JS</td><td>React + TypeScript + Tailwind</td></tr>
+    <tr><td>Backend</td><td>None (client-only)</td><td>Supabase (PostgreSQL + Edge Functions)</td></tr>
+    <tr><td>Auth</td><td>None</td><td>Supabase Auth (email + SSO)</td></tr>
+    <tr><td>Data</td><td>localStorage</td><td>PostgreSQL with row-level security</td></tr>
+    <tr><td>Email</td><td>EmailJS (200/mo)</td><td>SendGrid (40K/mo)</td></tr>
+    <tr><td>Payments</td><td>Manual tracking</td><td>Stripe Billing + Invoicing</td></tr>
+    <tr><td>SMS</td><td>—</td><td>Twilio</td></tr>
+    <tr><td>Hosting</td><td>Netlify (static)</td><td>Vercel + Supabase Cloud</td></tr>
+    <tr><td>Compliance</td><td>—</td><td>HIPAA (Supabase BAA + encryption)</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- RISKS & MITIGATION -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="section" id="risks">
+  <h1>Risks & Mitigation</h1>
+  <p class="subtitle">What could go wrong, and how we handle it.</p>
+
+  <table>
+    <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+    <tr>
+      <td><strong>Atlas.md adds practice management features</strong></td>
+      <td class="partial">Medium</td>
+      <td class="partial">Medium</td>
+      <td>Atlas.md has been charting-focused for 14 years. Their small bootstrapped team prioritizes clinical features. Even if they start, we have 12+ months head start and 3x the feature set. By then, we're building clinical features to replace them entirely.</td>
+    </tr>
+    <tr>
+      <td><strong>Hint Health builds similar features</strong></td>
+      <td class="partial">Medium</td>
+      <td class="partial">Medium</td>
+      <td>Hint's strategy is platform/API billing, not all-in-one. They'd need to build an entirely new product category. Different DNA.</td>
+    </tr>
+    <tr>
+      <td><strong>Elation adds DPC-native mode</strong></td>
+      <td class="cross">Low</td>
+      <td class="check">High</td>
+      <td>Elation's codebase is insurance-centric — retrofitting is harder than building fresh. Our speed advantage: we ship features in hours, they take quarters.</td>
+    </tr>
+    <tr>
+      <td><strong>HIPAA compliance delays</strong></td>
+      <td class="check">High</td>
+      <td class="partial">Medium</td>
+      <td>Use Supabase HIPAA-ready tier (BAA included). Hire healthcare compliance consultant month 1. Phase 1 is non-PHI (practice management only) — clinical data comes in Phase 3.</td>
+    </tr>
+    <tr>
+      <td><strong>Small practice reluctance to pay</strong></td>
+      <td class="partial">Medium</td>
+      <td class="partial">Medium</td>
+      <td>Phase 1: we're $149/mo <em>on top of</em> Atlas.md ($300). ROI pitch: saves 10+ hrs/week. Phase 3: we replace Atlas.md, saving $300/mo net. Free 30-day trial removes risk.</td>
+    </tr>
+    <tr>
+      <td><strong>CMO (Dr. P) availability limited</strong></td>
+      <td class="check">High</td>
+      <td class="partial">Medium</td>
+      <td>Dr. P continues practicing — that's the point (she's our power user and proof of concept). Deepak handles product and ops. Erik's B4M team handles engineering. Advisory role structured with clear time expectations.</td>
+    </tr>
+    <tr>
+      <td><strong>Atlas.md data migration complexity</strong></td>
+      <td class="partial">Medium</td>
+      <td class="cross">Low</td>
+      <td>Build Atlas.md CSV import as a first-class feature. DPC practices have small panels (200-600 patients). White-glove migration for first 50 practices.</td>
+    </tr>
+  </table>
+
+  <h2>Regulatory Considerations</h2>
+  <div class="info-card rose">
+    <div class="card-title">HIPAA Compliance Plan</div>
+    <p><strong>Phase 1 (Months 1-6):</strong> Platform handles practice management only — pipeline, communications, billing analytics. No Protected Health Information (PHI). No HIPAA requirements.<br>
+    <strong>Phase 2 (Months 7-9):</strong> HIPAA-compliant infrastructure via Supabase HIPAA tier. Encryption at rest (AES-256) and in transit (TLS 1.3). Audit logging. BAA executed. Required before clinical charting launches.<br>
+    <strong>Phase 3 (Month 12+):</strong> SOC 2 Type I certification. Annual penetration testing. Employee HIPAA training program.</p>
+  </div>
+
+  <h2>Exit Scenarios</h2>
+  <table>
+    <tr><th>Scenario</th><th>Timeline</th><th>Valuation Range</th></tr>
+    <tr><td><strong>Acquisition by Atlas.md</strong> — they buy the practice management layer they never built</td><td>Year 2–3</td><td>$8–15M (3–5x ARR)</td></tr>
+    <tr><td><strong>Acquisition by Hint Health</strong> — complete the DPC stack (billing + practice mgmt)</td><td>Year 2–3</td><td>$10–20M</td></tr>
+    <tr><td><strong>Acquisition by Elation/athena</strong> — bolt-on DPC module for enterprise EMR</td><td>Year 3–4</td><td>$15–30M</td></tr>
+    <tr><td><strong>Series A & continued growth</strong> — expand to all membership medicine</td><td>Year 2</td><td>$20–40M pre-money</td></tr>
+    <tr><td><strong>Profitable lifestyle SaaS</strong> — 500 practices x $299/mo = $1.8M ARR at 92% margin</td><td>Year 3+</td><td>Ongoing cash flow</td></tr>
+  </table>
+
+  <div class="info-card" style="margin-top:32px;">
+    <div class="card-title">The Bottom Line</div>
+    <p>Starlight.MD isn't an idea — it's a <strong>working product managing a real DPC practice</strong>. Our CMO runs her practice on it every day alongside Atlas.md, proving exactly what's missing from today's tools. The DPC market is growing, Atlas.md hasn't innovated in years, and we have the clinical founder + product team + working prototype combination that healthcare software demands. We're raising $500K to turn a proven prototype into a scalable platform and capture the fastest-growing segment of American medicine.</p>
+  </div>
+</div>
+
+</div> <!-- end .main -->
+
+<script>
+function go(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Handle hash navigation
+if (window.location.hash) {
+  const id = window.location.hash.slice(1);
+  const section = document.getElementById(id);
+  const link = document.querySelector('.sidebar a[href="#' + id + '"]');
+  if (section && link) go(id, link);
+}
+</script>
+
+</body>
+</html>
