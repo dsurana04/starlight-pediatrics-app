@@ -1448,17 +1448,18 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
   <div id="msgJourneySection"></div>
   <div id="msgRemindersSection" style="display:none;"></div>
   <div id="msgTemplatesSection" style="display:none;"></div>
-  <div id="msgReviewsSection" style="display:none;"></div>
-  <div id="msgLogSection" style="display:none;"></div>
-
-  <div class="card" style="margin-top:16px;">
-    <div class="card-header"><h2>&#9881; Google Review Link</h2></div>
-    <p style="font-size:12px;color:var(--sp-muted);margin-bottom:8px;">Set your Google Business review link so it gets inserted into review request messages. Find it at <a href="https://support.google.com/business/answer/7035772" target="_blank" style="color:var(--sp-sky);">Google Business Profile</a>.</p>
-    <div style="display:flex;gap:8px;">
-      <input type="url" id="googleReviewLinkInput" placeholder="https://g.page/r/YOUR-LINK/review" style="flex:1;padding:8px 12px;border:1px solid var(--sp-border);border-radius:6px;font-size:13px;" value="">
-      <button class="btn btn-primary btn-sm" onclick="saveGoogleReviewLink()">Save</button>
+  <div id="msgReviewsSection" style="display:none;">
+    <div id="msgReviewsContent"></div>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header"><h2>&#9881; Google Review Link</h2></div>
+      <p style="font-size:12px;color:var(--sp-muted);margin-bottom:8px;">Set your Google Business review link so it gets inserted into review request messages. Find it at <a href="https://support.google.com/business/answer/7035772" target="_blank" style="color:var(--sp-sky);">Google Business Profile</a>.</p>
+      <div style="display:flex;gap:8px;">
+        <input type="url" id="googleReviewLinkInput" placeholder="https://g.page/r/YOUR-LINK/review" style="flex:1;padding:8px 12px;border:1px solid var(--sp-border);border-radius:6px;font-size:13px;" value="">
+        <button class="btn btn-primary btn-sm" onclick="saveGoogleReviewLink()">Save</button>
+      </div>
     </div>
   </div>
+  <div id="msgLogSection" style="display:none;"></div>
 </div>
 
 <!-- ═══════ PRACTICE REPORT ═══════ -->
@@ -4412,9 +4413,20 @@ function renderMessages() {
   `).join('');
 
   // ─── GOOGLE REVIEWS TAB ───
+  const reviewTemplate = messageTemplates.find(t => t.category === 'review');
   const notReviewed = active.filter(p => !p.googleReview);
   const reviewed = active.filter(p => p.googleReview);
-  document.getElementById('msgReviewsSection').innerHTML = `
+  document.getElementById('msgReviewsContent').innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <h2>&#128231; Review Request Template</h2>
+        ${reviewTemplate ? `<button class="btn btn-secondary btn-sm" onclick="openTemplateEditor('${reviewTemplate.id}')">Edit Template</button>` : ''}
+      </div>
+      ${reviewTemplate ? `<div style="padding:12px;">
+        <div style="font-size:13px;color:var(--sp-muted);background:var(--sp-warm);padding:12px 14px;border-radius:8px;white-space:pre-wrap;line-height:1.5;max-height:200px;overflow-y:auto;">${reviewTemplate.body}</div>
+        <div style="margin-top:8px;font-size:11px;color:var(--sp-muted);">Merge tags ({{patient_name}}, {{parent_name}}, etc.) will be replaced with real values when sent.</div>
+      </div>` : '<p style="padding:12px;color:var(--sp-muted);">No review template found. <button class="btn btn-sm btn-primary" onclick="setMsgTab(document.querySelectorAll(\\\'#msgPillNav .pill\\\')[2],\\\'templates\\\')">Go to Templates</button> to create one.</p>'}
+    </div>
     <div class="card" style="margin-bottom:12px;">
       <div class="card-header"><h2 style="color:var(--sp-rose);">&#9734; Haven't Reviewed Yet (${notReviewed.length})</h2></div>
       ${notReviewed.length ? notReviewed.map(p => `
