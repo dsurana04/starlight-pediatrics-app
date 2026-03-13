@@ -4294,7 +4294,6 @@ function previewEmail(templateId, patientId) {
   const tmpl = messageTemplates.find(t => t.id === templateId);
   const p = patients.find(x => x.id === patientId);
   if (!tmpl || !p) return;
-  if (!p.email) { alert(p.firstName + ' has no email address on file. Add one in Edit Patient.'); return; }
 
   const resolved = resolveMergeTags(tmpl.body, p, { appendReviewNudge: tmpl.category !== 'review' });
   const subject = 'Starlight Pediatrics — ' + tmpl.name;
@@ -4302,14 +4301,23 @@ function previewEmail(templateId, patientId) {
 
   _previewState = { templateId, patientId, subject, htmlBody, tmplName: tmpl.name };
 
+  const hasEmail = !!p.email;
   document.getElementById('previewMeta').innerHTML = `
     <strong>From:</strong> Yogini Prajapati MD &lt;drp@starlightpediatrics.com&gt;<br>
-    <strong>To:</strong> ${p.parent || p.firstName} &lt;${p.email}&gt;<br>
+    <strong>To:</strong> ${p.parent || p.firstName} ${hasEmail ? '&lt;' + p.email + '&gt;' : '<span style="color:var(--sp-rose);font-weight:600;">— No email on file</span>'}<br>
     <strong>Subject:</strong> ${subject}
   `;
   document.getElementById('previewFrame').innerHTML = `<iframe id="previewIframe" style="width:100%;height:600px;border:none;" srcdoc="${htmlBody.replace(/"/g, '&quot;')}"></iframe>`;
-  document.getElementById('previewSendBtn').textContent = '📨 Send Email';
-  document.getElementById('previewSendBtn').disabled = false;
+  const sendBtn = document.getElementById('previewSendBtn');
+  if (hasEmail) {
+    sendBtn.textContent = '📨 Send Email';
+    sendBtn.disabled = false;
+    sendBtn.style.display = '';
+  } else {
+    sendBtn.textContent = 'No email — add in Edit Patient';
+    sendBtn.disabled = true;
+    sendBtn.style.display = '';
+  }
   document.getElementById('emailPreviewModal').classList.add('show');
 }
 
