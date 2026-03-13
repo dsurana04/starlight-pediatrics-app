@@ -1061,7 +1061,17 @@ tr:hover td { background: var(--sp-warm); }
 
 <!-- ═══════ REVENUE ═══════ -->
 <div class="page" id="page-revenue">
-  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Revenue Analytics</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);">Revenue Analytics</h2>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:12px;font-weight:600;color:var(--sp-muted);text-transform:uppercase;letter-spacing:1px;">View:</span>
+      <select id="revenueYearFilter" onchange="renderRevenue()" style="padding:6px 12px;border:1px solid var(--sp-border);border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--sp-navy);background:white;cursor:pointer;">
+        <option value="2026">2026 — Current</option>
+        <option value="2025">2025 — Historical</option>
+        <option value="all">All Time</option>
+      </select>
+    </div>
+  </div>
   <div class="kpi-row" id="revenueKpis"></div>
   <div class="detail-grid">
     <div class="card">
@@ -1089,6 +1099,30 @@ tr:hover td { background: var(--sp-warm); }
         </thead>
         <tbody id="revenueProjectionBody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Historical Revenue -->
+  <div id="historicalSection" style="display:none;">
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header"><h2>Practice Revenue History</h2></div>
+      <div class="chart-bar-container" id="histChart" style="min-height:200px;"></div>
+      <div class="chart-labels" id="histLabels"></div>
+    </div>
+    <div class="detail-grid" style="margin-top:16px;">
+      <div class="card">
+        <div class="card-header"><h2>Monthly Breakdown</h2></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Month</th><th>Subscriptions</th><th>Enrollment</th><th>Other</th><th>Labs</th><th>Total</th></tr></thead>
+            <tbody id="histTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Growth Summary</h2></div>
+        <div id="histSummary"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2446,7 +2480,97 @@ function renderActions() {
 // RENDER: REVENUE
 // ═══════════════════════════════════════════
 
+// Historical revenue data from Atlas MD (charges-by-category.csv)
+const HISTORICAL_REVENUE = [
+  { month: 'Jan 2025', subs: 53.22, prescriptions: 0, labs: 0, shipping: 0, enrollment: 0, other: 0, consult: 0, total: 53.22 },
+  { month: 'Mar 2025', subs: 212.89, prescriptions: 0, labs: 0, shipping: 0, enrollment: 300, other: 0, consult: 0, total: 512.89 },
+  { month: 'Apr 2025', subs: 639.99, prescriptions: 0, labs: 0, shipping: 0, enrollment: 0, other: 100, consult: 0, total: 739.99 },
+  { month: 'May 2025', subs: 970, prescriptions: 0, labs: 0, shipping: 0, enrollment: 0, other: 0, consult: 0, total: 970 },
+  { month: 'Jun 2025', subs: 1128.50, prescriptions: 0, labs: 0, shipping: 0, enrollment: 100, other: 0, consult: 0, total: 1228.50 },
+  { month: 'Jul 2025', subs: 998.54, prescriptions: 0, labs: 0, shipping: 0, enrollment: 100, other: 0, consult: 0, total: 1098.54 },
+  { month: 'Aug 2025', subs: 1195.80, prescriptions: 0, labs: 0, shipping: 0, enrollment: 100, other: 250, consult: 0, total: 1545.80 },
+  { month: 'Sep 2025', subs: 1195, prescriptions: 0, labs: 0, shipping: 0, enrollment: 0, other: 175, consult: 0, total: 1370 },
+  { month: 'Oct 2025', subs: 1537.90, prescriptions: 0, labs: 0, shipping: 0, enrollment: 100, other: 350, consult: 0, total: 1987.90 },
+  { month: 'Nov 2025', subs: 1980.50, prescriptions: 0, labs: 0, shipping: 0, enrollment: 200, other: 0, consult: 0, total: 2180.50 },
+  { month: 'Dec 2025', subs: 2460, prescriptions: 0, labs: 7.43, shipping: 0, enrollment: 100, other: 0, consult: 0, total: 2567.43 },
+  { month: 'Jan 2026', subs: 2545, prescriptions: 0, labs: 0, shipping: 0, enrollment: 200, other: 0, consult: 0, total: 2745 },
+];
+
+function renderHistorical(yearFilter) {
+  const section = document.getElementById('historicalSection');
+  const filtered = yearFilter === 'all' ? HISTORICAL_REVENUE :
+    HISTORICAL_REVENUE.filter(r => r.month.includes(yearFilter));
+
+  if (filtered.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  // Bar chart
+  const maxTotal = Math.max(...filtered.map(r => r.total));
+  document.getElementById('histChart').innerHTML = filtered.map(r => {
+    const h = maxTotal ? (r.total / maxTotal) * 180 : 0;
+    return `<div class="chart-bar-wrap">
+      <div class="chart-bar" style="height:${h}px;background:linear-gradient(180deg,var(--sp-mint),var(--sp-navy));">
+        <span class="bar-val">${fmtMoney(r.total)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('histLabels').innerHTML = filtered.map(r => `<span>${r.month.replace(' 20','\'')}</span>`).join('');
+
+  // Table
+  document.getElementById('histTableBody').innerHTML = filtered.map(r => `
+    <tr>
+      <td style="font-weight:600;">${r.month}</td>
+      <td>${fmtMoney(r.subs)}</td>
+      <td>${r.enrollment ? fmtMoney(r.enrollment) : '—'}</td>
+      <td>${r.other ? fmtMoney(r.other) : '—'}</td>
+      <td>${r.labs ? fmtMoney(r.labs) : '—'}</td>
+      <td style="font-weight:700;color:var(--sp-navy);">${fmtMoney(r.total)}</td>
+    </tr>
+  `).join('');
+
+  // Growth summary
+  const totalAll = filtered.reduce((s, r) => s + r.total, 0);
+  const totalSubs = filtered.reduce((s, r) => s + r.subs, 0);
+  const totalEnroll = filtered.reduce((s, r) => s + r.enrollment, 0);
+  const totalOther = filtered.reduce((s, r) => s + r.other + r.labs + r.consult, 0);
+  const first = filtered[0];
+  const last = filtered[filtered.length - 1];
+  const subsGrowth = first.subs > 0 ? Math.round(((last.subs - first.subs) / first.subs) * 100) : 0;
+
+  document.getElementById('histSummary').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="padding:14px;background:var(--sp-warm);border-radius:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--sp-muted);margin-bottom:4px;">Total Collected</div>
+        <div style="font-size:28px;font-weight:800;color:var(--sp-navy);">${fmtMoney(totalAll)}</div>
+        <div style="font-size:12px;color:var(--sp-muted);">${filtered.length} months</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="padding:12px;background:var(--sp-warm);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;color:var(--sp-navy);">${fmtMoney(totalSubs)}</div>
+          <div style="font-size:11px;color:var(--sp-muted);">Subscriptions</div>
+        </div>
+        <div style="padding:12px;background:var(--sp-warm);border-radius:8px;text-align:center;">
+          <div style="font-size:18px;font-weight:800;color:var(--sp-gold);">${fmtMoney(totalEnroll)}</div>
+          <div style="font-size:11px;color:var(--sp-muted);">Enrollment Fees</div>
+        </div>
+      </div>
+      ${totalOther > 0 ? `<div style="padding:12px;background:var(--sp-warm);border-radius:8px;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:var(--sp-mint);">${fmtMoney(totalOther)}</div>
+        <div style="font-size:11px;color:var(--sp-muted);">Other / Labs / Consults</div>
+      </div>` : ''}
+      <div style="padding:14px;background:linear-gradient(135deg,#E8F5E9,#F1F8F1);border-radius:10px;border-left:3px solid var(--sp-mint);">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--sp-mint);margin-bottom:4px;">Subscription Growth</div>
+        <div style="font-size:13px;color:var(--sp-text);">
+          ${fmtMoney(first.subs)}/mo <span style="color:var(--sp-mint);font-weight:700;">→</span> ${fmtMoney(last.subs)}/mo
+          ${subsGrowth > 0 ? `<span style="color:var(--sp-mint);font-weight:700;margin-left:6px;">+${subsGrowth}%</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderRevenue() {
+  const yearFilter = document.getElementById('revenueYearFilter').value;
   const active = getActivePatients();
   const mrr = active.reduce((sum, p) => sum + getMonthlyFee(p), 0);
   const arr = mrr * 12;
@@ -2563,6 +2687,13 @@ function renderRevenue() {
       </tr>
     `;
   }).join('');
+
+  // Show/hide sections based on year filter
+  const currentSections = document.querySelectorAll('#page-revenue > .kpi-row, #page-revenue > .detail-grid, #page-revenue > .card');
+  const showCurrent = yearFilter === '2026' || yearFilter === 'all';
+  const showHist = yearFilter === '2025' || yearFilter === 'all';
+  currentSections.forEach(el => { if (el.id !== 'historicalSection') el.style.display = showCurrent ? '' : 'none'; });
+  renderHistorical(showHist ? (yearFilter === 'all' ? 'all' : '2025') : 'none');
 }
 
 // ═══════════════════════════════════════════
