@@ -2038,7 +2038,7 @@ const DEFAULT_TEMPLATES = [
   { id: 't5', name: 'Happy Birthday', category: 'general', body: 'Happy Birthday to {{patient_name}}! From all of us at Starlight Pediatrics, we hope {{patient_name}} has a wonderful day. {{age}} already — they grow so fast!' },
   { id: 't11', name: 'Seasonal Check-In', category: 'general', body: 'Hi {{parent_name}}! Just checking in to see how {{patient_name}} is doing. Remember, as a Starlight family you have direct access to Dr. P — text or call anytime, no need to wait for an appointment!' },
   // Review Request
-  { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_name}}! We love having {{patient_name}} as part of the Starlight family. If you\'ve had a positive experience, would you mind leaving us a quick Google review? It helps other families find us and means the world to our small practice. Here\'s the link: {{google_review_link}} Thank you so much!' },
+  { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_name}},\n\nI just wanted to take a moment to say thank you for trusting me with {{patient_name}}\'s care.\n\nIf you have a moment, I would really appreciate it if you could share your experience by leaving me a Google review.\n\nYour feedback not only helps other families looking for a caring pediatric practice, but it also means so much to me so I can provide the best care possible.\n\nYou can leave me a review by clicking this link:\n{{google_review_link}}\n\nYou can also follow me on Instagram and Facebook:\nhttps://www.instagram.com/starlight.pediatrics\nhttps://www.facebook.com/starlightpediatricsatx\n\nThank you so much for your time and support!\n\nWarmly,\nDr. Yogini Prajapati\nStarlight Pediatrics' },
 ];
 
 // Patient Journey — maps age milestones to email touchpoints
@@ -4038,7 +4038,7 @@ function saveGoogleReviewLink() {
 }
 
 // Google Review link — Dr. P can update this in the app settings
-const GOOGLE_REVIEW_LINK = localStorage.getItem('sp_google_review_link') || 'https://g.page/r/YOUR-GOOGLE-REVIEW-LINK/review';
+const GOOGLE_REVIEW_LINK = localStorage.getItem('sp_google_review_link') || 'https://g.page/r/CTEazz5Muc6nEBM/review';
 
 const REVIEW_NUDGE_FOOTER = '\n\n---\nP.S. If you\'ve had a great experience with Starlight Pediatrics, we\'d love a quick Google review! It helps other families find us: ' + GOOGLE_REVIEW_LINK;
 
@@ -4208,7 +4208,7 @@ function renderMessages() {
 
   // Load Google Review link input
   const linkInput = document.getElementById('googleReviewLinkInput');
-  if (linkInput) linkInput.value = localStorage.getItem('sp_google_review_link') || '';
+  if (linkInput) linkInput.value = localStorage.getItem('sp_google_review_link') || 'https://g.page/r/CTEazz5Muc6nEBM/review';
 
   // ─── PATIENT JOURNEY TIMELINE ───
   const samplePatient = active[0] || patients[0] || { firstName: 'Baby', lastName: 'Name', parent: 'Parent', dob: '2026-01-01' };
