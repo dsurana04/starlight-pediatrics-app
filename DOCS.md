@@ -2,7 +2,7 @@
 
 ## Overview
 
-A single-page web app for **Starlight Pediatrics**, Dr. Yogini Prajapati's Direct Primary Care (DPC) pediatric practice. Replaces the practice's Excel spreadsheet with a live, branded patient management tool.
+A single-page web app for **Starlight Pediatrics**, Dr. Yogini Prajapati's Direct Primary Care (DPC) pediatric practice. Replaces the practice's Excel spreadsheet with a live, branded patient management and communication tool.
 
 - **Live URL:** https://starlight-pediatrics.netlify.app
 - **GitHub Pages:** https://dsurana04.github.io/starlight-pediatrics-app/
@@ -16,10 +16,24 @@ A single-page web app for **Starlight Pediatrics**, Dr. Yogini Prajapati's Direc
 
 ### Patient Management
 - Add, edit, delete patients via modal form
-- Fields: first/last name, DOB, status, parent/guardian, phone, email, notes, fee override
+- Fields: first/last name, DOB, status, parent/guardian, phone, email, notes, fee override, family group, referred by
 - Active vs. Prospect status
 - 20 seed patients pre-loaded (16 active, 4 prospects) from original Excel spreadsheet
 - Patient table with sorting, filtering (All / Active / Prospects)
+- Payment status dots (green = paid, red = unpaid) next to patient names
+- Google Review star badge next to patients who have left a review
+
+### Patient Detail View
+- Full patient profile with KPIs (monthly fee, annual value, DOB, next plan change)
+- Contact info card
+- EMR action alerts for upcoming billing changes
+- Wellness check timeline (past/current/future with scheduling)
+- Family members card (when linked to a family group)
+- Payment status toggle (paid/unpaid this month)
+- Google Review status + "Send Review Request" button
+- Visit log with type-colored badges and follow-up flags
+- Notes with timestamped entries
+- Email history showing all messages sent to this patient
 
 ### Age-Based Pricing Tiers
 Automatic fee calculation based on patient age (months since DOB):
@@ -35,6 +49,44 @@ Automatic fee calculation based on patient age (months since DOB):
 - Auto-detects when a patient crosses a tier boundary
 - Generates billing change alerts with exact dates
 - Fee override option for custom pricing
+- Family savings: 25% sibling discount, $500/mo family cap, 5% annual prepay
+
+### Family Linking
+- Assign patients to family groups via dropdown in patient modal
+- "Create New Family Group" option generates a unique family ID
+- Family members card in patient detail shows all siblings
+- Family discount information displayed when family group exists
+
+### Visit Log
+- Log visits with type selection: Well-Child, Sick, Home Visit, Phone/Text Consult, Other
+- Fields: date, visit type, chief complaint, follow-up needed checkbox, notes
+- Color-coded visit type badges in patient detail timeline
+- Visit history displayed in reverse chronological order
+
+### Newborn Home Visit Checklist
+- Structured checklist for Orion-tier (newborn) patients
+- 5 categories with 20 assessment items:
+  - **Feeding:** latch, formula, frequency, weight gain
+  - **Vitals & Growth:** weight, temperature, heart rate, head circumference
+  - **Newborn Exam:** jaundice, cord care, skin, fontanelle
+  - **Safety & Sleep:** sleep position, crib safety, car seat, smoke detectors
+  - **Parent Wellness:** postpartum mood, support system, questions, follow-up
+- Each item rated: Normal / Concern / N/A
+- Saves as a visit record with full checklist data
+- "Home Visit" button only appears for Orion-tier patients
+
+### Payment Tracking
+- Per-patient, per-month payment status (paid/overdue)
+- Toggle payment status from patient detail, billing page, or dashboard
+- Color-coded status dots in patient table
+- Clickable payment toggle in billing table
+- Overdue payment alerts on dashboard with "Mark Paid" buttons
+- Payment rate tracked in practice report
+
+### Referral Tracking
+- "Referred By" field on all patients (not just prospects)
+- Referral leaderboard on dashboard showing top referral sources
+- Referral data included in practice report
 
 ### Wellness Check Scheduling
 Based on AAP guidelines, calculates wellness check dates from DOB:
@@ -42,6 +94,7 @@ Based on AAP guidelines, calculates wellness check dates from DOB:
 - Schedule modal with date picker and notes (for Dr. Prajapati)
 - Green "completed" badges for scheduled items
 - Tracks scheduled vs. unscheduled checks
+- Month-by-month view for next 12 months
 
 ### Prospect Pipeline
 Kanban-style board with 4 stages:
@@ -52,23 +105,118 @@ Kanban-style board with 4 stages:
 
 - Move prospects between stages with arrow buttons
 - "Enroll" button converts prospect to active member
-- Prospect-specific fields: pipeline stage, due date, referral source
+- Prospect-specific fields: pipeline stage, due date
 - KPIs: total prospects, ready to enroll, due within 60 days, visits scheduled
 
+### Wix Website Lead Capture
+- Automatic lead capture via URL parameters (`?lead=1&firstName=...&lastName=...&phone=...&email=...&notes=...`)
+- Creates a new prospect in the pipeline automatically
+- Embeddable HTML form snippet displayed in Data & Backup page
+- Dr. P can paste the form into a Wix "Embed HTML" element on her website
+- Leads tagged with "Website" referral source
+- Duplicate detection prevents re-adding existing patients
+
 ### Revenue Dashboard
-- MRR (Monthly Recurring Revenue)
-- ARR (Annualized Revenue)
-- Average revenue per patient
-- Revenue by tier breakdown
-- Active patient count
+- MRR (Monthly Recurring Revenue) and ARR (Annualized Revenue)
+- Average revenue per patient and lifetime value (3-year)
+- Revenue by tier breakdown with patient counts
+- 6-month forecast chart
+- 12-month projection table with tier change annotations
+- Historical revenue data from 2025 (charges-by-category.csv)
+- Year filter dropdown (2025 / 2026 / All) for historical view
+- Bar chart + detailed table with growth summary
+
+### Growth Simulator
+- "What If?" sliders for each pricing tier (0–20 patients each)
+- Live projection of: total patients, projected MRR, projected ARR, growth %
+- Helps Dr. P visualize practice growth scenarios
 
 ### Action Items
 - Auto-generated alerts for:
   - Upcoming wellness checks
   - Billing tier changes (EMR updates needed)
   - Prospect follow-ups
-- Urgency levels: urgent, upcoming, info
+- Urgency levels: urgent, upcoming
 - Schedule buttons with date tracking
+- Filter by type (all, billing, wellness, follow-up)
+
+---
+
+## Messages & Email Hub
+
+### Patient Journey Timeline (default tab)
+Visual birth-to-childhood communication map with 16 milestone stages:
+
+| Stage | Age | Emails Triggered |
+|-------|-----|-----------------|
+| Welcome | Day 1 | Welcome New Family, What to Expect |
+| First Week | Day 3–5 | Newborn First Week Check-In |
+| First Visit | 2 Weeks | Schedule First Wellness Visit |
+| Wellness | 2 Months | Wellness Check Reminder, 1-Week Reminder |
+| Tier Change | 3 Months | Billing Change (Orion→Lyra), Google Review Request |
+| Wellness | 4, 6, 9 Months | Wellness Check Reminders |
+| Birthday + Tier | 1 Year | Birthday, Billing Change (Lyra→Sirius), Wellness |
+| Wellness | 15, 18, 24, 30 Months | Wellness Check Reminders |
+| Annual | 3+ Years | Birthday, Seasonal Check-In, Review Request |
+| Tier Change | 4 Years | Billing Change (Sirius→Pegasus) |
+| Ongoing | As needed | Missed Appointment, Payment Reminder |
+
+- Color-coded timeline nodes (onboarding, wellness, billing, birthday, review)
+- Each stage shows plan tier when it changes
+- Preview of every email template at each stage
+- One-click **Edit** button to customize any template
+- Legend and "How this works" guide
+
+### Email Templates (12 built-in)
+Organized by category with merge tags that auto-fill per patient:
+
+**Onboarding (4):**
+- Welcome New Family
+- Newborn — First Week Check-In
+- Newborn — 2 Week Follow-Up
+- New Patient — What to Expect
+
+**Wellness (2):**
+- Upcoming Wellness Check
+- Wellness Check — 1 Week Reminder
+
+**Billing (2):**
+- Billing Change Notice
+- Payment Reminder
+
+**General (3):**
+- Missed Appointment Follow-Up
+- Happy Birthday
+- Seasonal Check-In
+
+**Review (1):**
+- Google Review Request
+
+**Available merge tags:** `{{patient_name}}`, `{{parent_name}}`, `{{age}}`, `{{next_wellness}}`, `{{monthly_fee}}`, `{{tier_name}}`, `{{google_review_link}}`
+
+### Smart Reminders
+Auto-generates all messages Dr. P needs to send right now based on actual patient data:
+- Wellness checks due in next 30 days
+- Billing changes in next 60 days
+- Newborn check-ins (Orion tier, < 1 month old)
+- Google review requests (active > 3 months, no review)
+- Each reminder has: preview, Copy button, Send Email button (if patient has email)
+
+### Email Sending
+- Send emails directly to parents from any template via EmailJS
+- HTML-formatted emails with Starlight branding
+- Email log tracks every sent message per patient
+- Auto-append Google Review nudge to outbound emails for non-reviewers
+- All emails logged in patient's Email History and global Email Log tab
+
+### Google Review Tracking
+- `googleReview` field on each patient (date reviewed or false)
+- Gold star badge in patient table for reviewed families
+- Review toggle + "Send Review Request" in patient detail
+- **Reviews tab** in Messages: shows who hasn't reviewed with one-click send
+- Review progress banner with completion percentage and progress bar
+- Configurable Google Review link (set once in Messages page settings)
+- Auto-nudge: review request footer appended to all outbound emails for non-reviewers
 
 ### Monthly Email Reminders
 - Generates a full monthly checklist email with:
@@ -82,17 +230,37 @@ Kanban-style board with 4 stages:
 - Manual send button available anytime
 - "Open in Email App" and "Copy to Clipboard" fallbacks
 
+---
+
+## Other Pages
+
+### Billing
+- Current MRR and ARR
+- Plan changes in 30/60/90 days
+- Full billing table with payment status column (clickable toggle)
+- Next plan change and EMR action for each patient
+
 ### Pricing Guide
-- Full plan details with descriptions (star-themed names: Orion, Lyra, Sirius, Pegasus, Polaris)
+- Full plan details with descriptions (star-themed names)
 - Wellness check schedule table
 - Plan transition rules
-- Family savings info (25% sibling discount, $500/mo family cap, 5% annual prepay)
+- Family savings info
+
+### Practice Report
+- Printable/PDF-able practice summary
+- Patient census by tier with bar chart
+- Key metrics: MRR, ARR, avg revenue, wellness compliance, payment rate, visit count
+- Pipeline summary by stage
+- Referral sources leaderboard
+- Visits by type breakdown
+- Print-optimized CSS (hides sidebar/header)
 
 ### Data & Backup
-- Export all data as JSON file
+- Export all data as JSON file (patients, schedules, payments, templates)
 - Import/restore from backup file
 - Stats display (active patients, prospects, scheduled items)
 - "How Your Data Works" explainer for non-technical users
+- Wix Lead Capture embed code with copy button
 
 ---
 
@@ -101,7 +269,7 @@ Kanban-style board with 4 stages:
 ### EmailJS (Email Sending)
 - **Service:** EmailJS (https://emailjs.com)
 - **Plan:** Free tier — 200 emails/month
-- **Purpose:** Sends monthly checklist emails directly to Dr. P's inbox
+- **Purpose:** Sends monthly checklist emails to Dr. P + individual emails to parents
 - **How it works:** Client-side JavaScript calls EmailJS API, which sends via connected Gmail account
 
 **Configuration (in `index.html`):**
@@ -119,6 +287,12 @@ const EMAILJS_TEMPLATE_ID = 'template_ldemwak';
 - **Service Type:** Gmail (NOT "Gmail API" — that causes 412 scope errors)
 
 **EmailJS Account:** Registered under Deepak Surana's email at https://dashboard.emailjs.com
+
+### Wix Website (Lead Capture)
+- Embeddable HTML form for Dr. P's Wix website
+- Form submits via GET params to the app URL
+- App auto-creates prospect on load when `?lead=1` is detected
+- Embed code available in Data & Backup page
 
 ### Netlify (Hosting)
 - **Site:** starlight-pediatrics
@@ -142,22 +316,65 @@ const EMAILJS_TEMPLATE_ID = 'template_ldemwak';
 ## Technical Architecture
 
 ### Stack
-- **Frontend:** Single HTML file (`index.html`) with inline CSS and vanilla JavaScript
+- **Frontend:** Single HTML file (`index.html`) with inline CSS and vanilla JavaScript (~4,800 lines)
 - **Font:** Nunito (Google Fonts) — web substitute for brand font Lorin
 - **No framework, no build step, no dependencies** (except EmailJS CDN)
 - **Assets:** `doctor.jpg` (Dr. Yogini photo), `logo-mark.png` (heart+star icon), `logo-full.png` (full logo)
+
+### Data Model (version 6)
+Patient object:
+```javascript
+{
+  id, firstName, lastName, dob, status, // 'active' | 'prospect'
+  parent, phone, email, notes, feeOverride, notesList[],
+  pipelineStage, dueDate,              // prospect-only
+  familyId,                             // links siblings
+  referredBy,                           // referral source
+  visits[],                             // visit log entries
+  googleReview,                         // false or ISO date string
+  emailLog[],                           // sent email records
+}
+```
+
+Visit object:
+```javascript
+{
+  id, date, type,    // 'well-child' | 'sick' | 'home-visit' | 'phone' | 'other'
+  complaint, followUp, notes,
+  checklistData,     // only for home visits — structured checklist results
+}
+```
 
 ### Data Storage
 - **Primary:** Browser `localStorage`
   - `sp_patients` — patient array (JSON)
   - `sp_schedules` — schedule data (JSON)
+  - `sp_payments` — payment status per patient per month (JSON)
+  - `sp_message_templates` — email templates (JSON)
   - `sp_settings` — email/reminder settings (JSON)
-  - `sp_version` — data model version (currently `'5'`)
+  - `sp_version` — data model version (currently `'6'`)
+  - `sp_google_review_link` — configurable Google Review URL
   - `sp_last_backup` — timestamp of last manual backup
   - `sp_auto_backup` — redundant copy of all data (auto-saved on every change)
   - `sp_auto_download_week` — tracks weekly auto-download (e.g. `'2026-W11'`)
   - `sp_auto_email_sent_2026-04` — tracks auto-sent monthly emails
   - `sp_last_email_sent` — timestamp of last manual email send
+
+### Sidebar Navigation (14 pages)
+| Page | data-page | Description |
+|------|-----------|-------------|
+| Dashboard | `dashboard` | KPIs, actions, wellness, overdue payments, referral leaderboard |
+| Patients | `patients` | Patient table with search, sort, filter |
+| Pipeline | `pipeline` | Kanban board for prospects |
+| Billing | `billing` | Billing table with payment toggles |
+| Wellness | `wellness` | 12-month wellness check calendar |
+| Actions | `actions` | All action items with scheduling |
+| Revenue | `revenue` | Revenue dashboard + growth simulator |
+| Reminders | `reminders` | Monthly email generator + auto-send |
+| Messages | `messages` | Patient journey timeline, templates, reviews, email log |
+| Pricing | `pricing` | Plan details and family savings |
+| Report | `report` | Printable practice report |
+| Backup | `backup` | Export/import, Wix embed code |
 
 ### Data Protection (4 Layers)
 1. **Persistent Storage API** — `navigator.storage.persist()` prevents browser from evicting data
@@ -173,12 +390,20 @@ const EMAILJS_TEMPLATE_ID = 'template_ldemwak';
 - Requires Dr. P to open the app at least once between the 24th and 1st
 
 ### Versioning
-Data model changes require bumping the version number in two places:
+Data model version is currently `'6'`. The `migrateToV6()` function handles upgrading from v5:
 ```javascript
-if (saved && version === '5') {  // check
-localStorage.setItem('sp_version', '5');  // set
+function migrateToV6(list) {
+  return list.map(p => ({
+    ...p,
+    familyId: p.familyId || '',
+    referredBy: p.referredBy || p.referralSource || '',
+    visits: p.visits || [],
+    googleReview: p.googleReview || false,
+    emailLog: p.emailLog || [],
+  }));
+}
 ```
-This forces a re-seed of patient data from `SEED_PATIENTS`. Any user-added data will be lost on version bump unless backed up first.
+Migration runs automatically on load if `sp_version` is `'5'`.
 
 ---
 
@@ -198,6 +423,7 @@ The app stores Protected Health Information (PHI):
 - Phone numbers
 - Email addresses
 - Medical notes
+- Visit records
 
 Under HIPAA, any system storing PHI must have a signed Business Associate Agreement (BAA) with the hosting/database provider.
 
@@ -261,7 +487,7 @@ Under HIPAA, any system storing PHI must have a signed Business Associate Agreem
 ## File Structure
 ```
 starlight-app/
-├── index.html          # The entire app (HTML + CSS + JS, ~3000 lines)
+├── index.html          # The entire app (HTML + CSS + JS, ~4,800 lines)
 ├── doctor.jpg          # Dr. Yogini Prajapati headshot
 ├── logo-mark.png       # Heart + star logo mark
 ├── logo-full.png       # Full logo with text
@@ -293,8 +519,10 @@ When making changes:
 1. **Single-device data** — localStorage doesn't sync across devices. Use backup/restore to transfer.
 2. **No authentication** — anyone with the URL can access the app. Fine for now (single user), needs auth before multi-user.
 3. **Auto-send requires app visit** — monthly email only sends if Dr. P opens the app between the 24th and 1st. A server-side cron would fix this but requires a backend.
-4. **Version bump resets data** — changing the data model version (`sp_version`) re-seeds from `SEED_PATIENTS`, overwriting user data. Always back up before version bumps.
-5. **EmailJS free tier limit** — 200 emails/month. More than enough for monthly reminders + occasional manual sends.
+4. **Version bump resets data** — changing the data model version re-seeds from `SEED_PATIENTS`, overwriting user data. Always back up before version bumps. Migration functions handle graceful upgrades (v5→v6).
+5. **EmailJS free tier limit** — 200 emails/month. Sufficient for monthly reminders + parent emails for a small practice. Monitor if sending volume increases.
+6. **Google Review link** — must be manually configured by Dr. P in the Messages page settings. Default is a placeholder URL.
+7. **Email sending requires patient email** — patients without an email address can only receive messages via Copy + text/call. The app shows Copy as fallback.
 
 ---
 
@@ -310,3 +538,9 @@ When making changes:
 | 2026-03-13 | Data & Backup page: export/import, auto-backup, persistent storage, recovery |
 | 2026-03-13 | EmailJS integration: real email sending (free, 200/mo) |
 | 2026-03-13 | Auto-send monthly email on the 24th (one week before 1st) |
+| 2026-03-13 | Added 2025 historical revenue data with year filter on revenue page |
+| 2026-03-13 | 10 new features: payment tracking, visit log, family linking, referral tracking, newborn home visit checklist, message templates, wellness reminders, growth simulator, practice report, Wix lead capture |
+| 2026-03-13 | Data model v5→v6 migration: familyId, referredBy, visits[], googleReview, emailLog[] |
+| 2026-03-13 | Email Hub: 12 lifecycle templates, send-to-parent via EmailJS, email log tracking |
+| 2026-03-13 | Google Review tracking: per-patient status, review progress banner, auto-nudge in emails |
+| 2026-03-13 | Patient Journey Timeline: visual birth-to-childhood communication map with 16 stages, linked templates, one-click edit |
