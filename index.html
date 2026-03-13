@@ -2209,6 +2209,12 @@ function loadMessageTemplates() {
   const saved = localStorage.getItem('sp_message_templates');
   if (saved) {
     messageTemplates = JSON.parse(saved);
+    // Migrate t12 to use first-name tags if still using old format
+    const t12 = messageTemplates.find(t => t.id === 't12');
+    if (t12 && t12.body.includes('{{parent_name}}')) {
+      const defaultT12 = DEFAULT_TEMPLATES.find(t => t.id === 't12');
+      if (defaultT12) { t12.body = defaultT12.body; saveMessageTemplates(); }
+    }
   } else {
     messageTemplates = JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
     saveMessageTemplates();
