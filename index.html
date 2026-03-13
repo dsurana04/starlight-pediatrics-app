@@ -867,6 +867,11 @@ tr:hover td { background: var(--sp-warm); }
 </head>
 <body>
 
+<!-- ═══════ BACKUP REMINDER BANNER ═══════ -->
+<div id="backupBanner" style="display:none;background:linear-gradient(135deg,#FFF3E0,#FFF8F0);padding:10px 20px;text-align:center;font-size:13px;color:#8B6914;border-bottom:1px solid #F0D9A0;cursor:pointer;" onclick="exportBackup();dismissBanner();">
+  <span style="margin-right:6px;">&#128190;</span> <strong>Back up your data</strong> — it's been a while. Click here to download a backup. <span style="float:right;opacity:0.5;font-size:16px;" onclick="event.stopPropagation();dismissBanner();">&#10005;</span>
+</div>
+
 <!-- ═══════ HEADER ═══════ -->
 <div class="header">
   <div class="header-brand">
@@ -1532,6 +1537,25 @@ function loadPatients() {
   // Re-seed if version changed (pricing tier updates)
   if (saved && version === '5') {
     patients = JSON.parse(saved);
+  } else if (!saved) {
+    // Try to recover from auto-backup before falling back to seed data
+    const autoBackup = localStorage.getItem('sp_auto_backup');
+    if (autoBackup) {
+      try {
+        const backup = JSON.parse(autoBackup);
+        if (backup.patients && backup.patients.length > 0) {
+          patients = backup.patients;
+          if (backup.schedules) { scheduleData = backup.schedules; }
+          localStorage.setItem('sp_version', '5');
+          savePatients();
+          console.log('Recovered ' + patients.length + ' patients from auto-backup.');
+          return;
+        }
+      } catch(e) {}
+    }
+    patients = JSON.parse(JSON.stringify(SEED_PATIENTS));
+    localStorage.setItem('sp_version', '5');
+    savePatients();
   } else {
     patients = JSON.parse(JSON.stringify(SEED_PATIENTS));
     localStorage.setItem('sp_version', '5');
@@ -2951,6 +2975,67 @@ updatePipelineBadge();
 
 // Update action badge
 document.getElementById('actionCount').textContent = getAllActions().filter(a => a.urgency === 'urgent').length;
+
+// ═══════════════════════════════════════════
+// AUTO-BACKUP & DATA PROTECTION
+// ═══════════════════════════════════════════
+
+// Request persistent storage so browser won't evict data
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().then(granted => {
+    if (granted) console.log('Persistent storage granted — data is safe.');
+  });
+}
+
+// Save a redundant backup copy to a second key every time patients change
+function autoBackupToStorage() {
+  const backup = { patients, schedules: scheduleData, savedAt: new Date().toISOString() };
+  localStorage.setItem('sp_auto_backup', JSON.stringify(backup));
+}
+
+// Wrap savePatients and saveSchedules to also trigger auto-backup
+const _origSavePatients = savePatients;
+savePatients = function() { _origSavePatients(); autoBackupToStorage(); };
+const _origSaveSchedules = saveSchedules;
+saveSchedules = function() { _origSaveSchedules(); autoBackupToStorage(); };
+
+// Show backup reminder if no backup in 7+ days
+function checkBackupReminder() {
+  const lastBackupStr = localStorage.getItem('sp_last_backup');
+  if (!lastBackupStr) {
+    // Never backed up — show banner
+    document.getElementById('backupBanner').style.display = 'block';
+    return;
+  }
+  const lastBackup = new Date(lastBackupStr);
+  const daysSince = (Date.now() - lastBackup.getTime()) / (1000 * 60 * 60 * 24);
+  if (daysSince >= 7) {
+    document.getElementById('backupBanner').style.display = 'block';
+  }
+}
+
+function dismissBanner() {
+  document.getElementById('backupBanner').style.display = 'none';
+}
+
+// Auto-download backup weekly (first visit of the week)
+function autoWeeklyBackup() {
+  const lastAuto = localStorage.getItem('sp_auto_download_week');
+  const now = new Date();
+  const weekKey = now.getFullYear() + '-W' + String(Math.ceil((((now - new Date(now.getFullYear(),0,1)) / 86400000) + new Date(now.getFullYear(),0,1).getDay() + 1) / 7)).padStart(2,'0');
+  if (lastAuto === weekKey) return; // already done this week
+  // Only auto-download if there are patients
+  if (patients.length > 0) {
+    localStorage.setItem('sp_auto_download_week', weekKey);
+    // Small delay so page loads first
+    setTimeout(() => {
+      exportBackup();
+    }, 2000);
+  }
+}
+
+checkBackupReminder();
+autoWeeklyBackup();
 </script>
 </body>
 </html>
