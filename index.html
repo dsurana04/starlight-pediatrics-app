@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starlight Pediatrics — Patient Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sp-navy: #245C7B;
+  --sp-blue: #245C7B;
+  --sp-sky: #3a7ca5;
+  --sp-gold: #BB9973;
+  --sp-mint: #6a9e8f;
+  --sp-rose: #c47a8a;
+  --sp-bg: #F4EEEa;
+  --sp-card: #ffffff;
+  --sp-text: #3a3330;
+  --sp-muted: #8a7e78;
+  --sp-border: #E5DBD6;
+  --sp-success: #6a9e8f;
+  --sp-warning: #BB9973;
+  --sp-danger: #c47a8a;
+  --sp-silver: #BFBBBD;
+  --sp-warm: #EAE3DF;
+  --sp-cream: #F4EEEa;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(36,92,123,0.06);
+  --shadow-lg: 0 8px 32px rgba(36,92,123,0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--sp-navy);
+  color: white;
+  padding: 0 24px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(36,92,123,0.18);
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.header-brand .logo-mark {
+  width: 42px;
+  height: 42px;
+  position: relative;
+}
+.header-brand .logo-mark svg { width: 42px; height: 42px; }
+.header-brand h1 {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+.header-brand h1 strong {
+  font-weight: 800;
+  display: block;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--sp-gold);
+  margin-top: -2px;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+.header-right .date { font-weight: 500; color: rgba(255,255,255,0.9); }
+
+/* ── Layout ── */
+.layout {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  background: var(--sp-cream);
+  border-right: 1px solid var(--sp-border);
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--sp-muted);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.sidebar-item:hover { background: var(--sp-bg); color: var(--sp-text); }
+.sidebar-item.active {
+  color: var(--sp-navy);
+  background: var(--sp-warm);
+  border-left-color: var(--sp-gold);
+  font-weight: 600;
+}
+.sidebar-item .icon { font-size: 18px; width: 24px; text-align: center; }
+.sidebar-item .badge {
+  margin-left: auto;
+  background: var(--sp-rose);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+  overflow-y: auto;
+}
+
+/* ── Pages ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: var(--sp-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sp-navy);
+}
+
+/* ── KPI Row ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.kpi {
+  background: var(--sp-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+}
+.kpi.blue::before { background: var(--sp-navy); }
+.kpi.gold::before { background: var(--sp-gold); }
+.kpi.mint::before { background: var(--sp-mint); }
+.kpi.rose::before { background: var(--sp-rose); }
+.kpi.sky::before { background: var(--sp-sky); }
+.kpi .kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sp-muted);
+  margin-bottom: 6px;
+}
+.kpi .kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--sp-navy);
+}
+.kpi .kpi-sub {
+  font-size: 12px;
+  color: var(--sp-muted);
+  margin-top: 4px;
+}
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--sp-bg);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sp-muted);
+  border-bottom: 2px solid var(--sp-border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+th:hover { color: var(--sp-blue); }
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--sp-border);
+  vertical-align: middle;
+}
+tr:hover td { background: rgba(44,82,130,0.02); }
+
+/* ── Badges ── */
+.badge-plan {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.badge-orion { background: #245C7B; color: white; }
+.badge-lyra { background: #BB9973; color: white; }
+.badge-sirius { background: #6a9e8f; color: white; }
+.badge-pegasus { background: #BFBBBD; color: #3a3330; }
+.badge-polaris { background: #E5DBD6; color: #3a3330; }
+.badge-prospect { background: var(--sp-warm); color: var(--sp-muted); }
+
+/* ── Scheduled / Completed states ── */
+.scheduled-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #d4edda;
+  color: #276749;
+}
+.reminder-card.completed {
+  opacity: 0.6;
+  background: #f0faf4 !important;
+  border-left-color: var(--sp-success) !important;
+}
+.reminder-card.completed .r-title {
+  text-decoration: line-through;
+  color: var(--sp-muted);
+}
+.schedule-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--sp-border);
+  background: white;
+  color: var(--sp-navy);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.schedule-btn:hover {
+  background: var(--sp-navy);
+  color: white;
+  border-color: var(--sp-navy);
+}
+.schedule-btn.done {
+  background: #d4edda;
+  color: #276749;
+  border-color: #b7e4c7;
+  cursor: default;
+}
+.schedule-date-input {
+  padding: 3px 8px;
+  border: 1px solid var(--sp-border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--sp-text);
+  width: 130px;
+}
+
+/* ── Action Badges ── */
+.action-due {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.action-due.urgent { background: #fed7d7; color: #c53030; }
+.action-due.upcoming { background: #fefcbf; color: #975a16; }
+.action-due.ok { background: #c6f6d5; color: #276749; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: var(--sp-blue);
+  color: white;
+}
+.btn-primary:hover { background: #1d4d68; }
+.btn-secondary {
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  border: 1px solid var(--sp-border);
+}
+.btn-secondary:hover { background: #e2e8f0; }
+.btn-danger {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+}
+.btn-danger:hover { background: #fed7d7; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-gold {
+  background: var(--sp-gold);
+  color: var(--sp-navy);
+}
+.btn-gold:hover { background: #e5b030; }
+
+/* ── Modal ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(26,39,68,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--sp-card);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+.modal h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sp-navy);
+  margin-bottom: 20px;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sp-muted);
+  margin-bottom: 6px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--sp-text);
+  background: var(--sp-bg);
+  transition: border 0.15s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--sp-blue);
+  background: white;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* ── Wellness Timeline ── */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--sp-border);
+}
+.timeline-item {
+  position: relative;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--sp-border);
+  background: white;
+}
+.timeline-item.past::before { background: var(--sp-success); border-color: var(--sp-success); }
+.timeline-item.current::before { background: var(--sp-gold); border-color: var(--sp-gold); box-shadow: 0 0 0 4px rgba(246,195,68,0.3); }
+.timeline-item.future::before { background: white; border-color: var(--sp-border); }
+.timeline-item .tl-date { font-weight: 600; color: var(--sp-navy); }
+.timeline-item .tl-label { color: var(--sp-muted); }
+.timeline-item .tl-age { font-size: 11px; color: var(--sp-sky); font-weight: 600; }
+
+/* ── Revenue Chart ── */
+.chart-bar-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 200px;
+  padding: 0 8px;
+  border-bottom: 2px solid var(--sp-border);
+  margin-bottom: 8px;
+}
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+.chart-bar {
+  width: 100%;
+  max-width: 48px;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.5s ease;
+  position: relative;
+  cursor: pointer;
+}
+.chart-bar:hover { opacity: 0.85; }
+.chart-bar .bar-val {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sp-navy);
+  white-space: nowrap;
+}
+.chart-labels {
+  display: flex;
+  gap: 8px;
+}
+.chart-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--sp-muted);
+  font-weight: 500;
+}
+
+/* ── Reminder Cards ── */
+.reminder-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.reminder-card.wellness { background: #ebf8ff; border-left: 4px solid var(--sp-sky); }
+.reminder-card.billing { background: #fffff0; border-left: 4px solid var(--sp-gold); }
+.reminder-card.prospect { background: #f0fff4; border-left: 4px solid var(--sp-mint); }
+.reminder-card .r-icon { font-size: 20px; }
+.reminder-card .r-content { flex: 1; }
+.reminder-card .r-title { font-weight: 600; color: var(--sp-navy); }
+.reminder-card .r-detail { color: var(--sp-muted); font-size: 12px; }
+.reminder-card .r-date { font-size: 12px; font-weight: 600; color: var(--sp-blue); white-space: nowrap; }
+
+/* ── Search ── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sp-bg);
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+}
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--sp-text);
+  outline: none;
+}
+.search-bar .search-icon { color: var(--sp-muted); }
+
+/* ── Patient Detail Panel ── */
+.patient-detail {
+  display: none;
+}
+.patient-detail.show { display: block; }
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.detail-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--sp-border);
+  margin-bottom: 16px;
+}
+.tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+.tab:hover { color: var(--sp-text); }
+.tab.active { color: var(--sp-navy); border-bottom-color: var(--sp-gold); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .modal { width: 95%; margin: 0 10px; }
+}
+
+/* ── Print ── */
+@media print {
+  .header, .sidebar { display: none; }
+  .main { padding: 0; max-width: 100%; }
+}
+
+/* ── Animations ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.page.active { animation: fadeIn 0.2s ease; }
+
+/* ── Email Preview ── */
+.email-preview {
+  background: white;
+  border: 1px solid var(--sp-border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  margin: 16px 0;
+}
+.email-preview .email-header {
+  border-bottom: 1px solid var(--sp-border);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+.email-preview .email-from, .email-preview .email-to, .email-preview .email-subject {
+  font-size: 13px;
+  color: var(--sp-muted);
+  margin-bottom: 4px;
+}
+.email-preview .email-subject { font-weight: 700; color: var(--sp-navy); font-size: 15px; }
+
+/* ── Notes ── */
+.note-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.note-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.note-item {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sp-border);
+  font-size: 13px;
+}
+.note-item .note-date {
+  color: var(--sp-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<div class="header">
+  <div class="header-brand">
+    <div class="logo-mark">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Heart shape -->
+        <path d="M30 52C30 52 6 36 6 20C6 12 12 6 20 6C24.5 6 28.5 8.5 30 12C31.5 8.5 35.5 6 40 6C48 6 54 12 54 20C54 36 30 52 30 52Z" fill="white" opacity="0.95"/>
+        <path d="M25 48C25 48 4 34 4 19C4 11.5 10 5.5 17.5 5.5C22 5.5 26 8 28 12C28 12 28 18 20 26C16 30 25 48 25 48Z" fill="#BFBBBD" opacity="0.5"/>
+        <!-- Star with trail -->
+        <path d="M42 4L43.5 8.5L48 10L43.5 11.5L42 16L40.5 11.5L36 10L40.5 8.5L42 4Z" fill="#BB9973"/>
+        <line x1="42" y1="10" x2="34" y2="22" stroke="#BB9973" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+      </svg>
+    </div>
+    <h1>Starlight<strong>Pediatrics</strong></h1>
+  </div>
+  <div class="header-right">
+    <span class="date" id="headerDate"></span>
+    <span style="opacity:0.6;">Atlas MD</span>
+  </div>
+</div>
+
+<!-- ═══════ LAYOUT ═══════ -->
+<div class="layout">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-item active" data-page="dashboard">
+    <span class="icon">&#128200;</span> Dashboard
+  </div>
+  <div class="sidebar-item" data-page="patients">
+    <span class="icon">&#128101;</span> Patients
+    <span class="badge" id="patientCount">0</span>
+  </div>
+  <div class="sidebar-item" data-page="billing">
+    <span class="icon">&#128176;</span> Billing
+  </div>
+  <div class="sidebar-item" data-page="wellness">
+    <span class="icon">&#128197;</span> Wellness
+  </div>
+  <div class="sidebar-item" data-page="actions">
+    <span class="icon">&#9888;&#65039;</span> Action Items
+    <span class="badge" id="actionCount">0</span>
+  </div>
+  <div class="sidebar-item" data-page="revenue">
+    <span class="icon">&#128202;</span> Revenue
+  </div>
+  <div class="sidebar-item" data-page="reminders">
+    <span class="icon">&#128231;</span> Reminders
+  </div>
+  <div class="sidebar-item" data-page="pricing">
+    <span class="icon">&#127991;&#65039;</span> Pricing Guide
+  </div>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main">
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div class="page active" id="page-dashboard">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Dashboard</h2>
+  <div class="kpi-row" id="dashKpis"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>&#9888;&#65039; Upcoming Actions</h2>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('actions')">View All</button>
+    </div>
+    <div id="dashActions"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>&#128197; This Month's Wellness Checks</h2>
+      <button class="btn btn-secondary btn-sm" onclick="navigate('wellness')">View All</button>
+    </div>
+    <div id="dashWellness"></div>
+  </div>
+</div>
+
+<!-- ═══════ PATIENTS ═══════ -->
+<div class="page" id="page-patients">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);">Patients</h2>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="openAddPatient()">+ Add Patient</button>
+      <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="patientSearch" placeholder="Search patients..." oninput="renderPatientTable()">
+  </div>
+
+  <!-- Patient List View -->
+  <div id="patientListView">
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" data-filter="active" onclick="setPatientFilter(this,'active')">Active</div>
+        <div class="tab" data-filter="prospect" onclick="setPatientFilter(this,'prospect')">Prospects</div>
+        <div class="tab" data-filter="all" onclick="setPatientFilter(this,'all')">All</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortPatients('name')">Patient Name</th>
+              <th onclick="sortPatients('dob')">DOB</th>
+              <th onclick="sortPatients('age')">Age</th>
+              <th onclick="sortPatients('plan')">Plan</th>
+              <th onclick="sortPatients('fee')">Monthly Fee</th>
+              <th>Next Wellness</th>
+              <th>Plan Change</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patientTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Detail View -->
+  <div class="patient-detail" id="patientDetailView">
+    <button class="btn btn-secondary btn-sm" onclick="closePatientDetail()" style="margin-bottom:16px;">&#8592; Back to List</button>
+    <div id="patientDetailContent"></div>
+  </div>
+</div>
+
+<!-- ═══════ BILLING ═══════ -->
+<div class="page" id="page-billing">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Billing Overview</h2>
+  <div class="kpi-row" id="billingKpis"></div>
+  <div class="card">
+    <div class="card-header"><h2>Billing by Patient</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Current Plan</th>
+            <th>Monthly Fee</th>
+            <th>Annual Value</th>
+            <th>Next Plan Change</th>
+            <th>New Fee</th>
+            <th>Atlas MD Action</th>
+          </tr>
+        </thead>
+        <tbody id="billingTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ WELLNESS ═══════ -->
+<div class="page" id="page-wellness">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Wellness Check Schedule</h2>
+  <div class="card" id="wellnessContent"></div>
+</div>
+
+<!-- ═══════ ACTION ITEMS ═══════ -->
+<div class="page" id="page-actions">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Action Items</h2>
+  <div class="tabs">
+    <div class="tab active" data-afilter="all" onclick="setActionFilter(this,'all')">All</div>
+    <div class="tab" data-afilter="billing" onclick="setActionFilter(this,'billing')">Billing Changes</div>
+    <div class="tab" data-afilter="wellness" onclick="setActionFilter(this,'wellness')">Wellness Checks</div>
+    <div class="tab" data-afilter="followup" onclick="setActionFilter(this,'followup')">Follow-ups</div>
+  </div>
+  <div id="actionsList"></div>
+</div>
+
+<!-- ═══════ REVENUE ═══════ -->
+<div class="page" id="page-revenue">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Revenue Analytics</h2>
+  <div class="kpi-row" id="revenueKpis"></div>
+  <div class="detail-grid">
+    <div class="card">
+      <div class="card-header"><h2>Monthly Revenue Forecast</h2></div>
+      <div class="chart-bar-container" id="revenueChart"></div>
+      <div class="chart-labels" id="revenueLabels"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Revenue by Plan Tier</h2></div>
+      <div id="revByPlan"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>12-Month Revenue Projection</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Active Patients</th>
+            <th>MRR</th>
+            <th>Cumulative</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="revenueProjectionBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ REMINDERS ═══════ -->
+<div class="page" id="page-reminders">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Monthly Email Reminders</h2>
+  <p style="font-size:14px;color:var(--sp-muted);margin-bottom:16px;">On the 1st of each month, review your checklist below and send yourself a reminder email with everything you need to do.</p>
+
+  <div class="detail-grid" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-header"><h2>Email Settings</h2></div>
+      <div class="form-group">
+        <label>Send Reminders To</label>
+        <input type="email" id="reminderEmail" value="drp@starlightpediatrics.com" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Practice Name</label>
+        <input type="text" id="reminderPracticeName" value="Starlight Pediatrics" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Doctor Name</label>
+        <input type="text" id="reminderDoctorName" value="Dr. P" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Include in Email</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="emailIncWellness" checked onchange="saveSettings()"> Wellness checks to schedule
+          </label>
+          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="emailIncBilling" checked onchange="saveSettings()"> Billing changes (Atlas MD)
+          </label>
+          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="emailIncRevenue" checked onchange="saveSettings()"> Revenue snapshot
+          </label>
+          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="emailIncProspects" checked onchange="saveSettings()"> Prospect follow-ups
+          </label>
+          <label style="font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="emailIncScheduled" checked onchange="saveSettings()"> Already-scheduled items
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Quick Actions</h2></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-primary" onclick="generateEmailPreview()" style="width:100%;justify-content:center;">&#128231; Generate This Month's Email</button>
+        <button class="btn btn-gold" onclick="sendViaMailto()" style="width:100%;justify-content:center;">&#9993; Open in Email App</button>
+        <button class="btn btn-secondary" onclick="copyEmailToClipboard()" style="width:100%;justify-content:center;">&#128203; Copy to Clipboard</button>
+      </div>
+      <div style="margin-top:16px;padding:14px;background:var(--sp-warm);border-radius:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--sp-navy);margin-bottom:6px;">How it works</div>
+        <ol style="font-size:12px;color:var(--sp-muted);line-height:1.8;padding-left:16px;">
+          <li>Review & customize your settings on the left</li>
+          <li>Click <strong>Generate</strong> to preview your monthly email</li>
+          <li>Click <strong>Open in Email App</strong> to send it to yourself</li>
+          <li>Or <strong>Copy</strong> the text and paste it anywhere</li>
+        </ol>
+        <p style="font-size:11px;color:var(--sp-muted);margin-top:8px;font-style:italic;">Tip: Do this on the 1st of every month so nothing falls through the cracks!</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="emailPreviewContainer"></div>
+</div>
+
+<!-- ═══════ PRICING GUIDE ═══════ -->
+<div class="page" id="page-pricing">
+  <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);margin-bottom:20px;">Pricing Guide</h2>
+
+  <!-- Plan Tier Cards -->
+  <div class="kpi-row" style="grid-template-columns:repeat(5,1fr);">
+    <div class="kpi rose">
+      <div class="kpi-label">&#11088; Orion</div>
+      <div class="kpi-value">$295</div>
+      <div class="kpi-sub">Newborns (0–2 months)</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">&#127926; Lyra</div>
+      <div class="kpi-value">$225</div>
+      <div class="kpi-sub">3–12 months</div>
+    </div>
+    <div class="kpi mint">
+      <div class="kpi-label">&#11088; Sirius</div>
+      <div class="kpi-value">$175</div>
+      <div class="kpi-sub">1–4 years</div>
+    </div>
+    <div class="kpi gold">
+      <div class="kpi-label">&#129412; Pegasus</div>
+      <div class="kpi-value">$150</div>
+      <div class="kpi-sub">5–18 years</div>
+    </div>
+    <div class="kpi sky">
+      <div class="kpi-label">&#11088; Polaris</div>
+      <div class="kpi-value">$100</div>
+      <div class="kpi-sub">19–22 years</div>
+    </div>
+  </div>
+
+  <!-- Plan Details -->
+  <div class="detail-grid" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-header"><h2>&#11088; Orion — $295/mo (0–2 months)</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:10px;font-style:italic;">Just like the mighty hunter Orion, this plan provides strength and protection for your baby's earliest days.</p>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li>Expectant parent meet-and-greet</li>
+        <li>Newborn preparation, education, and support</li>
+        <li>3 in-home newborn visits</li>
+        <li>Newborn sleep and lactation support</li>
+        <li>Sick or problem-based visits</li>
+        <li>All well-visits and checkups</li>
+        <li>Immediate text responses — no voicemails</li>
+        <li>Vaccination access via pharmacy partnership</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>&#127926; Lyra — $225/mo (3–12 months)</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:10px;font-style:italic;">Lyra, the harp, represents harmony and growth during this precious first year.</p>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li>Well-visits and checkups</li>
+        <li>Sick or problem-based visits</li>
+        <li>Developmental monitoring and guidance</li>
+        <li>Office-based visits</li>
+        <li>Lactation support and feeding help</li>
+        <li>Vaccination access via pharmacy partnership</li>
+      </ul>
+    </div>
+  </div>
+  <div class="detail-grid" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-header"><h2>&#11088; Sirius — $175/mo (1–4 years)</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:10px;font-style:italic;">Sirius, the brightest star, lights the way through the toddler years of rapid growth.</p>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li>Wellness visits and checkups</li>
+        <li>Sick or problem-based visits</li>
+        <li>Office-based visits</li>
+        <li>Developmental screening and guidance</li>
+        <li>Nutrition, sleep, and behavior guidance</li>
+        <li>Vaccination access via pharmacy partnership</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>&#129412; Pegasus — $150/mo (5–18 years)</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:10px;font-style:italic;">Inspired by Pegasus, the winged horse, fostering strength, imagination, and freedom.</p>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li>Wellness visits and checkups</li>
+        <li>Sick or problem-based visits</li>
+        <li>Office-based visits</li>
+        <li>Nutrition, sleep, and behavior guidance + developmental screening</li>
+        <li>Sports physicals</li>
+        <li>Routine anxiety/depression screening (adolescents)</li>
+        <li>Vaccination access via pharmacy partnership</li>
+      </ul>
+    </div>
+  </div>
+  <div class="detail-grid" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-header"><h2>&#11088; Polaris — $100/mo (19–22 years)</h2></div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:10px;font-style:italic;">Much like Polaris, the North Star, providing stability and direction during life's transitions.</p>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li>Remote care coordination (text, email, video)</li>
+        <li>Prescription management</li>
+        <li>Continued health guidance — avoid student health center hassles</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>&#128176; Family Savings</h2></div>
+      <ul style="font-size:13px;line-height:2;padding-left:18px;color:var(--sp-text);">
+        <li><strong>25% discount</strong> for additional children</li>
+        <li><strong>Family maximum:</strong> $500/month</li>
+        <li><strong>5% discount</strong> for annual prepayment</li>
+        <li><strong>$100</strong> one-time enrollment fee per family</li>
+        <li><strong>$50 travel fee</strong> for in-home visits (families with children 3mo+)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Wellness Check Schedule -->
+  <div class="card">
+    <div class="card-header"><h2>Wellness Check Schedule</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Visit</th><th>Age</th><th>Months from Birth</th><th>Plan at Visit</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>2 months</td><td>2</td><td><span class="badge-plan badge-orion">Orion</span></td></tr>
+          <tr><td>2</td><td>4 months</td><td>4</td><td><span class="badge-plan badge-lyra">Lyra</span></td></tr>
+          <tr><td>3</td><td>6 months</td><td>6</td><td><span class="badge-plan badge-lyra">Lyra</span></td></tr>
+          <tr><td>4</td><td>9 months</td><td>9</td><td><span class="badge-plan badge-lyra">Lyra</span></td></tr>
+          <tr><td>5</td><td>12 months (1 year)</td><td>12</td><td><span class="badge-plan badge-sirius">Sirius</span></td></tr>
+          <tr><td>6</td><td>15 months</td><td>15</td><td><span class="badge-plan badge-sirius">Sirius</span></td></tr>
+          <tr><td>7</td><td>18 months</td><td>18</td><td><span class="badge-plan badge-sirius">Sirius</span></td></tr>
+          <tr><td>8</td><td>24 months (2 years)</td><td>24</td><td><span class="badge-plan badge-sirius">Sirius</span></td></tr>
+          <tr><td>9</td><td>30 months (2.5 years)</td><td>30</td><td><span class="badge-plan badge-sirius">Sirius</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Plan Transition Rules -->
+  <div class="card">
+    <div class="card-header"><h2>Plan Transition Rules (Atlas MD)</h2></div>
+    <p style="font-size:14px;line-height:1.7;color:var(--sp-text);">
+      <strong>Orion &#8594; Lyra:</strong> When baby turns 3 months, reduce from $295 to $225. Change in Atlas MD effective the 1st of the month after they turn 3 months.<br><br>
+      <strong>Lyra &#8594; Sirius:</strong> When child turns 1 year, reduce from $225 to $175. Change in Atlas MD effective the 1st of the month after they turn 1 year.<br><br>
+      <strong>Sirius &#8594; Pegasus:</strong> When child turns 4 years, reduce from $175 to $150. Change in Atlas MD effective the 1st of the month after they turn 4 years.<br><br>
+      <strong>Pegasus &#8594; Polaris:</strong> When young adult turns 19, reduce from $150 to $100. Change in Atlas MD effective the 1st of the month after they turn 19.<br><br>
+      <em style="color:var(--sp-muted);">Tip: The app automatically calculates these dates for each patient and alerts you on the Actions page.</em>
+    </p>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ═══════ ADD/EDIT PATIENT MODAL ═══════ -->
+<div class="modal-overlay" id="patientModal">
+  <div class="modal">
+    <h2 id="modalTitle">Add New Patient</h2>
+    <input type="hidden" id="editPatientId">
+    <div class="form-row">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="pFirstName">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="pLastName">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date of Birth</label>
+        <input type="date" id="pDOB">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="pStatus">
+          <option value="active">Active Member</option>
+          <option value="prospect">Prospect</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Parent/Guardian Name</label>
+        <input type="text" id="pParent">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="pPhone">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="pEmail">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="pNotes" rows="3" placeholder="e.g., home birth, allergies, special considerations..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Override Monthly Fee (optional — leave blank for auto-pricing)</label>
+      <input type="number" id="pFeeOverride" placeholder="Auto-calculated from DOB">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePatient()">Save Patient</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PATIENT DETAIL MODAL ═══════ -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <h2>Add Note</h2>
+    <div class="form-group">
+      <label>Note</label>
+      <textarea id="noteText" rows="3"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('noteModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCHEDULE MODAL ═══════ -->
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal" style="width:420px;">
+    <h2 id="scheduleModalTitle">Schedule Appointment</h2>
+    <p id="scheduleModalDesc" style="font-size:14px;color:var(--sp-muted);margin-bottom:16px;"></p>
+    <input type="hidden" id="scheduleKey">
+    <div class="form-group">
+      <label>Scheduled Date</label>
+      <input type="date" id="scheduleDate">
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="scheduleNotes" placeholder="e.g., 10am with Dr. Surana">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSchedule()">Mark Scheduled</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA LAYER
+// ═══════════════════════════════════════════
+
+const WELLNESS_MONTHS = [2, 4, 6, 9, 12, 15, 18, 24, 30];
+
+const PRICING_TIERS = [
+  { name: 'Orion', minMonths: 0, maxMonths: 3, fee: 295, badge: 'orion', tagline: 'Newborns (0–2 months)' },
+  { name: 'Lyra', minMonths: 3, maxMonths: 12, fee: 225, badge: 'lyra', tagline: '3–12 months' },
+  { name: 'Sirius', minMonths: 12, maxMonths: 48, fee: 175, badge: 'sirius', tagline: '1–4 years' },
+  { name: 'Pegasus', minMonths: 48, maxMonths: 216, fee: 150, badge: 'pegasus', tagline: '5–18 years' },
+  { name: 'Polaris', minMonths: 216, maxMonths: 9999, fee: 100, badge: 'polaris', tagline: '19–22 years' },
+];
+
+const FAMILY_SAVINGS = {
+  siblingDiscount: 0.25,       // 25% off additional children
+  familyMax: 500,              // $500/mo family cap
+  annualPrepayDiscount: 0.05,  // 5% off annual prepay
+  enrollmentFee: 100,          // $100 one-time per family
+  travelFee: 50,               // $50 for in-home visits (3mo+)
+};
+
+const SEED_PATIENTS = [
+  { id: 'p1', firstName: 'Sage', lastName: 'Spitzer', dob: '2026-01-28', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p2', firstName: 'Carter', lastName: 'Conoly', dob: '2026-02-15', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p3', firstName: 'Kian', lastName: 'Yellanki', dob: '2025-04-27', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p4', firstName: 'Gianna', lastName: 'Sarria', dob: '2026-02-26', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p5', firstName: 'Thomas Bradley', lastName: 'Hughes', dob: '2025-06-04', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p6', firstName: 'Callan James', lastName: 'Geddes', dob: '2025-06-15', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p7', firstName: 'Eden Aspen', lastName: 'Frank', dob: '2025-10-07', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p8', firstName: 'Ashton Key', lastName: 'Saltzgiver', dob: '2025-10-06', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p9', firstName: 'Harper', lastName: 'Wilkinson', dob: '2025-10-18', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p10', firstName: 'Lyla Gene', lastName: 'Vukmaravich', dob: '2025-10-20', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p11', firstName: 'Lavanya', lastName: 'Peddina', dob: '2025-11-25', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p12', firstName: 'Suma Passerine', lastName: 'Blue', dob: '2025-12-27', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p13', firstName: 'Artuin Magnus', lastName: 'Bravick', dob: '2023-01-16', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p14', firstName: 'Charlie Zinn', lastName: 'Tinlin', dob: '2021-04-29', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p15', firstName: 'Max', lastName: 'Smith', dob: '2014-06-14', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p16', firstName: 'Olena', lastName: 'Kozma', dob: '2023-09-02', status: 'active', parent: '', phone: '', email: '', notes: '', feeOverride: null, notesList: [] },
+  { id: 'p17', firstName: 'Montgomery', lastName: 'Jackson', dob: '2025-07-24', status: 'prospect', parent: '', phone: '', email: '', notes: 'Charged 1 time visit fee', feeOverride: null, notesList: [] },
+  { id: 'p18', firstName: 'Alexandria', lastName: 'Caces', dob: '', status: 'prospect', parent: '', phone: '', email: '', notes: 'Baby born - interested, will see at 2 mo. Home birth.', feeOverride: null, notesList: [] },
+  { id: 'p19', firstName: 'Riley', lastName: 'W', dob: '', status: 'prospect', parent: '', phone: '503-539-7030', email: '', notes: 'Due April 27', feeOverride: null, notesList: [] },
+  { id: 'p20', firstName: 'Sena', lastName: 'Milliman', dob: '', status: 'prospect', parent: '', phone: '(917) 941-4975', email: '', notes: 'Westlake. Due April 27. Enrolled.', feeOverride: null, notesList: [] },
+];
+
+let patients = [];
+let patientFilter = 'active';
+let actionFilter = 'all';
+let sortField = 'name';
+let sortDir = 1;
+let currentDetailId = null;
+let notePatientId = null;
+
+function loadPatients() {
+  const version = localStorage.getItem('sp_version');
+  const saved = localStorage.getItem('sp_patients');
+  // Re-seed if version changed (pricing tier updates)
+  if (saved && version === '3') {
+    patients = JSON.parse(saved);
+  } else {
+    patients = JSON.parse(JSON.stringify(SEED_PATIENTS));
+    localStorage.setItem('sp_version', '3');
+    savePatients();
+  }
+}
+
+function savePatients() {
+  localStorage.setItem('sp_patients', JSON.stringify(patients));
+}
+
+function loadSettings() {
+  const s = localStorage.getItem('sp_settings');
+  const defaults = { email: 'drp@starlightpediatrics.com', practiceName: 'Starlight Pediatrics', doctorName: 'Dr. P', incWellness: true, incBilling: true, incRevenue: true, incProspects: true, incScheduled: true };
+  const settings = s ? { ...defaults, ...JSON.parse(s) } : defaults;
+  document.getElementById('reminderEmail').value = settings.email;
+  document.getElementById('reminderPracticeName').value = settings.practiceName;
+  document.getElementById('reminderDoctorName').value = settings.doctorName;
+  document.getElementById('emailIncWellness').checked = settings.incWellness;
+  document.getElementById('emailIncBilling').checked = settings.incBilling;
+  document.getElementById('emailIncRevenue').checked = settings.incRevenue;
+  document.getElementById('emailIncProspects').checked = settings.incProspects;
+  document.getElementById('emailIncScheduled').checked = settings.incScheduled;
+}
+
+function saveSettings() {
+  const settings = {
+    email: document.getElementById('reminderEmail').value,
+    practiceName: document.getElementById('reminderPracticeName').value,
+    doctorName: document.getElementById('reminderDoctorName').value,
+    incWellness: document.getElementById('emailIncWellness').checked,
+    incBilling: document.getElementById('emailIncBilling').checked,
+    incRevenue: document.getElementById('emailIncRevenue').checked,
+    incProspects: document.getElementById('emailIncProspects').checked,
+    incScheduled: document.getElementById('emailIncScheduled').checked,
+  };
+  localStorage.setItem('sp_settings', JSON.stringify(settings));
+}
+
+function getEmailSettings() {
+  return {
+    email: document.getElementById('reminderEmail').value,
+    practiceName: document.getElementById('reminderPracticeName').value,
+    doctorName: document.getElementById('reminderDoctorName').value,
+    incWellness: document.getElementById('emailIncWellness').checked,
+    incBilling: document.getElementById('emailIncBilling').checked,
+    incRevenue: document.getElementById('emailIncRevenue').checked,
+    incProspects: document.getElementById('emailIncProspects').checked,
+    incScheduled: document.getElementById('emailIncScheduled').checked,
+  };
+}
+
+// ═══════════════════════════════════════════
+// SCHEDULING DATA
+// ═══════════════════════════════════════════
+
+// Schedule entries stored as { [key]: { date, notes, completedAt } }
+// Keys are like "wellness:p1:6" (type:patientId:detail) or "billing:p3:Sirius"
+let scheduleData = {};
+
+function loadSchedules() {
+  const saved = localStorage.getItem('sp_schedules');
+  if (saved) scheduleData = JSON.parse(saved);
+}
+
+function saveSchedules() {
+  localStorage.setItem('sp_schedules', JSON.stringify(scheduleData));
+}
+
+function getSchedule(key) {
+  return scheduleData[key] || null;
+}
+
+function openScheduleModal(key, title, desc) {
+  document.getElementById('scheduleKey').value = key;
+  document.getElementById('scheduleModalTitle').textContent = title;
+  document.getElementById('scheduleModalDesc').textContent = desc;
+  document.getElementById('scheduleDate').value = '';
+  document.getElementById('scheduleNotes').value = '';
+  // Pre-fill if already scheduled
+  const existing = getSchedule(key);
+  if (existing) {
+    document.getElementById('scheduleDate').value = existing.date || '';
+    document.getElementById('scheduleNotes').value = existing.notes || '';
+  }
+  document.getElementById('scheduleModal').classList.add('show');
+}
+
+function closeScheduleModal() {
+  document.getElementById('scheduleModal').classList.remove('show');
+}
+
+function saveSchedule() {
+  const key = document.getElementById('scheduleKey').value;
+  const date = document.getElementById('scheduleDate').value;
+  const notes = document.getElementById('scheduleNotes').value.trim();
+  if (!date) { alert('Please select a date.'); return; }
+  scheduleData[key] = { date, notes, completedAt: new Date().toISOString() };
+  saveSchedules();
+  closeScheduleModal();
+  // Re-render current page
+  const activePage = document.querySelector('.sidebar-item.active');
+  if (activePage) renderPage(activePage.dataset.page);
+}
+
+function unschedule(key) {
+  if (!confirm('Remove this scheduled date?')) return;
+  delete scheduleData[key];
+  saveSchedules();
+  const activePage = document.querySelector('.sidebar-item.active');
+  if (activePage) renderPage(activePage.dataset.page);
+}
+
+function scheduleButtonHTML(key, title, desc) {
+  const sched = getSchedule(key);
+  if (sched) {
+    const d = parseDate(sched.date);
+    return `<span class="scheduled-badge" title="${sched.notes || ''}">&#9989; ${fmtDate(d)}${sched.notes ? ' — ' + sched.notes : ''}</span>
+            <button class="schedule-btn" onclick="openScheduleModal('${key}','${title.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}')" style="margin-left:4px;font-size:10px;padding:2px 6px;">Edit</button>
+            <button class="schedule-btn" onclick="unschedule('${key}')" style="margin-left:2px;font-size:10px;padding:2px 6px;color:var(--sp-rose);">&#10005;</button>`;
+  }
+  return `<button class="schedule-btn" onclick="openScheduleModal('${key}','${title.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}')" >&#128197; Schedule</button>`;
+}
+
+// ═══════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════
+
+const TODAY = new Date();
+
+function parseDate(s) {
+  if (!s) return null;
+  const d = new Date(s + 'T00:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtMoney(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0 });
+}
+
+function monthsBetween(d1, d2) {
+  return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth()) + (d2.getDate() > d1.getDate() ? 0 : 0);
+}
+
+function ageMonths(dob) {
+  if (!dob) return null;
+  const d = parseDate(dob);
+  if (!d) return null;
+  return monthsBetween(d, TODAY);
+}
+
+function ageString(dob) {
+  const m = ageMonths(dob);
+  if (m === null) return '—';
+  if (m < 0) return 'Not born yet';
+  if (m < 1) return 'Newborn';
+  if (m < 12) return m + ' mo';
+  const yrs = Math.floor(m / 12);
+  const rem = m % 12;
+  return yrs + 'y' + (rem ? ' ' + rem + 'mo' : '');
+}
+
+function getTier(dob) {
+  const m = ageMonths(dob);
+  if (m === null) return null;
+  for (const t of PRICING_TIERS) {
+    if (m >= t.minMonths && m < t.maxMonths) return t;
+  }
+  return PRICING_TIERS[PRICING_TIERS.length - 1];
+}
+
+function getMonthlyFee(p) {
+  if (p.feeOverride) return p.feeOverride;
+  const t = getTier(p.dob);
+  return t ? t.fee : 0;
+}
+
+function getNextTierChange(dob) {
+  if (!dob) return null;
+  const d = parseDate(dob);
+  if (!d) return null;
+  const m = ageMonths(dob);
+
+  // transitions: Orion→Lyra at 3mo, Lyra→Sirius at 12mo, Sirius→Pegasus at 48mo, Pegasus→Polaris at 216mo (18yr)
+  const transitions = [
+    { atMonths: 3, from: 295, to: 225, toName: 'Lyra' },
+    { atMonths: 12, from: 225, to: 175, toName: 'Sirius' },
+    { atMonths: 48, from: 175, to: 150, toName: 'Pegasus' },
+    { atMonths: 216, from: 150, to: 100, toName: 'Polaris' },
+  ];
+
+  for (const t of transitions) {
+    if (m < t.atMonths) {
+      // Calculate the date when baby reaches this age
+      const changeDate = new Date(d);
+      changeDate.setMonth(changeDate.getMonth() + t.atMonths);
+      // First of next month
+      const effectiveDate = new Date(changeDate.getFullYear(), changeDate.getMonth() + 1, 1);
+      return { ...t, date: effectiveDate };
+    }
+  }
+  return null; // No more transitions
+}
+
+function getWellnessChecks(dob) {
+  if (!dob) return [];
+  const d = parseDate(dob);
+  if (!d) return [];
+  return WELLNESS_MONTHS.map(m => {
+    const checkDate = new Date(d);
+    checkDate.setMonth(checkDate.getMonth() + m);
+    const isPast = checkDate < TODAY;
+    const isThisMonth = checkDate.getMonth() === TODAY.getMonth() && checkDate.getFullYear() === TODAY.getFullYear();
+    return {
+      months: m,
+      date: checkDate,
+      label: m >= 12 ? (m / 12) + (m % 12 ? '' : '') + (m === 12 ? ' year' : m === 24 ? ' years' : m === 30 ? ' years (2.5)' : ' months') : m + ' months',
+      isPast,
+      isThisMonth,
+      isCurrent: isThisMonth,
+    };
+  });
+}
+
+function getNextWellness(dob) {
+  const checks = getWellnessChecks(dob);
+  return checks.find(c => !c.isPast) || null;
+}
+
+function getActivePatients() {
+  return patients.filter(p => p.status === 'active');
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`.sidebar-item[data-page="${page}"]`).classList.add('active');
+  renderPage(page);
+}
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', () => navigate(item.dataset.page));
+});
+
+// ═══════════════════════════════════════════
+// RENDER: DASHBOARD
+// ═══════════════════════════════════════════
+
+function renderDashboard() {
+  const active = getActivePatients();
+  const mrr = active.reduce((sum, p) => sum + getMonthlyFee(p), 0);
+  const arr = mrr * 12;
+  const avgFee = active.length ? Math.round(mrr / active.length) : 0;
+
+  // Count actions
+  const actions = getAllActions();
+  const urgentActions = actions.filter(a => a.urgency === 'urgent').length;
+
+  document.getElementById('dashKpis').innerHTML = `
+    <div class="kpi blue">
+      <div class="kpi-label">Active Patients</div>
+      <div class="kpi-value">${active.length}</div>
+      <div class="kpi-sub">${patients.filter(p=>p.status==='prospect').length} prospects</div>
+    </div>
+    <div class="kpi gold">
+      <div class="kpi-label">Monthly Revenue (MRR)</div>
+      <div class="kpi-value">${fmtMoney(mrr)}</div>
+      <div class="kpi-sub">${fmtMoney(arr)} annualized</div>
+    </div>
+    <div class="kpi mint">
+      <div class="kpi-label">Avg Revenue / Patient</div>
+      <div class="kpi-value">${fmtMoney(avgFee)}</div>
+      <div class="kpi-sub">per month</div>
+    </div>
+    <div class="kpi rose">
+      <div class="kpi-label">Action Items</div>
+      <div class="kpi-value">${actions.length}</div>
+      <div class="kpi-sub">${urgentActions} urgent</div>
+    </div>
+  `;
+
+  // Upcoming actions (top 5, excluding scheduled)
+  const topActions = actions.filter(a => !getSchedule(a.key)).slice(0, 5);
+  const scheduledCount = actions.filter(a => getSchedule(a.key)).length;
+  document.getElementById('dashActions').innerHTML = topActions.length ?
+    topActions.map(a => `
+      <div class="reminder-card ${a.type}">
+        <span class="r-icon">${a.type === 'billing' ? '&#128176;' : a.type === 'wellness' ? '&#129658;' : '&#128100;'}</span>
+        <div class="r-content">
+          <div class="r-title">${a.title}</div>
+          <div class="r-detail">${a.detail}</div>
+        </div>
+        <span class="action-due ${a.urgency}">${a.urgency === 'urgent' ? '&#128308; Urgent' : a.urgency === 'upcoming' ? '&#128992; Soon' : '&#128994; OK'}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="r-date">${fmtDate(a.date)}</div>
+          ${scheduleButtonHTML(a.key, a.title, a.detail)}
+        </div>
+      </div>
+    `).join('') + (scheduledCount ? `<p style="font-size:12px;color:var(--sp-muted);padding:8px 12px;margin-top:4px;">&#9989; ${scheduledCount} item${scheduledCount>1?'s':''} already scheduled — <a href="#" onclick="navigate('actions');return false;" style="color:var(--sp-navy);">view all</a></p>` : '')
+    : '<p style="color:var(--sp-muted);font-size:14px;padding:12px;">No upcoming actions. Everything is on track!</p>';
+
+  // This month's wellness
+  const thisMonthWellness = [];
+  active.forEach(p => {
+    const checks = getWellnessChecks(p.dob);
+    checks.forEach(c => {
+      if (c.isThisMonth) {
+        thisMonthWellness.push({ patient: p, check: c });
+      }
+    });
+  });
+  document.getElementById('dashWellness').innerHTML = thisMonthWellness.length ?
+    thisMonthWellness.map(w => {
+      const wKey = 'wellness:' + w.patient.id + ':' + w.check.months;
+      const sched = getSchedule(wKey);
+      return `
+        <div class="reminder-card wellness ${sched ? 'completed' : ''}">
+          <span class="r-icon">${sched ? '&#9989;' : '&#129658;'}</span>
+          <div class="r-content">
+            <div class="r-title">${w.patient.firstName} ${w.patient.lastName}</div>
+            <div class="r-detail">${w.check.label} wellness check</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${scheduleButtonHTML(wKey, w.patient.firstName + ' ' + w.patient.lastName + ' wellness', w.check.label + ' wellness check')}
+          </div>
+        </div>
+      `;
+    }).join('') : '<p style="color:var(--sp-muted);font-size:14px;padding:12px;">No wellness checks this month.</p>';
+}
+
+// ═══════════════════════════════════════════
+// RENDER: PATIENTS
+// ═══════════════════════════════════════════
+
+function setPatientFilter(el, f) {
+  patientFilter = f;
+  document.querySelectorAll('#page-patients .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderPatientTable();
+}
+
+function sortPatients(field) {
+  if (sortField === field) sortDir *= -1;
+  else { sortField = field; sortDir = 1; }
+  renderPatientTable();
+}
+
+function renderPatientTable() {
+  const search = document.getElementById('patientSearch').value.toLowerCase();
+  let list = patients.filter(p => {
+    if (patientFilter === 'active') return p.status === 'active';
+    if (patientFilter === 'prospect') return p.status === 'prospect';
+    return true;
+  });
+  if (search) {
+    list = list.filter(p =>
+      (p.firstName + ' ' + p.lastName).toLowerCase().includes(search) ||
+      (p.notes || '').toLowerCase().includes(search)
+    );
+  }
+
+  // Sort
+  list.sort((a, b) => {
+    let va, vb;
+    switch (sortField) {
+      case 'name': va = a.firstName + a.lastName; vb = b.firstName + b.lastName; break;
+      case 'dob': va = a.dob || 'z'; vb = b.dob || 'z'; break;
+      case 'age': va = ageMonths(a.dob) || 9999; vb = ageMonths(b.dob) || 9999; break;
+      case 'fee': va = getMonthlyFee(a); vb = getMonthlyFee(b); break;
+      case 'plan': va = (getTier(a.dob)||{}).name||'z'; vb = (getTier(b.dob)||{}).name||'z'; break;
+      default: va = a.firstName; vb = b.firstName;
+    }
+    if (va < vb) return -1 * sortDir;
+    if (va > vb) return 1 * sortDir;
+    return 0;
+  });
+
+  const tbody = document.getElementById('patientTableBody');
+  tbody.innerHTML = list.map(p => {
+    const tier = getTier(p.dob);
+    const fee = getMonthlyFee(p);
+    const nextWell = getNextWellness(p.dob);
+    const nextChange = getNextTierChange(p.dob);
+    const isChangeUrgent = nextChange && nextChange.date && ((nextChange.date - TODAY) / 86400000) < 30;
+
+    return `
+      <tr>
+        <td>
+          <strong style="cursor:pointer;color:var(--sp-navy);" onclick="openPatientDetail('${p.id}')">${p.firstName} ${p.lastName}</strong>
+        </td>
+        <td>${p.dob ? fmtDate(parseDate(p.dob)) : '—'}</td>
+        <td>${ageString(p.dob)}</td>
+        <td>${tier ? `<span class="badge-plan badge-${tier.badge}">${tier.name}</span>` : (p.status === 'prospect' ? '<span class="badge-plan badge-prospect">Prospect</span>' : '—')}</td>
+        <td><strong>${fee ? fmtMoney(fee) : '—'}</strong></td>
+        <td>${nextWell ? fmtDate(nextWell.date) + ' <span style="font-size:11px;color:var(--sp-muted);">(' + nextWell.label + ')</span>' : '—'}</td>
+        <td>${nextChange ? `<span class="action-due ${isChangeUrgent ? 'urgent' : 'upcoming'}">${fmtDate(nextChange.date)} &#8594; ${fmtMoney(nextChange.to)}</span>` : '<span style="color:var(--sp-muted);font-size:12px;">None</span>'}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="openEditPatient('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')" style="margin-left:4px;">&#128465;</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('patientCount').textContent = getActivePatients().length;
+}
+
+// ═══════════════════════════════════════════
+// PATIENT DETAIL
+// ═══════════════════════════════════════════
+
+function openPatientDetail(id) {
+  currentDetailId = id;
+  const p = patients.find(x => x.id === id);
+  if (!p) return;
+
+  const tier = getTier(p.dob);
+  const fee = getMonthlyFee(p);
+  const checks = getWellnessChecks(p.dob);
+  const nextChange = getNextTierChange(p.dob);
+  const colors = ['#e86c8a','#4a9ede','#38b2ac','#f6c344','#9f7aea','#ed8936'];
+  const colorIdx = id.charCodeAt(1) % colors.length;
+
+  const initials = (p.firstName[0] || '') + (p.lastName[0] || '');
+
+  document.getElementById('patientListView').style.display = 'none';
+  document.getElementById('patientDetailView').classList.add('show');
+
+  document.getElementById('patientDetailContent').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-avatar" style="background:${colors[colorIdx]}">${initials}</div>
+      <div>
+        <h2 style="font-size:22px;font-weight:800;color:var(--sp-navy);">${p.firstName} ${p.lastName}</h2>
+        <div style="font-size:14px;color:var(--sp-muted);">${ageString(p.dob)} ${tier ? '— ' + tier.name + ' Plan' : ''} ${p.status === 'prospect' ? '— Prospect' : ''}</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="openEditPatient('${p.id}')">Edit</button>
+      </div>
+    </div>
+
+    <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+      <div class="kpi blue">
+        <div class="kpi-label">Monthly Fee</div>
+        <div class="kpi-value">${fee ? fmtMoney(fee) : '—'}</div>
+      </div>
+      <div class="kpi gold">
+        <div class="kpi-label">Annual Value</div>
+        <div class="kpi-value">${fee ? fmtMoney(fee * 12) : '—'}</div>
+      </div>
+      <div class="kpi mint">
+        <div class="kpi-label">Date of Birth</div>
+        <div class="kpi-value" style="font-size:18px;">${p.dob ? fmtDate(parseDate(p.dob)) : '—'}</div>
+      </div>
+      <div class="kpi rose">
+        <div class="kpi-label">Next Plan Change</div>
+        <div class="kpi-value" style="font-size:16px;">${nextChange ? fmtDate(nextChange.date) : 'None'}</div>
+        ${nextChange ? `<div class="kpi-sub">${fmtMoney(nextChange.from)} &#8594; ${fmtMoney(nextChange.to)} (${nextChange.toName})</div>` : ''}
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="card">
+        <div class="card-header"><h2>Contact Info</h2></div>
+        <div style="font-size:14px;line-height:2;">
+          <div><strong>Parent/Guardian:</strong> ${p.parent || '—'}</div>
+          <div><strong>Phone:</strong> ${p.phone || '—'}</div>
+          <div><strong>Email:</strong> ${p.email || '—'}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Atlas MD Actions</h2></div>
+        ${nextChange ? `
+          <div class="reminder-card billing" style="margin:0;">
+            <span class="r-icon">&#128176;</span>
+            <div class="r-content">
+              <div class="r-title">Change billing in Atlas MD</div>
+              <div class="r-detail">Update from ${fmtMoney(nextChange.from)}/mo to ${fmtMoney(nextChange.to)}/mo (${nextChange.toName} plan) effective ${fmtDate(nextChange.date)}</div>
+            </div>
+          </div>
+        ` : '<p style="font-size:13px;color:var(--sp-muted);">No pending billing changes.</p>'}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Wellness Check Timeline</h2>
+      </div>
+      ${checks.length ? `
+        <div class="timeline">
+          ${checks.map(c => `
+            <div class="timeline-item ${c.isPast ? 'past' : c.isCurrent ? 'current' : 'future'}">
+              <div>
+                <span class="tl-date">${fmtDate(c.date)}</span>
+                <span class="tl-age">${c.label}</span>
+                <span class="tl-label">${c.isPast ? '&#9989; Completed' : c.isCurrent ? '&#128308; This month!' : '&#9711; Upcoming'}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<p style="font-size:13px;color:var(--sp-muted);">No DOB set — cannot calculate wellness schedule.</p>'}
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Notes</h2>
+        <button class="btn btn-secondary btn-sm" onclick="openNoteModal('${p.id}')">+ Add Note</button>
+      </div>
+      ${p.notes ? `<div class="note-item"><div>${p.notes}</div></div>` : ''}
+      ${(p.notesList || []).map(n => `
+        <div class="note-item">
+          <span class="note-date">${n.date}</span>
+          <div>${n.text}</div>
+        </div>
+      `).join('')}
+      ${!p.notes && !(p.notesList||[]).length ? '<p style="font-size:13px;color:var(--sp-muted);">No notes yet.</p>' : ''}
+    </div>
+  `;
+}
+
+function closePatientDetail() {
+  document.getElementById('patientListView').style.display = 'block';
+  document.getElementById('patientDetailView').classList.remove('show');
+  currentDetailId = null;
+}
+
+function openNoteModal(id) {
+  notePatientId = id;
+  document.getElementById('noteText').value = '';
+  document.getElementById('noteModal').classList.add('show');
+}
+
+function saveNote() {
+  if (!notePatientId) return;
+  const text = document.getElementById('noteText').value.trim();
+  if (!text) return;
+  const p = patients.find(x => x.id === notePatientId);
+  if (!p) return;
+  if (!p.notesList) p.notesList = [];
+  p.notesList.unshift({ date: TODAY.toLocaleDateString(), text });
+  savePatients();
+  document.getElementById('noteModal').classList.remove('show');
+  openPatientDetail(notePatientId);
+}
+
+// ═══════════════════════════════════════════
+// ADD / EDIT PATIENT
+// ═══════════════════════════════════════════
+
+function openAddPatient() {
+  document.getElementById('modalTitle').textContent = 'Add New Patient';
+  document.getElementById('editPatientId').value = '';
+  document.getElementById('pFirstName').value = '';
+  document.getElementById('pLastName').value = '';
+  document.getElementById('pDOB').value = '';
+  document.getElementById('pStatus').value = 'active';
+  document.getElementById('pParent').value = '';
+  document.getElementById('pPhone').value = '';
+  document.getElementById('pEmail').value = '';
+  document.getElementById('pNotes').value = '';
+  document.getElementById('pFeeOverride').value = '';
+  document.getElementById('patientModal').classList.add('show');
+}
+
+function openEditPatient(id) {
+  const p = patients.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = 'Edit Patient';
+  document.getElementById('editPatientId').value = id;
+  document.getElementById('pFirstName').value = p.firstName;
+  document.getElementById('pLastName').value = p.lastName;
+  document.getElementById('pDOB').value = p.dob;
+  document.getElementById('pStatus').value = p.status;
+  document.getElementById('pParent').value = p.parent || '';
+  document.getElementById('pPhone').value = p.phone || '';
+  document.getElementById('pEmail').value = p.email || '';
+  document.getElementById('pNotes').value = p.notes || '';
+  document.getElementById('pFeeOverride').value = p.feeOverride || '';
+  document.getElementById('patientModal').classList.add('show');
+}
+
+function savePatient() {
+  const id = document.getElementById('editPatientId').value;
+  const data = {
+    firstName: document.getElementById('pFirstName').value.trim(),
+    lastName: document.getElementById('pLastName').value.trim(),
+    dob: document.getElementById('pDOB').value,
+    status: document.getElementById('pStatus').value,
+    parent: document.getElementById('pParent').value.trim(),
+    phone: document.getElementById('pPhone').value.trim(),
+    email: document.getElementById('pEmail').value.trim(),
+    notes: document.getElementById('pNotes').value.trim(),
+    feeOverride: document.getElementById('pFeeOverride').value ? Number(document.getElementById('pFeeOverride').value) : null,
+  };
+
+  if (!data.firstName || !data.lastName) {
+    alert('Please enter first and last name.');
+    return;
+  }
+
+  if (id) {
+    const p = patients.find(x => x.id === id);
+    if (p) Object.assign(p, data);
+  } else {
+    data.id = 'p' + Date.now();
+    data.notesList = [];
+    patients.push(data);
+  }
+
+  savePatients();
+  closeModal();
+  renderPatientTable();
+  renderDashboard();
+}
+
+function deletePatient(id) {
+  if (!confirm('Remove this patient?')) return;
+  patients = patients.filter(p => p.id !== id);
+  savePatients();
+  renderPatientTable();
+  renderDashboard();
+}
+
+function closeModal() {
+  document.getElementById('patientModal').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════
+// RENDER: BILLING
+// ═══════════════════════════════════════════
+
+function renderBilling() {
+  const active = getActivePatients();
+  const mrr = active.reduce((sum, p) => sum + getMonthlyFee(p), 0);
+
+  // Count plan changes in next 30/60/90 days
+  const changes30 = active.filter(p => { const c = getNextTierChange(p.dob); return c && c.date && (c.date - TODAY) / 86400000 <= 30 && (c.date - TODAY) / 86400000 > 0; }).length;
+  const changes90 = active.filter(p => { const c = getNextTierChange(p.dob); return c && c.date && (c.date - TODAY) / 86400000 <= 90 && (c.date - TODAY) / 86400000 > 0; }).length;
+
+  document.getElementById('billingKpis').innerHTML = `
+    <div class="kpi blue">
+      <div class="kpi-label">Current MRR</div>
+      <div class="kpi-value">${fmtMoney(mrr)}</div>
+    </div>
+    <div class="kpi gold">
+      <div class="kpi-label">ARR</div>
+      <div class="kpi-value">${fmtMoney(mrr * 12)}</div>
+    </div>
+    <div class="kpi rose">
+      <div class="kpi-label">Plan Changes (30d)</div>
+      <div class="kpi-value">${changes30}</div>
+    </div>
+    <div class="kpi mint">
+      <div class="kpi-label">Plan Changes (90d)</div>
+      <div class="kpi-value">${changes90}</div>
+    </div>
+  `;
+
+  document.getElementById('billingTableBody').innerHTML = active.map(p => {
+    const tier = getTier(p.dob);
+    const fee = getMonthlyFee(p);
+    const change = getNextTierChange(p.dob);
+    const isUrgent = change && change.date && ((change.date - TODAY) / 86400000) < 30;
+
+    return `
+      <tr>
+        <td><strong>${p.firstName} ${p.lastName}</strong></td>
+        <td>${tier ? `<span class="badge-plan badge-${tier.badge}">${tier.name}</span>` : '—'}</td>
+        <td><strong>${fmtMoney(fee)}</strong></td>
+        <td>${fmtMoney(fee * 12)}</td>
+        <td>${change ? `<span class="action-due ${isUrgent ? 'urgent' : 'upcoming'}">${fmtDate(change.date)}</span>` : '—'}</td>
+        <td>${change ? fmtMoney(change.to) + '/mo (' + change.toName + ')' : '—'}</td>
+        <td>${change && isUrgent ? '<strong style="color:#c53030;">&#9888; Update Atlas MD!</strong>' : (change ? 'Scheduled' : '<span style="color:var(--sp-muted);">No change</span>')}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// RENDER: WELLNESS
+// ═══════════════════════════════════════════
+
+function renderWellness() {
+  const active = getActivePatients();
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Build a month-by-month view for the next 12 months
+  let html = '';
+  for (let offset = 0; offset < 12; offset++) {
+    const targetDate = new Date(TODAY.getFullYear(), TODAY.getMonth() + offset, 1);
+    const monthStr = months[targetDate.getMonth()] + ' ' + targetDate.getFullYear();
+    const checksThisMonth = [];
+
+    active.forEach(p => {
+      const checks = getWellnessChecks(p.dob);
+      checks.forEach(c => {
+        if (c.date.getMonth() === targetDate.getMonth() && c.date.getFullYear() === targetDate.getFullYear()) {
+          checksThisMonth.push({ patient: p, check: c });
+        }
+      });
+    });
+
+    if (checksThisMonth.length === 0) continue;
+
+    html += `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:15px;font-weight:700;color:var(--sp-navy);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--sp-border);">
+          ${monthStr} <span style="font-size:12px;font-weight:500;color:var(--sp-muted);">(${checksThisMonth.length} check${checksThisMonth.length>1?'s':''})</span>
+        </h3>
+        ${checksThisMonth.map(w => {
+          const wKey = 'wellness:' + w.patient.id + ':' + w.check.months;
+          const sched = getSchedule(wKey);
+          return `
+            <div class="reminder-card wellness ${sched ? 'completed' : ''}" style="margin-bottom:6px;">
+              <span class="r-icon">${sched ? '&#9989;' : '&#129658;'}</span>
+              <div class="r-content">
+                <div class="r-title">${w.patient.firstName} ${w.patient.lastName}</div>
+                <div class="r-detail">${w.check.label} wellness check — ${sched ? 'Scheduled' : 'Schedule around'} ${fmtDate(w.check.date)}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                ${!sched && offset === 0 ? '<span class="action-due urgent">This Month</span>' : !sched && offset === 1 ? '<span class="action-due upcoming">Next Month</span>' : ''}
+                ${scheduleButtonHTML(wKey, w.patient.firstName + ' ' + w.patient.lastName + ' wellness', w.check.label + ' wellness check')}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  document.getElementById('wellnessContent').innerHTML = html || '<p style="color:var(--sp-muted);font-size:14px;">No wellness checks in the next 12 months.</p>';
+}
+
+// ═══════════════════════════════════════════
+// ACTION ITEMS
+// ═══════════════════════════════════════════
+
+function getAllActions() {
+  const actions = [];
+  const active = getActivePatients();
+
+  active.forEach(p => {
+    // Billing changes
+    const change = getNextTierChange(p.dob);
+    if (change && change.date) {
+      const daysAway = (change.date - TODAY) / 86400000;
+      if (daysAway <= 90 && daysAway > -30) {
+        actions.push({
+          type: 'billing',
+          key: `billing:${p.id}:${change.toName}`,
+          title: `Change billing: ${p.firstName} ${p.lastName}`,
+          detail: `Update Atlas MD from ${fmtMoney(change.from)}/mo to ${fmtMoney(change.to)}/mo (${change.toName} plan)`,
+          date: change.date,
+          urgency: daysAway <= 0 ? 'urgent' : daysAway <= 30 ? 'urgent' : 'upcoming',
+          patient: p,
+        });
+      }
+    }
+
+    // Wellness checks
+    const nextWell = getNextWellness(p.dob);
+    if (nextWell) {
+      const daysAway = (nextWell.date - TODAY) / 86400000;
+      if (daysAway <= 60 && daysAway > -14) {
+        actions.push({
+          type: 'wellness',
+          key: `wellness:${p.id}:${nextWell.months}`,
+          title: `Schedule wellness: ${p.firstName} ${p.lastName}`,
+          detail: `${nextWell.label} wellness check`,
+          date: nextWell.date,
+          urgency: daysAway <= 0 ? 'urgent' : daysAway <= 14 ? 'urgent' : 'upcoming',
+          patient: p,
+        });
+      }
+    }
+  });
+
+  // Prospects follow-up
+  patients.filter(p => p.status === 'prospect').forEach(p => {
+    actions.push({
+      type: 'followup',
+      key: `followup:${p.id}`,
+      title: `Follow up: ${p.firstName} ${p.lastName}`,
+      detail: p.notes || 'Prospect — follow up to convert',
+      date: TODAY,
+      urgency: 'upcoming',
+      patient: p,
+    });
+  });
+
+  // Sort: unscheduled first (urgent then upcoming), then scheduled
+  const urgencyOrder = { urgent: 0, upcoming: 1, ok: 2 };
+  actions.sort((a, b) => {
+    const aScheduled = getSchedule(a.key) ? 1 : 0;
+    const bScheduled = getSchedule(b.key) ? 1 : 0;
+    if (aScheduled !== bScheduled) return aScheduled - bScheduled;
+    return (urgencyOrder[a.urgency] - urgencyOrder[b.urgency]) || (a.date - b.date);
+  });
+
+  return actions;
+}
+
+function setActionFilter(el, f) {
+  actionFilter = f;
+  document.querySelectorAll('#page-actions .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderActions();
+}
+
+function renderActions() {
+  let actions = getAllActions();
+  if (actionFilter !== 'all') {
+    actions = actions.filter(a => a.type === actionFilter);
+  }
+
+  // Count only unscheduled urgent items for the badge
+  document.getElementById('actionCount').textContent = getAllActions().filter(a => a.urgency === 'urgent' && !getSchedule(a.key)).length;
+
+  document.getElementById('actionsList').innerHTML = actions.length ?
+    actions.map(a => {
+      const sched = getSchedule(a.key);
+      return `
+        <div class="reminder-card ${a.type} ${sched ? 'completed' : ''}" style="margin-top:8px;">
+          <span class="r-icon">${sched ? '&#9989;' : (a.type === 'billing' ? '&#128176;' : a.type === 'wellness' ? '&#129658;' : '&#128100;')}</span>
+          <div class="r-content">
+            <div class="r-title">${a.title}</div>
+            <div class="r-detail">${a.detail}</div>
+          </div>
+          ${sched ? '' : `<span class="action-due ${a.urgency}">${a.urgency === 'urgent' ? '&#128308; Urgent' : '&#128992; Upcoming'}</span>`}
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div class="r-date">${fmtDate(a.date)}</div>
+            ${scheduleButtonHTML(a.key, a.title, a.detail)}
+          </div>
+        </div>
+      `;
+    }).join('') : '<p style="color:var(--sp-muted);font-size:14px;padding:20px;">No action items for this filter.</p>';
+}
+
+// ═══════════════════════════════════════════
+// RENDER: REVENUE
+// ═══════════════════════════════════════════
+
+function renderRevenue() {
+  const active = getActivePatients();
+  const mrr = active.reduce((sum, p) => sum + getMonthlyFee(p), 0);
+  const arr = mrr * 12;
+
+  // Revenue by tier
+  const byTier = {};
+  PRICING_TIERS.forEach(t => byTier[t.name] = { count: 0, revenue: 0, fee: t.fee });
+  active.forEach(p => {
+    const tier = getTier(p.dob);
+    if (tier) {
+      byTier[tier.name].count++;
+      byTier[tier.name].revenue += getMonthlyFee(p);
+    }
+  });
+
+  document.getElementById('revenueKpis').innerHTML = `
+    <div class="kpi blue">
+      <div class="kpi-label">MRR</div>
+      <div class="kpi-value">${fmtMoney(mrr)}</div>
+    </div>
+    <div class="kpi gold">
+      <div class="kpi-label">ARR</div>
+      <div class="kpi-value">${fmtMoney(arr)}</div>
+    </div>
+    <div class="kpi mint">
+      <div class="kpi-label">Avg per Patient</div>
+      <div class="kpi-value">${fmtMoney(active.length ? Math.round(mrr / active.length) : 0)}</div>
+    </div>
+    <div class="kpi sky">
+      <div class="kpi-label">Lifetime Value (3yr avg)</div>
+      <div class="kpi-value">${fmtMoney(active.length ? Math.round((mrr / active.length) * 36) : 0)}</div>
+    </div>
+  `;
+
+  // Monthly forecast chart (next 6 months)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const forecast = [];
+  for (let i = 0; i < 6; i++) {
+    const targetMonth = new Date(TODAY.getFullYear(), TODAY.getMonth() + i, 1);
+    let monthRevenue = 0;
+    active.forEach(p => {
+      // Simulate fee at that point in time
+      if (!p.dob) { monthRevenue += getMonthlyFee(p); return; }
+      const dob = parseDate(p.dob);
+      const ageAtThat = (targetMonth.getFullYear() - dob.getFullYear()) * 12 + (targetMonth.getMonth() - dob.getMonth());
+      for (const t of PRICING_TIERS) {
+        if (ageAtThat >= t.minMonths && ageAtThat < t.maxMonths) {
+          monthRevenue += p.feeOverride || t.fee;
+          break;
+        }
+      }
+    });
+    forecast.push({ month: months[targetMonth.getMonth()] + ' ' + targetMonth.getFullYear(), revenue: monthRevenue });
+  }
+
+  const maxRev = Math.max(...forecast.map(f => f.revenue));
+  document.getElementById('revenueChart').innerHTML = forecast.map(f => {
+    const h = maxRev ? (f.revenue / maxRev) * 180 : 0;
+    return `
+      <div class="chart-bar-wrap">
+        <div class="chart-bar" style="height:${h}px;background:linear-gradient(180deg,var(--sp-gold),var(--sp-navy));">
+          <span class="bar-val">${fmtMoney(f.revenue)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('revenueLabels').innerHTML = forecast.map(f => `<span>${f.month}</span>`).join('');
+
+  // Revenue by plan
+  const tierColors = { Orion: '#e86c8a', Lyra: '#4a9ede', Sirius: '#38b2ac', Pegasus: '#f6c344', Polaris: '#9f7aea' };
+  document.getElementById('revByPlan').innerHTML = Object.entries(byTier).map(([name, data]) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--sp-border);">
+      <div style="width:12px;height:12px;border-radius:3px;background:${tierColors[name]};"></div>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">${name}</div>
+        <div style="font-size:12px;color:var(--sp-muted);">${data.count} patient${data.count!==1?'s':''} @ ${fmtMoney(data.fee)}/mo</div>
+      </div>
+      <div style="font-weight:700;font-size:16px;color:var(--sp-navy);">${fmtMoney(data.revenue)}/mo</div>
+    </div>
+  `).join('');
+
+  // 12-month projection table
+  let cumulative = 0;
+  document.getElementById('revenueProjectionBody').innerHTML = Array.from({ length: 12 }, (_, i) => {
+    const targetMonth = new Date(TODAY.getFullYear(), TODAY.getMonth() + i, 1);
+    let monthRevenue = 0;
+    let changes = [];
+    active.forEach(p => {
+      if (!p.dob) { monthRevenue += getMonthlyFee(p); return; }
+      const dob = parseDate(p.dob);
+      const ageAtThat = (targetMonth.getFullYear() - dob.getFullYear()) * 12 + (targetMonth.getMonth() - dob.getMonth());
+      let fee = p.feeOverride || 0;
+      if (!fee) {
+        for (const t of PRICING_TIERS) {
+          if (ageAtThat >= t.minMonths && ageAtThat < t.maxMonths) { fee = t.fee; break; }
+        }
+      }
+      monthRevenue += fee;
+
+      // Check if a tier change happens this month
+      const change = getNextTierChange(p.dob);
+      if (change && change.date && change.date.getMonth() === targetMonth.getMonth() && change.date.getFullYear() === targetMonth.getFullYear()) {
+        changes.push(`${p.firstName} ${p.lastName[0]}. → ${change.toName}`);
+      }
+    });
+    cumulative += monthRevenue;
+    return `
+      <tr>
+        <td><strong>${months[targetMonth.getMonth()]} ${targetMonth.getFullYear()}</strong></td>
+        <td>${active.length}</td>
+        <td><strong>${fmtMoney(monthRevenue)}</strong></td>
+        <td>${fmtMoney(cumulative)}</td>
+        <td style="font-size:12px;color:var(--sp-muted);">${changes.length ? changes.join(', ') : '—'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// RENDER: REMINDERS
+// ═══════════════════════════════════════════
+
+function generateEmailPreview() {
+  const cfg = getEmailSettings();
+  const active = getActivePatients();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const currentMonth = months[TODAY.getMonth()];
+  const currentYear = TODAY.getFullYear();
+
+  // Wellness checks this month + next month
+  const wellnessItems = [];
+  active.forEach(p => {
+    const checks = getWellnessChecks(p.dob);
+    checks.forEach(c => {
+      const isThisMonth = c.date.getMonth() === TODAY.getMonth() && c.date.getFullYear() === TODAY.getFullYear();
+      const nextMonth = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 1);
+      const isNextMonth = c.date.getMonth() === nextMonth.getMonth() && c.date.getFullYear() === nextMonth.getFullYear();
+      if (isThisMonth || isNextMonth) {
+        const wKey = 'wellness:' + p.id + ':' + c.months;
+        const sched = getSchedule(wKey);
+        wellnessItems.push({ patient: p, check: c, isThisMonth, sched });
+      }
+    });
+  });
+
+  // Billing changes this month + next 2 months
+  const billingChanges = [];
+  active.forEach(p => {
+    const change = getNextTierChange(p.dob);
+    if (change && change.date) {
+      const daysAway = (change.date - TODAY) / 86400000;
+      if (daysAway >= 0 && daysAway <= 60) {
+        const bKey = 'billing:' + p.id + ':' + change.toName;
+        const sched = getSchedule(bKey);
+        billingChanges.push({ patient: p, change, sched });
+      }
+    }
+  });
+
+  const mrr = active.reduce((sum, p) => sum + getMonthlyFee(p), 0);
+  const prospects = patients.filter(p => p.status === 'prospect');
+
+  // Build email sections
+  let sections = '';
+
+  if (cfg.incWellness) {
+    const unscheduled = wellnessItems.filter(w => !w.sched);
+    const scheduled = wellnessItems.filter(w => w.sched);
+    sections += `
+      <h4 style="color:#245C7B;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Wellness Checks to Schedule</h4>
+      ${unscheduled.length ? `
+        <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
+          ${unscheduled.map(w => `<li><strong>${w.patient.firstName} ${w.patient.lastName}</strong> — ${w.check.label} check (around ${fmtDate(w.check.date)}) ${w.isThisMonth ? '<span style="color:#c53030;font-weight:600;">THIS MONTH</span>' : '<span style="color:#BB9973;">next month</span>'}</li>`).join('')}
+        </ul>
+      ` : '<p style="font-size:14px;color:#8a7e78;">All wellness checks are scheduled!</p>'}
+    `;
+    if (cfg.incScheduled && scheduled.length) {
+      sections += `
+        <p style="font-size:13px;color:#6a9e8f;margin-top:4px;">Already scheduled: ${scheduled.map(w => `${w.patient.firstName} ${w.patient.lastName[0]}. (${fmtDate(parseDate(w.sched.date))})`).join(', ')}</p>
+      `;
+    }
+  }
+
+  if (cfg.incBilling) {
+    sections += `
+      <h4 style="color:#BB9973;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Billing Changes — Update Atlas MD</h4>
+      ${billingChanges.length ? `
+        <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
+          ${billingChanges.map(b => `<li>${b.sched ? '<span style="color:#6a9e8f;">DONE</span>' : '<span style="color:#c53030;">TODO</span>'} <strong>${b.patient.firstName} ${b.patient.lastName}</strong> — Change from ${fmtMoney(b.change.from)}/mo to ${fmtMoney(b.change.to)}/mo (${b.change.toName} plan) by ${fmtDate(b.change.date)}</li>`).join('')}
+        </ul>
+      ` : '<p style="font-size:14px;color:#8a7e78;">No billing changes in the next 60 days.</p>'}
+    `;
+  }
+
+  if (cfg.incRevenue) {
+    sections += `
+      <h4 style="color:#6a9e8f;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Revenue Snapshot</h4>
+      <table style="font-size:14px;border-collapse:collapse;">
+        <tr><td style="padding:4px 16px 4px 0;font-weight:600;">Active Patients</td><td>${active.length}</td></tr>
+        <tr><td style="padding:4px 16px 4px 0;font-weight:600;">Monthly Revenue</td><td>${fmtMoney(mrr)}</td></tr>
+        <tr><td style="padding:4px 16px 4px 0;font-weight:600;">Annualized</td><td>${fmtMoney(mrr * 12)}</td></tr>
+        <tr><td style="padding:4px 16px 4px 0;font-weight:600;">Avg per Patient</td><td>${fmtMoney(active.length ? Math.round(mrr / active.length) : 0)}/mo</td></tr>
+      </table>
+    `;
+  }
+
+  if (cfg.incProspects && prospects.length) {
+    sections += `
+      <h4 style="color:#c47a8a;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Prospect Follow-ups</h4>
+      <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
+        ${prospects.map(p => `<li><strong>${p.firstName} ${p.lastName}</strong>${p.phone ? ' (' + p.phone + ')' : ''} — ${p.notes || 'Follow up to convert'}</li>`).join('')}
+      </ul>
+    `;
+  }
+
+  const emailHTML = `
+    <div class="email-preview" id="emailContent">
+      <div class="email-header">
+        <div class="email-from"><strong>From:</strong> ${cfg.practiceName} Patient Manager</div>
+        <div class="email-to"><strong>To:</strong> ${cfg.email}</div>
+        <div class="email-subject" style="font-size:16px;margin-top:4px;">&#11088; ${cfg.practiceName} — ${currentMonth} ${currentYear} Monthly Checklist</div>
+      </div>
+
+      <p style="font-size:15px;color:#245C7B;margin-bottom:4px;">Good morning ${cfg.doctorName}!</p>
+      <p style="font-size:14px;color:#3a3330;margin-bottom:16px;">Here's your <strong>${currentMonth} ${currentYear}</strong> checklist. ${active.length} active patients, ${fmtMoney(mrr)}/mo revenue.</p>
+
+      ${sections}
+
+      <div style="margin-top:24px;padding:14px;background:#F4EEEa;border-radius:8px;border-left:3px solid #BB9973;">
+        <p style="font-size:13px;color:#8a7e78;margin:0;">
+          &#11088; Generated by ${cfg.practiceName} Patient Manager<br>
+          Open the app to schedule appointments, update billing, and see full patient timelines.
+        </p>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('emailPreviewContainer').innerHTML = emailHTML;
+}
+
+function getEmailPlainText() {
+  const el = document.getElementById('emailContent');
+  if (!el) return null;
+  // Get clean text version
+  let text = el.innerText || el.textContent;
+  // Clean up excessive whitespace
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  return text;
+}
+
+function copyEmailToClipboard() {
+  const text = getEmailPlainText();
+  if (!text) { alert('Generate the email first!'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Email content copied to clipboard!');
+  });
+}
+
+function sendViaMailto() {
+  const text = getEmailPlainText();
+  if (!text) {
+    generateEmailPreview();
+  }
+  const cfg = getEmailSettings();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const currentMonth = months[TODAY.getMonth()];
+  const currentYear = TODAY.getFullYear();
+  const subject = encodeURIComponent(`${cfg.practiceName} — ${currentMonth} ${currentYear} Monthly Checklist`);
+  const body = encodeURIComponent(getEmailPlainText() || 'Generate the email preview first.');
+  const mailto = `mailto:${cfg.email}?subject=${subject}&body=${body}`;
+  window.open(mailto);
+}
+
+// ═══════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════
+
+function exportCSV() {
+  const headers = ['Name','DOB','Age','Plan','Monthly Fee','Annual Value','Next Wellness','Next Plan Change','Status'];
+  const rows = patients.map(p => {
+    const tier = getTier(p.dob);
+    const fee = getMonthlyFee(p);
+    const nextWell = getNextWellness(p.dob);
+    const nextChange = getNextTierChange(p.dob);
+    return [
+      p.firstName + ' ' + p.lastName,
+      p.dob || '',
+      ageString(p.dob),
+      tier ? tier.name : '',
+      fee,
+      fee * 12,
+      nextWell ? fmtDate(nextWell.date) : '',
+      nextChange ? fmtDate(nextChange.date) + ' -> $' + nextChange.to : '',
+      p.status,
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
+  });
+
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'starlight-patients-' + TODAY.toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ═══════════════════════════════════════════
+// PAGE ROUTER
+// ═══════════════════════════════════════════
+
+function renderPage(page) {
+  switch (page) {
+    case 'dashboard': renderDashboard(); break;
+    case 'patients': renderPatientTable(); break;
+    case 'billing': renderBilling(); break;
+    case 'wellness': renderWellness(); break;
+    case 'actions': renderActions(); break;
+    case 'revenue': renderRevenue(); break;
+    case 'reminders': generateEmailPreview(); break;
+  }
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+
+document.getElementById('headerDate').textContent = TODAY.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+loadPatients();
+loadSettings();
+loadSchedules();
+renderDashboard();
+renderPatientTable();
+
+// Update action badge
+document.getElementById('actionCount').textContent = getAllActions().filter(a => a.urgency === 'urgent').length;
+</script>
+</body>
+</html>
