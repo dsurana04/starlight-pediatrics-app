@@ -3114,6 +3114,52 @@ function autoWeeklyBackup() {
 
 checkBackupReminder();
 autoWeeklyBackup();
+
+// ═══════════════════════════════════════════
+// AUTO-SEND MONTHLY EMAIL (24th–end of month)
+// ═══════════════════════════════════════════
+// Sends automatically when Dr. P opens the app on or after the 24th,
+// giving her a full week before the 1st to take action.
+
+function autoSendMonthlyEmail() {
+  if (!isEmailJSConfigured()) return;
+  const day = TODAY.getDate();
+  if (day < 24) return; // too early
+
+  // Build a key like "2026-03" for the NEXT month's checklist
+  const nextMonth = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 1);
+  const monthKey = nextMonth.getFullYear() + '-' + String(nextMonth.getMonth() + 1).padStart(2, '0');
+  const sentKey = 'sp_auto_email_sent_' + monthKey;
+
+  if (localStorage.getItem(sentKey)) return; // already sent for this cycle
+
+  // Small delay so page fully loads
+  setTimeout(() => {
+    generateEmailPreview();
+    const cfg = getEmailSettings();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const targetMonth = months[nextMonth.getMonth()];
+    const targetYear = nextMonth.getFullYear();
+    const subject = `${cfg.practiceName} — ${targetMonth} ${targetYear} Monthly Checklist (Auto-Reminder)`;
+    const emailContent = document.getElementById('emailContent');
+    if (!emailContent) return;
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: cfg.email,
+      subject: subject,
+      message_html: emailContent.innerHTML,
+    }, EMAILJS_PUBLIC_KEY)
+    .then(function() {
+      localStorage.setItem(sentKey, new Date().toISOString());
+      console.log('Auto-sent monthly email for ' + monthKey);
+    })
+    .catch(function(err) {
+      console.error('Auto-send failed:', err);
+    });
+  }, 3000);
+}
+
+autoSendMonthlyEmail();
 </script>
 </body>
 </html>
