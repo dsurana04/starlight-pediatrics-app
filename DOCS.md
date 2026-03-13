@@ -18,10 +18,12 @@ A single-page web app for **Starlight Pediatrics**, Dr. Yogini Prajapati's Direc
 - Add, edit, delete patients via modal form
 - Fields: first/last name, DOB, status, parent/guardian, phone, email, notes, fee override, family group, referred by
 - Active vs. Prospect status
-- 20 seed patients pre-loaded (16 active, 4 prospects) from original Excel spreadsheet
-- Patient table with sorting, filtering (All / Active / Prospects)
+- 21 seed patients pre-loaded (17 active including Riya Surana test patient, 4 prospects)
+- Patient table with sorting on ALL columns, filtering (All / Active / Prospects)
+- **Prospect-specific table view:** shows Name, Phone, Email, Due Date/DOB, Stage, editable Follow-Up Date (instead of wellness/plan change columns)
 - Payment status dots (green = paid, red = unpaid) next to patient names
 - Google Review star badge next to patients who have left a review
+- Auto-merges new seed patients into existing localStorage data on load
 
 ### Patient Detail View
 - Full patient profile with KPIs (monthly fee, annual value, DOB, next plan change)
@@ -107,6 +109,7 @@ Kanban-style board with 4 stages:
 - "Enroll" button converts prospect to active member
 - Prospect-specific fields: pipeline stage, due date
 - KPIs: total prospects, ready to enroll, due within 60 days, visits scheduled
+- **Automated Nurture Sequence** — see Prospect Nurture section below
 
 ### Wix Website Lead Capture
 - Automatic lead capture via URL parameters (`?lead=1&firstName=...&lastName=...&phone=...&email=...&notes=...`)
@@ -167,7 +170,7 @@ Visual birth-to-childhood communication map with 16 milestone stages:
 - One-click **Edit** button to customize any template
 - Legend and "How this works" guide
 
-### Email Templates (12 built-in)
+### Email Templates (17 built-in)
 Organized by category with merge tags that auto-fill per patient:
 
 **Onboarding (4):**
@@ -190,9 +193,18 @@ Organized by category with merge tags that auto-fill per patient:
 - Seasonal Check-In
 
 **Review (1):**
-- Google Review Request
+- Google Review Request (uses first names only — `{{parent_first}}`, `{{patient_first}}`)
 
-**Available merge tags:** `{{patient_name}}`, `{{parent_name}}`, `{{age}}`, `{{next_wellness}}`, `{{monthly_fee}}`, `{{tier_name}}`, `{{google_review_link}}`
+**Nurture (5):**
+- Nurture: Welcome Inquiry (Day 0)
+- Nurture: Meet Dr. P (Day 2)
+- Nurture: Why DPC Works (Day 5)
+- Nurture: What Families Say (Day 10)
+- Nurture: We're Here When You're Ready (Day 21)
+
+**Available merge tags:** `{{patient_name}}`, `{{patient_first}}`, `{{parent_name}}`, `{{parent_first}}`, `{{age}}`, `{{next_wellness}}`, `{{monthly_fee}}`, `{{tier_name}}`, `{{google_review_link}}`
+
+New templates auto-merge into existing localStorage on load (no data loss).
 
 ### Smart Reminders
 Auto-generates all messages Dr. P needs to send right now based on actual patient data:
@@ -203,8 +215,14 @@ Auto-generates all messages Dr. P needs to send right now based on actual patien
 - Each reminder has: preview, Copy button, Send Email button (if patient has email)
 
 ### Email Sending
-- Send emails directly to parents from any template via EmailJS
-- HTML-formatted emails with Starlight branding
+- **Preview modal** — always see the full rendered email before sending (works even without an email on file)
+- Professional HTML email template with:
+  - Logo + navy gradient header
+  - "Starlight Pediatrics — Direct Primary Care for Children"
+  - Signature: "Yogini Prajapati MD, Founder, Starlight Pediatrics, drp@starlightpediatrics.com"
+  - Social links: Instagram, Facebook, Website
+  - **CAN-SPAM compliant:** business name, Austin TX, unsubscribe mailto link
+- **From name:** "Yogini Prajapati MD" (no comma — EmailJS treats commas as separators)
 - Email log tracks every sent message per patient
 - Auto-append Google Review nudge to outbound emails for non-reviewers
 - All emails logged in patient's Email History and global Email Log tab
@@ -213,10 +231,33 @@ Auto-generates all messages Dr. P needs to send right now based on actual patien
 - `googleReview` field on each patient (date reviewed or false)
 - Gold star badge in patient table for reviewed families
 - Review toggle + "Send Review Request" in patient detail
-- **Reviews tab** in Messages: shows who hasn't reviewed with one-click send
-- Review progress banner with completion percentage and progress bar
-- Configurable Google Review link (set once in Messages page settings)
+- **Reviews tab** in Messages shows:
+  - Review request template preview with Edit button
+  - Who hasn't reviewed with last-sent date tracking
+  - **30-day follow-up cadence:** green "Sent Xd ago" badge if < 30 days, yellow "Follow up" badge when 30+ days
+  - Total send count per patient
+  - Google Review link settings (moved inside Reviews tab)
+- **Default Google Review link:** `https://g.page/r/CTEazz5Muc6nEBM/review`
 - Auto-nudge: review request footer appended to all outbound emails for non-reviewers
+
+### Prospect Nurture Sequences
+Automated 5-step drip campaign for converting prospects into active patients:
+
+| Step | Day | Template | Applicable Stages |
+|------|-----|----------|-------------------|
+| 1 | 0 | Welcome Inquiry — what makes Starlight special | All |
+| 2 | 2 | Meet Dr. P — personal intro, invite to Meet & Greet | Inquiry, Meet & Greet |
+| 3 | 5 | Why DPC Works — value prop, direct access, no copays | Inquiry, Meet & Greet, Scheduled Visit |
+| 4 | 10 | What Families Say — social proof, Google reviews link | Inquiry, Meet & Greet, Scheduled Visit |
+| 5 | 21 | Gentle Follow-Up — we're here when you're ready | All |
+
+- **Auto-initializes** when a prospect is created (manual or via Wix lead capture)
+- **Stage-aware:** steps auto-skip when prospect advances past applicable stages
+- **Nurture tab** in Messages: per-prospect step-by-step view with Preview & Send buttons
+- **Pause/Resume** toggle per prospect
+- Marks step as sent after successful email delivery
+- Badge count shows total due nurture steps
+- Data stored per patient in `nurture: { startDate, stepsSent[], paused }`
 
 ### Monthly Email Reminders
 - Generates a full monthly checklist email with:
@@ -316,12 +357,12 @@ const EMAILJS_TEMPLATE_ID = 'template_ldemwak';
 ## Technical Architecture
 
 ### Stack
-- **Frontend:** Single HTML file (`index.html`) with inline CSS and vanilla JavaScript (~4,800 lines)
+- **Frontend:** Single HTML file (`index.html`) with inline CSS and vanilla JavaScript (~5,200 lines)
 - **Font:** Nunito (Google Fonts) — web substitute for brand font Lorin
 - **No framework, no build step, no dependencies** (except EmailJS CDN)
 - **Assets:** `doctor.jpg` (Dr. Yogini photo), `logo-mark.png` (heart+star icon), `logo-full.png` (full logo)
 
-### Data Model (version 6)
+### Data Model (version 7)
 Patient object:
 ```javascript
 {
@@ -333,6 +374,7 @@ Patient object:
   visits[],                             // visit log entries
   googleReview,                         // false or ISO date string
   emailLog[],                           // sent email records
+  nurture,                              // prospect-only: { startDate, stepsSent[], paused }
 }
 ```
 
@@ -352,7 +394,7 @@ Visit object:
   - `sp_payments` — payment status per patient per month (JSON)
   - `sp_message_templates` — email templates (JSON)
   - `sp_settings` — email/reminder settings (JSON)
-  - `sp_version` — data model version (currently `'6'`)
+  - `sp_version` — data model version (currently `'7'`)
   - `sp_google_review_link` — configurable Google Review URL
   - `sp_last_backup` — timestamp of last manual backup
   - `sp_auto_backup` — redundant copy of all data (auto-saved on every change)
@@ -371,7 +413,7 @@ Visit object:
 | Actions | `actions` | All action items with scheduling |
 | Revenue | `revenue` | Revenue dashboard + growth simulator |
 | Reminders | `reminders` | Monthly email generator + auto-send |
-| Messages | `messages` | Patient journey timeline, templates, reviews, email log |
+| Messages | `messages` | Patient journey, nurture sequences, templates, reviews, email log |
 | Pricing | `pricing` | Plan details and family savings |
 | Report | `report` | Printable practice report |
 | Backup | `backup` | Export/import, Wix embed code |
@@ -390,20 +432,10 @@ Visit object:
 - Requires Dr. P to open the app at least once between the 24th and 1st
 
 ### Versioning
-Data model version is currently `'6'`. The `migrateToV6()` function handles upgrading from v5:
-```javascript
-function migrateToV6(list) {
-  return list.map(p => ({
-    ...p,
-    familyId: p.familyId || '',
-    referredBy: p.referredBy || p.referralSource || '',
-    visits: p.visits || [],
-    googleReview: p.googleReview || false,
-    emailLog: p.emailLog || [],
-  }));
-}
-```
-Migration runs automatically on load if `sp_version` is `'5'`.
+Data model version is currently `'7'`. Migration chain: v5 → v6 → v7.
+- `migrateToV6()` — adds familyId, referredBy, visits[], googleReview, emailLog[]
+- `migrateToV7()` — adds nurture field (auto-initializes for existing prospects with startDate 7 days ago)
+- Migrations run automatically on load. New seed patients are auto-merged by ID.
 
 ---
 
@@ -521,8 +553,9 @@ When making changes:
 3. **Auto-send requires app visit** — monthly email only sends if Dr. P opens the app between the 24th and 1st. A server-side cron would fix this but requires a backend.
 4. **Version bump resets data** — changing the data model version re-seeds from `SEED_PATIENTS`, overwriting user data. Always back up before version bumps. Migration functions handle graceful upgrades (v5→v6).
 5. **EmailJS free tier limit** — 200 emails/month. Sufficient for monthly reminders + parent emails for a small practice. Monitor if sending volume increases.
-6. **Google Review link** — must be manually configured by Dr. P in the Messages page settings. Default is a placeholder URL.
-7. **Email sending requires patient email** — patients without an email address can only receive messages via Copy + text/call. The app shows Copy as fallback.
+6. **Google Review link** — pre-configured to `https://g.page/r/CTEazz5Muc6nEBM/review`. Can be changed in Messages > Reviews tab.
+7. **Email preview works without email** — patients without an email address can preview what would be sent, but Send is disabled. Copy is available as fallback.
+8. **EmailJS from name** — must not contain commas (EmailJS treats commas as list separators). Currently set to "Yogini Prajapati MD" in both app code and EmailJS dashboard template.
 
 ---
 
@@ -544,3 +577,20 @@ When making changes:
 | 2026-03-13 | Email Hub: 12 lifecycle templates, send-to-parent via EmailJS, email log tracking |
 | 2026-03-13 | Google Review tracking: per-patient status, review progress banner, auto-nudge in emails |
 | 2026-03-13 | Patient Journey Timeline: visual birth-to-childhood communication map with 16 stages, linked templates, one-click edit |
+| 2026-03-13 | Pill-nav redesign for Messages tab — icons, badges, clearer clickable UI |
+| 2026-03-13 | All patient table columns now sortable (added Next Wellness, Plan Change) with sort direction arrows |
+| 2026-03-13 | Prospect-specific table view: phone, email, stage, editable follow-up date columns |
+| 2026-03-13 | Professional HTML email template: logo header, CAN-SPAM footer, social links, signature block |
+| 2026-03-13 | Email preview modal — see exact email before sending, works even without email on file |
+| 2026-03-13 | From name changed to "Yogini Prajapati MD" across all email sends |
+| 2026-03-13 | Google Review template rewritten with Dr. P's authentic voice, first names only |
+| 2026-03-13 | Added `{{patient_first}}` and `{{parent_first}}` merge tags |
+| 2026-03-13 | Review tab: last-sent tracking per patient with 30-day follow-up cadence badges |
+| 2026-03-13 | Google Review link set to real URL: `https://g.page/r/CTEazz5Muc6nEBM/review` |
+| 2026-03-13 | Added Riya Surana as test patient (dual email: yogini + dsurana) |
+| 2026-03-13 | Auto-merge new seed patients into existing localStorage on load |
+| 2026-03-13 | Data model v6→v7: nurture field on patient objects |
+| 2026-03-13 | Automated Prospect Nurture Sequences: 5-step drip campaign (Day 0, 2, 5, 10, 21) |
+| 2026-03-13 | Nurture tab in Messages: per-prospect step tracker, Preview & Send, Pause/Resume |
+| 2026-03-13 | Stage-aware nurture: steps auto-skip when prospect advances past applicable stages |
+| 2026-03-13 | New nurture templates auto-merge into existing localStorage |
