@@ -877,6 +877,20 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
 .pipeline-card .pc-actions button:hover { background: var(--sp-navy); color: white; border-color: var(--sp-navy); }
 .pipeline-card .pc-actions button.convert-btn { color: var(--sp-mint); border-color: var(--sp-mint); }
 .pipeline-card .pc-actions button.convert-btn:hover { background: var(--sp-mint); color: white; }
+
+/* Nurture Strip */
+.nurture-strip { display:flex;align-items:center;gap:5px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--sp-border); }
+.nurture-dot { width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:2px solid var(--sp-border);color:var(--sp-muted);background:white;flex-shrink:0; }
+.nurture-dot.sent { background:var(--sp-mint);border-color:var(--sp-mint);color:white; }
+.nurture-dot.due { background:#fff3cd;border-color:#f6c344;color:#856404;animation:pulse-dot 1.5s infinite; }
+.nurture-dot.skipped { background:var(--sp-warm);border-color:var(--sp-border);color:var(--sp-border);text-decoration:line-through; }
+.nurture-dot.pending { background:white;border-color:var(--sp-border);color:var(--sp-muted); }
+@keyframes pulse-dot { 0%,100%{box-shadow:0 0 0 0 rgba(246,195,68,0.4)} 50%{box-shadow:0 0 0 4px rgba(246,195,68,0)} }
+.nurture-send-btn { font-size:10px;padding:2px 8px;border-radius:4px;background:var(--sp-gold);color:white;border:none;cursor:pointer;font-weight:600;white-space:nowrap; }
+.nurture-send-btn:hover { background:var(--sp-gold-rich); }
+.nurture-pause-btn { font-size:10px;padding:2px 6px;border-radius:4px;background:var(--sp-warm);color:var(--sp-muted);border:1px solid var(--sp-border);cursor:pointer;margin-left:auto; }
+.nurture-paused { font-size:10px;color:var(--sp-muted);font-style:italic; }
+
 @media (max-width: 768px) {
   .pipeline-board { grid-template-columns: 1fr; }
 }
@@ -1443,6 +1457,7 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
     <div class="pill" onclick="setMsgTab(this,'reminders')"><span class="pill-icon">&#128276;</span> Send Now <span class="pill-badge" id="remindersBadge">0</span></div>
     <div class="pill" onclick="setMsgTab(this,'templates')"><span class="pill-icon">&#128196;</span> Templates <span class="pill-badge" id="templatesBadge">0</span></div>
     <div class="pill" onclick="setMsgTab(this,'reviews')"><span class="pill-icon">&#11088;</span> Reviews <span class="pill-badge" id="reviewsBadge">0</span></div>
+    <div class="pill" onclick="setMsgTab(this,'nurture')"><span class="pill-icon">&#127793;</span> Nurture <span class="pill-badge" id="nurtureBadge">0</span></div>
     <div class="pill" onclick="setMsgTab(this,'log')"><span class="pill-icon">&#128231;</span> Sent</div>
   </div>
   <div id="msgJourneySection"></div>
@@ -1459,6 +1474,7 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
       </div>
     </div>
   </div>
+  <div id="msgNurtureSection" style="display:none;"></div>
   <div id="msgLogSection" style="display:none;"></div>
 </div>
 
@@ -1831,27 +1847,32 @@ function migrateToV6(list) {
     familyId: p.familyId || '',
     referredBy: p.referredBy || p.referralSource || '',
     visits: p.visits || [],
-    googleReview: p.googleReview || false, // false, or ISO date string when reviewed
-    emailLog: p.emailLog || [], // [{ date, templateName, sentBy }]
+    googleReview: p.googleReview || false,
+    emailLog: p.emailLog || [],
+  }));
+}
+
+function migrateToV7(list) {
+  return list.map(p => ({
+    ...p,
+    nurture: p.nurture || (p.status === 'prospect' ? { startDate: new Date(Date.now() - 7 * 86400000).toISOString(), stepsSent: [], paused: false } : null),
   }));
 }
 
 function loadPatients() {
   const version = localStorage.getItem('sp_version');
   const saved = localStorage.getItem('sp_patients');
-  if (saved && (version === '6' || version === '5')) {
+  if (saved && (version === '7' || version === '6' || version === '5')) {
     patients = JSON.parse(saved);
-    if (version === '5') {
-      patients = migrateToV6(patients);
-      localStorage.setItem('sp_version', '6');
-      savePatients();
-    }
+    if (version === '5') patients = migrateToV6(patients);
+    if (version === '5' || version === '6') patients = migrateToV7(patients);
+    if (version !== '7') { localStorage.setItem('sp_version', '7'); savePatients(); }
     // Merge any new seed patients that don't exist yet
     const existingIds = new Set(patients.map(p => p.id));
     let added = false;
     SEED_PATIENTS.forEach(sp => {
       if (!existingIds.has(sp.id)) {
-        patients.push(migrateToV6([JSON.parse(JSON.stringify(sp))])[0]);
+        patients.push(migrateToV7(migrateToV6([JSON.parse(JSON.stringify(sp))]))[0]);
         added = true;
       }
     });
@@ -1862,21 +1883,21 @@ function loadPatients() {
       try {
         const backup = JSON.parse(autoBackup);
         if (backup.patients && backup.patients.length > 0) {
-          patients = migrateToV6(backup.patients);
+          patients = migrateToV7(migrateToV6(backup.patients));
           if (backup.schedules) { scheduleData = backup.schedules; }
-          localStorage.setItem('sp_version', '6');
+          localStorage.setItem('sp_version', '7');
           savePatients();
           console.log('Recovered ' + patients.length + ' patients from auto-backup.');
           return;
         }
       } catch(e) {}
     }
-    patients = migrateToV6(JSON.parse(JSON.stringify(SEED_PATIENTS)));
-    localStorage.setItem('sp_version', '6');
+    patients = migrateToV7(migrateToV6(JSON.parse(JSON.stringify(SEED_PATIENTS))));
+    localStorage.setItem('sp_version', '7');
     savePatients();
   } else {
-    patients = migrateToV6(JSON.parse(JSON.stringify(SEED_PATIENTS)));
-    localStorage.setItem('sp_version', '6');
+    patients = migrateToV7(migrateToV6(JSON.parse(JSON.stringify(SEED_PATIENTS))));
+    localStorage.setItem('sp_version', '7');
     savePatients();
   }
 }
@@ -2066,6 +2087,20 @@ const DEFAULT_TEMPLATES = [
   { id: 't11', name: 'Seasonal Check-In', category: 'general', body: 'Hi {{parent_name}}! Just checking in to see how {{patient_name}} is doing. Remember, as a Starlight family you have direct access to Dr. P — text or call anytime, no need to wait for an appointment!' },
   // Review Request
   { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_first}},\n\nI just wanted to take a moment to say thank you for trusting me with {{patient_first}}\'s care.\n\nIf you have a moment, I would really appreciate it if you could share your experience by leaving me a Google review.\n\nYour feedback not only helps other families looking for a caring pediatric practice, but it also means so much to me so I can provide the best care possible.\n\nYou can leave me a review by clicking this link:\n{{google_review_link}}\n\nYou can also follow me on Instagram and Facebook:\nhttps://www.instagram.com/starlight.pediatrics\nhttps://www.facebook.com/starlightpediatricsatx\n\nThank you so much for your time and support!' },
+  // Nurture Sequence
+  { id: 'tn1', name: 'Nurture: Welcome Inquiry', category: 'nurture', body: 'Hi {{parent_first}},\n\nThank you so much for reaching out about Starlight Pediatrics! I\'m Dr. Yogini Prajapati, and I\'d love to tell you about what makes our practice special.\n\nAs a Direct Primary Care pediatrician, I offer:\n• Unlimited visits with no copays or surprise bills\n• 24/7 direct access to me by call, text, or email\n• Unhurried appointments — I spend real time with your child\n• Home visits for newborns\n• No waiting rooms, no rushed visits\n\nI would love to learn more about your family and answer any questions. Would you like to schedule a free Meet & Greet?\n\nWarmly,\nDr. P' },
+  { id: 'tn2', name: 'Nurture: Meet Dr. P', category: 'nurture', body: 'Hi {{parent_first}},\n\nI wanted to follow up and share a little more about myself. I started Starlight Pediatrics because I believe every child deserves a pediatrician who truly knows them — not just their chart.\n\nIn our Meet & Greet, we\'ll:\n• Chat about your child\'s needs and your family\'s priorities\n• Tour the practice (or do a virtual visit)\n• Answer all your questions about DPC\n• No pressure, no commitment\n\nI have availability this week if you\'d like to meet! Just text or call me directly.\n\nLooking forward to connecting,\nDr. P' },
+  { id: 'tn3', name: 'Nurture: Why DPC Works', category: 'nurture', body: 'Hi {{parent_first}},\n\nI know choosing a pediatrician is a big decision, so I wanted to share why families choose Direct Primary Care:\n\n1. No insurance games — one simple monthly membership\n2. Same-day or next-day appointments, always\n3. Longer visits — I actually get to know {{patient_first}}\n4. Preventive care that catches things early\n5. A doctor who answers your texts at 9pm when you\'re worried\n\nOur families often say the peace of mind alone is worth it. I\'d love for you to experience it too.\n\nHappy to answer any questions!\nDr. P' },
+  { id: 'tn4', name: 'Nurture: What Families Say', category: 'nurture', body: 'Hi {{parent_first}},\n\nI wanted to share what some of our Starlight families have said:\n\n"Dr. P makes us feel like we\'re her only patients. She remembers everything about our kids."\n\n"I texted Dr. P on a Sunday about my daughter\'s rash and she responded in minutes. Try that with a traditional pediatrician!"\n\n"Worth every penny. No more sitting in waiting rooms full of sick kids."\n\nIf you\'d like to read more, check out our Google reviews: {{google_review_link}}\n\nWould you like to schedule a visit or have any questions?\nDr. P' },
+  { id: 'tn5', name: 'Nurture: We\'re Here When You\'re Ready', category: 'nurture', body: 'Hi {{parent_first}},\n\nJust checking in! I know life gets busy, especially with little ones.\n\nI wanted you to know that I\'m here whenever you\'re ready. Starlight Pediatrics is a small, intentional practice — I keep my patient panel limited so every family gets the attention they deserve.\n\nIf you have any questions at all, or just want to chat about whether DPC is right for your family, don\'t hesitate to reach out.\n\nWishing {{patient_first}} and your family all the best,\nDr. P' },
+];
+
+const NURTURE_SEQUENCE = [
+  { step: 0, day: 0, templateId: 'tn1', label: 'Welcome Inquiry', icon: '&#128075;', stages: ['inquiry','meet-and-greet','scheduled-visit','ready-to-enroll'] },
+  { step: 1, day: 2, templateId: 'tn2', label: 'Meet Dr. P', icon: '&#128105;&#8205;&#9877;&#65039;', stages: ['inquiry','meet-and-greet'] },
+  { step: 2, day: 5, templateId: 'tn3', label: 'Why DPC Works', icon: '&#128161;', stages: ['inquiry','meet-and-greet','scheduled-visit'] },
+  { step: 3, day: 10, templateId: 'tn4', label: 'What Families Say', icon: '&#128172;', stages: ['inquiry','meet-and-greet','scheduled-visit'] },
+  { step: 4, day: 21, templateId: 'tn5', label: 'Gentle Follow-Up', icon: '&#128155;', stages: ['inquiry','meet-and-greet','scheduled-visit','ready-to-enroll'] },
 ];
 
 // Patient Journey — maps age milestones to email touchpoints
@@ -2215,6 +2250,15 @@ function loadMessageTemplates() {
       const defaultT12 = DEFAULT_TEMPLATES.find(t => t.id === 't12');
       if (defaultT12) { t12.body = defaultT12.body; saveMessageTemplates(); }
     }
+    // Merge any new default templates (e.g., nurture templates)
+    let tmplAdded = false;
+    DEFAULT_TEMPLATES.forEach(dt => {
+      if (!messageTemplates.find(t => t.id === dt.id)) {
+        messageTemplates.push(JSON.parse(JSON.stringify(dt)));
+        tmplAdded = true;
+      }
+    });
+    if (tmplAdded) saveMessageTemplates();
   } else {
     messageTemplates = JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
     saveMessageTemplates();
@@ -3017,6 +3061,7 @@ function savePatient() {
     data.visits = [];
     data.googleReview = false;
     data.emailLog = [];
+    data.nurture = data.status === 'prospect' ? { startDate: new Date().toISOString(), stepsSent: [], paused: false } : null;
     patients.push(data);
   }
 
@@ -3943,11 +3988,91 @@ function renderPipeline() {
                 ${stage.key === 'ready-to-enroll' ? `<button class="convert-btn" onclick="convertToActive('${p.id}')">✓ Enroll</button>` : ''}
                 <button onclick="openEditPatient('${p.id}')" title="Edit">✏️</button>
               </div>
+              ${renderNurtureStrip(p)}
             </div>`;
         }).join('')}
       </div>`;
   }).join('');
 }
+
+// ═══════════════════════════════════════════
+// NURTURE SEQUENCE
+// ═══════════════════════════════════════════
+
+function initNurtureSequence(prospectId) {
+  const p = patients.find(x => x.id === prospectId);
+  if (p && p.status === 'prospect') {
+    p.nurture = { startDate: new Date().toISOString(), stepsSent: [], paused: false };
+    savePatients();
+  }
+}
+
+function getNurtureStatus(prospect) {
+  if (!prospect.nurture || !prospect.nurture.startDate) return null;
+  const start = new Date(prospect.nurture.startDate);
+  const sent = prospect.nurture.stepsSent || [];
+  const sentSteps = new Set(sent.map(s => s.step));
+  const stage = prospect.pipelineStage || 'inquiry';
+
+  const steps = NURTURE_SEQUENCE.map(ns => {
+    const dueDate = new Date(start.getTime() + ns.day * 86400000);
+    const isSent = sentSteps.has(ns.step);
+    const isApplicable = ns.stages.includes(stage);
+    const isDue = !isSent && isApplicable && dueDate <= TODAY;
+    const sentInfo = sent.find(s => s.step === ns.step);
+    return { ...ns, dueDate, isSent, isApplicable, isDue, sentDate: sentInfo?.sentDate || null };
+  });
+
+  const nextStep = steps.find(s => !s.isSent && s.isApplicable);
+  const dueSteps = steps.filter(s => s.isDue);
+  const isComplete = !nextStep;
+
+  return { steps, nextStep, dueSteps, isComplete, paused: prospect.nurture.paused };
+}
+
+function markNurtureSent(prospectId, stepIndex) {
+  const p = patients.find(x => x.id === prospectId);
+  if (!p || !p.nurture) return;
+  if (!p.nurture.stepsSent.find(s => s.step === stepIndex)) {
+    p.nurture.stepsSent.push({ step: stepIndex, sentDate: new Date().toISOString() });
+    savePatients();
+  }
+}
+
+function toggleNurturePause(prospectId) {
+  const p = patients.find(x => x.id === prospectId);
+  if (p && p.nurture) { p.nurture.paused = !p.nurture.paused; savePatients(); renderPipeline(); }
+}
+
+function getNurtureDueCount() {
+  return patients.filter(p => p.status === 'prospect' && p.nurture && !p.nurture.paused)
+    .reduce((count, p) => { const s = getNurtureStatus(p); return count + (s ? s.dueSteps.length : 0); }, 0);
+}
+
+function renderNurtureStrip(prospect) {
+  const status = getNurtureStatus(prospect);
+  if (!status) return '';
+  return `<div class="nurture-strip">
+    ${status.steps.map(s => {
+      const cls = s.isSent ? 'sent' : s.isDue ? 'due' : !s.isApplicable ? 'skipped' : 'pending';
+      const title = s.label + (s.isSent ? ' — Sent' : s.isDue ? ' — Due now!' : !s.isApplicable ? ' — Skipped (stage advanced)' : ' — Day ' + s.day);
+      return `<span class="nurture-dot ${cls}" title="${title}">${s.isSent ? '✓' : s.isDue ? '!' : !s.isApplicable ? '–' : '○'}</span>`;
+    }).join('')}
+    ${status.paused ? '<span class="nurture-paused">Paused</span>' : ''}
+    ${!status.paused && status.dueSteps.length > 0 ? `<button class="nurture-send-btn" onclick="previewNurtureEmail('${prospect.id}', ${status.dueSteps[0].step})">Send Step ${status.dueSteps[0].step + 1}</button>` : ''}
+    <button class="nurture-pause-btn" onclick="toggleNurturePause('${prospect.id}')" title="${status.paused ? 'Resume' : 'Pause'} nurture">${status.paused ? '▶' : '⏸'}</button>
+  </div>`;
+}
+
+function previewNurtureEmail(prospectId, stepIndex) {
+  const ns = NURTURE_SEQUENCE.find(s => s.step === stepIndex);
+  if (!ns) return;
+  // Store nurture context so we can mark sent after
+  _nurtureContext = { prospectId, stepIndex };
+  previewEmail(ns.templateId, prospectId);
+}
+
+let _nurtureContext = null;
 
 // ═══════════════════════════════════════════
 // VISIT LOG
@@ -4055,7 +4180,7 @@ function saveHomeVisit() {
 function setMsgTab(el, tab) {
   document.querySelectorAll('#msgPillNav .pill').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['journey', 'reminders', 'templates', 'reviews', 'log'].forEach(t => {
+  ['journey', 'reminders', 'templates', 'reviews', 'nurture', 'log'].forEach(t => {
     const section = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1) + 'Section');
     if (section) section.style.display = t === tab ? 'block' : 'none';
   });
@@ -4209,6 +4334,11 @@ function sendPreviewedEmail() {
     btn.textContent = 'Sent!';
     if (!p.emailLog) p.emailLog = [];
     p.emailLog.unshift({ date: new Date().toISOString(), templateName: _previewState.tmplName });
+    // Mark nurture step sent if applicable
+    if (_nurtureContext && _nurtureContext.prospectId === _previewState.patientId) {
+      markNurtureSent(_nurtureContext.prospectId, _nurtureContext.stepIndex);
+      _nurtureContext = null;
+    }
     savePatients();
     setTimeout(() => { document.getElementById('emailPreviewModal').classList.remove('show'); }, 1500);
   })
@@ -4574,6 +4704,50 @@ function renderMessages() {
     ` : ''}
   `;
 
+  // ─── NURTURE TAB ───
+  const prospects = patients.filter(p => p.status === 'prospect');
+  const nurtureHtml = prospects.length ? prospects.map(p => {
+    const status = getNurtureStatus(p);
+    if (!status) return '';
+    return `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-size:16px;">${p.firstName} ${p.lastName} <span style="font-size:12px;color:var(--sp-muted);font-weight:400;">${(p.pipelineStage || 'inquiry').replace(/-/g,' ')}</span></h2>
+        <button class="btn btn-secondary btn-sm" onclick="toggleNurturePause('${p.id}')">${status.paused ? '▶ Resume' : '⏸ Pause'}</button>
+      </div>
+      <div style="padding:12px;">
+        ${status.steps.map(s => {
+          const cls = s.isSent ? 'color:var(--sp-mint)' : s.isDue ? 'color:#856404;font-weight:600' : !s.isApplicable ? 'color:var(--sp-border);text-decoration:line-through' : 'color:var(--sp-muted)';
+          const badge = s.isSent ? '<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:#d4edda;color:#155724;margin-left:6px;">Sent</span>' : s.isDue && !status.paused ? '<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:#fff3cd;color:#856404;margin-left:6px;">Due now</span>' : !s.isApplicable ? '<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--sp-warm);color:var(--sp-muted);margin-left:6px;">Skipped</span>' : '';
+          return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--sp-border);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:16px;">${s.icon}</span>
+              <div>
+                <div style="${cls};font-size:13px;">Step ${s.step + 1}: ${s.label} <span style="font-size:11px;font-weight:400;">(Day ${s.day})</span>${badge}</div>
+                ${s.sentDate ? '<div style="font-size:11px;color:var(--sp-muted);">Sent ' + fmtDate(new Date(s.sentDate)) + '</div>' : ''}
+              </div>
+            </div>
+            ${s.isDue && !status.paused ? `<button class="btn btn-sm btn-primary" onclick="previewNurtureEmail('${p.id}', ${s.step})" style="font-size:11px;">&#128065; Preview & Send</button>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('') : '<div class="card"><p style="padding:16px;color:var(--sp-muted);">No prospects in the pipeline. Add prospects to start nurture sequences.</p></div>';
+
+  document.getElementById('msgNurtureSection').innerHTML = `
+    <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#f8f6f3,#fff);">
+      <div style="padding:16px;">
+        <h2 style="font-size:18px;color:var(--sp-navy);margin-bottom:4px;">&#127793; Prospect Nurture Sequences</h2>
+        <p style="font-size:13px;color:var(--sp-muted);margin:0;">5-step automated follow-up: Welcome → Meet Dr. P → Why DPC → Family Stories → Gentle Follow-Up</p>
+      </div>
+    </div>
+    ${nurtureHtml}
+  `;
+
+  // Update nurture badge
+  const nb = document.getElementById('nurtureBadge');
+  if (nb) nb.textContent = getNurtureDueCount();
+
   // ─── EMAIL LOG TAB ───
   const allLogs = [];
   patients.forEach(p => {
@@ -4828,6 +5002,9 @@ function checkInboundLeads() {
     dueDate: '',
     referredBy: 'Website',
     familyId: '',
+    googleReview: false,
+    emailLog: [],
+    nurture: { startDate: new Date().toISOString(), stepsSent: [], paused: false },
   };
   patients.push(newProspect);
   savePatients();
