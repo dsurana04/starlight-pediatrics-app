@@ -8,27 +8,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --sp-navy: #1B4D6E;
-  --sp-blue: #1B4D6E;
-  --sp-sky: #2E7DA6;
-  --sp-gold: #C4956A;
-  --sp-gold-rich: #A67B52;
+  --sp-navy: #245C7B;
+  --sp-blue: #245C7B;
+  --sp-sky: #3A7FA3;
+  --sp-gold: #BB9973;
+  --sp-gold-rich: #9E7D58;
   --sp-mint: #4D8E7F;
   --sp-rose: #B0616F;
-  --sp-bg: #FAF7F5;
+  --sp-bg: #F4EEEA;
   --sp-card: #ffffff;
   --sp-text: #2C2421;
   --sp-muted: #7D6E66;
-  --sp-border: #E8DDD6;
+  --sp-border: #E5DBD6;
   --sp-success: #4D8E7F;
-  --sp-warning: #C4956A;
+  --sp-warning: #BB9973;
   --sp-danger: #B0616F;
-  --sp-silver: #A8A3A0;
-  --sp-warm: #F0E8E3;
-  --sp-cream: #FAF7F5;
+  --sp-silver: #BFBBBD;
+  --sp-warm: #EAE3DF;
+  --sp-cream: #F4EEEA;
   --radius: 14px;
-  --shadow: 0 1px 3px rgba(27,77,110,0.04), 0 4px 16px rgba(27,77,110,0.06);
-  --shadow-lg: 0 4px 12px rgba(27,77,110,0.06), 0 16px 40px rgba(27,77,110,0.10);
+  --shadow: 0 1px 3px rgba(36,92,123,0.04), 0 4px 16px rgba(36,92,123,0.06);
+  --shadow-lg: 0 4px 12px rgba(36,92,123,0.06), 0 16px 40px rgba(36,92,123,0.10);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,7 +43,7 @@ body {
 
 /* ── Header ── */
 .header {
-  background: linear-gradient(135deg, #153D58 0%, var(--sp-navy) 50%, #1B4D6E 100%);
+  background: linear-gradient(135deg, #1A4A63 0%, var(--sp-navy) 50%, #245C7B 100%);
   color: white;
   padding: 0 28px;
   height: 72px;
@@ -871,20 +871,16 @@ tr:hover td { background: var(--sp-warm); }
 <div class="header">
   <div class="header-brand">
     <div class="logo-mark">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Heart shape -->
-        <path d="M30 52C30 52 6 36 6 20C6 12 12 6 20 6C24.5 6 28.5 8.5 30 12C31.5 8.5 35.5 6 40 6C48 6 54 12 54 20C54 36 30 52 30 52Z" fill="white" opacity="0.95"/>
-        <path d="M25 48C25 48 4 34 4 19C4 11.5 10 5.5 17.5 5.5C22 5.5 26 8 28 12C28 12 28 18 20 26C16 30 25 48 25 48Z" fill="#BFBBBD" opacity="0.5"/>
-        <!-- Star with trail -->
-        <path d="M42 4L43.5 8.5L48 10L43.5 11.5L42 16L40.5 11.5L36 10L40.5 8.5L42 4Z" fill="#BB9973"/>
-        <line x1="42" y1="10" x2="34" y2="22" stroke="#BB9973" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-      </svg>
+      <img src="logo-mark.png" alt="Starlight Pediatrics" style="width:46px;height:46px;object-fit:contain;filter:brightness(1.1);">
     </div>
     <h1>Starlight<strong>Pediatrics</strong></h1>
   </div>
   <div class="header-right">
     <span class="date" id="headerDate"></span>
-    <span style="opacity:0.6;">Atlas MD</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="opacity:0.8;font-size:12px;">Dr. Yogini Prajapati</span>
+      <img src="doctor.jpg" alt="Dr. Yogini Prajapati" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--sp-gold);box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+    </div>
   </div>
 </div>
 
@@ -1026,7 +1022,7 @@ tr:hover td { background: var(--sp-warm); }
             <th>Annual Value</th>
             <th>Next Plan Change</th>
             <th>New Fee</th>
-            <th>Atlas MD Action</th>
+            <th>EMR Action</th>
           </tr>
         </thead>
         <tbody id="billingTableBody"></tbody>
@@ -1095,20 +1091,16 @@ tr:hover td { background: var(--sp-warm); }
   <div class="detail-grid" style="margin-bottom:16px;">
     <div class="card">
       <div class="card-header"><h2>Email Settings</h2></div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:14px;">
         <label>Send Reminders To</label>
         <input type="email" id="reminderEmail" value="drp@starlightpediatrics.com" onchange="saveSettings()">
       </div>
-      <div class="form-group">
-        <label>Practice Name</label>
-        <input type="text" id="reminderPracticeName" value="Starlight Pediatrics" onchange="saveSettings()">
-      </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-bottom:14px;">
         <label>Doctor Name</label>
         <input type="text" id="reminderDoctorName" value="Dr. P" onchange="saveSettings()">
       </div>
-      <div class="form-group">
-        <label>Include in Email</label>
+      <div style="margin-top:8px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--sp-muted);margin-bottom:8px;">Include in Email</div>
         <div class="toggle-list">
           <label class="toggle-item">
             <input type="checkbox" id="emailIncWellness" checked onchange="saveSettings()">
@@ -1118,7 +1110,7 @@ tr:hover td { background: var(--sp-warm); }
           <label class="toggle-item">
             <input type="checkbox" id="emailIncBilling" checked onchange="saveSettings()">
             <span class="toggle-track"></span>
-            <span class="toggle-label">Billing changes (Atlas MD)</span>
+            <span class="toggle-label">Billing changes (EMR)</span>
           </label>
           <label class="toggle-item">
             <input type="checkbox" id="emailIncRevenue" checked onchange="saveSettings()">
@@ -1295,12 +1287,12 @@ tr:hover td { background: var(--sp-warm); }
 
   <!-- Plan Transition Rules -->
   <div class="card">
-    <div class="card-header"><h2>Plan Transition Rules (Atlas MD)</h2></div>
+    <div class="card-header"><h2>Plan Transition Rules (EMR)</h2></div>
     <p style="font-size:14px;line-height:1.7;color:var(--sp-text);">
-      <strong>Orion &#8594; Lyra:</strong> When baby turns 3 months, reduce from $295 to $225. Change in Atlas MD effective the 1st of the month after they turn 3 months.<br><br>
-      <strong>Lyra &#8594; Sirius:</strong> When child turns 1 year, reduce from $225 to $175. Change in Atlas MD effective the 1st of the month after they turn 1 year.<br><br>
-      <strong>Sirius &#8594; Pegasus:</strong> When child turns 4 years, reduce from $175 to $150. Change in Atlas MD effective the 1st of the month after they turn 4 years.<br><br>
-      <strong>Pegasus &#8594; Polaris:</strong> When young adult turns 19, reduce from $150 to $100. Change in Atlas MD effective the 1st of the month after they turn 19.<br><br>
+      <strong>Orion &#8594; Lyra:</strong> When baby turns 3 months, reduce from $295 to $225. Change in EMR effective the 1st of the month after they turn 3 months.<br><br>
+      <strong>Lyra &#8594; Sirius:</strong> When child turns 1 year, reduce from $225 to $175. Change in EMR effective the 1st of the month after they turn 1 year.<br><br>
+      <strong>Sirius &#8594; Pegasus:</strong> When child turns 4 years, reduce from $175 to $150. Change in EMR effective the 1st of the month after they turn 4 years.<br><br>
+      <strong>Pegasus &#8594; Polaris:</strong> When young adult turns 19, reduce from $150 to $100. Change in EMR effective the 1st of the month after they turn 19.<br><br>
       <em style="color:var(--sp-muted);">Tip: The app automatically calculates these dates for each patient and alerts you on the Actions page.</em>
     </p>
   </div>
@@ -1499,7 +1491,6 @@ function loadSettings() {
   const defaults = { email: 'drp@starlightpediatrics.com', practiceName: 'Starlight Pediatrics', doctorName: 'Dr. P', incWellness: true, incBilling: true, incRevenue: true, incProspects: true, incScheduled: true };
   const settings = s ? { ...defaults, ...JSON.parse(s) } : defaults;
   document.getElementById('reminderEmail').value = settings.email;
-  document.getElementById('reminderPracticeName').value = settings.practiceName;
   document.getElementById('reminderDoctorName').value = settings.doctorName;
   document.getElementById('emailIncWellness').checked = settings.incWellness;
   document.getElementById('emailIncBilling').checked = settings.incBilling;
@@ -1511,7 +1502,7 @@ function loadSettings() {
 function saveSettings() {
   const settings = {
     email: document.getElementById('reminderEmail').value,
-    practiceName: document.getElementById('reminderPracticeName').value,
+    practiceName: 'Starlight Pediatrics',
     doctorName: document.getElementById('reminderDoctorName').value,
     incWellness: document.getElementById('emailIncWellness').checked,
     incBilling: document.getElementById('emailIncBilling').checked,
@@ -1525,7 +1516,7 @@ function saveSettings() {
 function getEmailSettings() {
   return {
     email: document.getElementById('reminderEmail').value,
-    practiceName: document.getElementById('reminderPracticeName').value,
+    practiceName: 'Starlight Pediatrics',
     doctorName: document.getElementById('reminderDoctorName').value,
     incWellness: document.getElementById('emailIncWellness').checked,
     incBilling: document.getElementById('emailIncBilling').checked,
@@ -1963,12 +1954,12 @@ function openPatientDetail(id) {
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><h2>Atlas MD Actions</h2></div>
+        <div class="card-header"><h2>EMR Actions</h2></div>
         ${nextChange ? `
           <div class="reminder-card billing" style="margin:0;">
             <span class="r-icon">&#128176;</span>
             <div class="r-content">
-              <div class="r-title">Change billing in Atlas MD</div>
+              <div class="r-title">Change billing in EMR</div>
               <div class="r-detail">Update from ${fmtMoney(nextChange.from)}/mo to ${fmtMoney(nextChange.to)}/mo (${nextChange.toName} plan) effective ${fmtDate(nextChange.date)}</div>
             </div>
           </div>
@@ -2207,7 +2198,7 @@ function renderBilling() {
         <td>${fmtMoney(fee * 12)}</td>
         <td>${change ? `<span class="action-due ${isUrgent ? 'urgent' : 'upcoming'}">${fmtDate(change.date)}</span>` : '—'}</td>
         <td>${change ? fmtMoney(change.to) + '/mo (' + change.toName + ')' : '—'}</td>
-        <td>${change && isUrgent ? '<strong style="color:#c53030;">&#9888; Update Atlas MD!</strong>' : (change ? 'Scheduled' : '<span style="color:var(--sp-muted);">No change</span>')}</td>
+        <td>${change && isUrgent ? '<strong style="color:#c53030;">&#9888; Update EMR!</strong>' : (change ? 'Scheduled' : '<span style="color:var(--sp-muted);">No change</span>')}</td>
       </tr>
     `;
   }).join('');
@@ -2286,7 +2277,7 @@ function getAllActions() {
           type: 'billing',
           key: `billing:${p.id}:${change.toName}`,
           title: `Change billing: ${p.firstName} ${p.lastName}`,
-          detail: `Update Atlas MD from ${fmtMoney(change.from)}/mo to ${fmtMoney(change.to)}/mo (${change.toName} plan)`,
+          detail: `Update EMR from ${fmtMoney(change.from)}/mo to ${fmtMoney(change.to)}/mo (${change.toName} plan)`,
           date: change.date,
           urgency: daysAway <= 0 ? 'urgent' : daysAway <= 30 ? 'urgent' : 'upcoming',
           patient: p,
@@ -2563,7 +2554,7 @@ function generateEmailPreview() {
 
   if (cfg.incBilling) {
     sections += `
-      <h4 style="color:#BB9973;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Billing Changes — Update Atlas MD</h4>
+      <h4 style="color:#BB9973;margin:16px 0 8px;border-bottom:1px solid #E5DBD6;padding-bottom:4px;">Billing Changes — Update EMR</h4>
       ${billingChanges.length ? `
         <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
           ${billingChanges.map(b => `<li>${b.sched ? '<span style="color:#6a9e8f;">DONE</span>' : '<span style="color:#c53030;">TODO</span>'} <strong>${b.patient.firstName} ${b.patient.lastName}</strong> — Change from ${fmtMoney(b.change.from)}/mo to ${fmtMoney(b.change.to)}/mo (${b.change.toName} plan) by ${fmtDate(b.change.date)}</li>`).join('')}
