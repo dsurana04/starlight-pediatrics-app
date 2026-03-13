@@ -1831,6 +1831,16 @@ function loadPatients() {
       localStorage.setItem('sp_version', '6');
       savePatients();
     }
+    // Merge any new seed patients that don't exist yet
+    const existingIds = new Set(patients.map(p => p.id));
+    let added = false;
+    SEED_PATIENTS.forEach(sp => {
+      if (!existingIds.has(sp.id)) {
+        patients.push(migrateToV6([JSON.parse(JSON.stringify(sp))])[0]);
+        added = true;
+      }
+    });
+    if (added) savePatients();
   } else if (!saved) {
     const autoBackup = localStorage.getItem('sp_auto_backup');
     if (autoBackup) {
