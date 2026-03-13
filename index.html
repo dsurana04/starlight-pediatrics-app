@@ -6,6 +6,7 @@
 <title>Starlight Pediatrics — Patient Manager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root {
   --sp-navy: #245C7B;
@@ -1140,20 +1141,16 @@ tr:hover td { background: var(--sp-warm); }
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><h2>Quick Actions</h2></div>
+      <div class="card-header"><h2>Send Email</h2></div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <button class="btn btn-primary" onclick="generateEmailPreview()" style="width:100%;justify-content:center;">&#128231; Generate This Month's Email</button>
-        <button class="btn btn-gold" onclick="sendViaMailto()" style="width:100%;justify-content:center;">&#9993; Open in Email App</button>
+        <button class="btn btn-primary" onclick="sendEmailNow()" id="sendEmailBtn" style="width:100%;justify-content:center;padding:14px 20px;font-size:15px;">&#128231; Send This Month's Email</button>
+        <div id="emailSendStatus" style="display:none;padding:10px;border-radius:8px;font-size:13px;text-align:center;"></div>
+        <button class="btn btn-secondary" onclick="sendViaMailto()" style="width:100%;justify-content:center;">&#9993; Open in Email App Instead</button>
         <button class="btn btn-secondary" onclick="copyEmailToClipboard()" style="width:100%;justify-content:center;">&#128203; Copy to Clipboard</button>
       </div>
       <div style="margin-top:16px;padding:14px;background:var(--sp-warm);border-radius:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--sp-navy);margin-bottom:6px;">How it works</div>
-        <ol style="font-size:12px;color:var(--sp-muted);line-height:1.8;padding-left:16px;">
-          <li>Review & customize your settings on the left</li>
-          <li>Click <strong>Generate</strong> to preview your monthly email</li>
-          <li>Click <strong>Open in Email App</strong> to send it to yourself</li>
-          <li>Or <strong>Copy</strong> the text and paste it anywhere</li>
-        </ol>
+        <p style="font-size:12px;color:var(--sp-muted);line-height:1.6;">Click <strong>Send</strong> and your monthly checklist email will arrive in your inbox within seconds. Preview it below first if you want.</p>
         <p style="font-size:11px;color:var(--sp-muted);margin-top:8px;font-style:italic;">Tip: Do this on the 1st of every month so nothing falls through the cracks!</p>
       </div>
     </div>
@@ -2721,6 +2718,87 @@ function sendViaMailto() {
   const body = encodeURIComponent(getEmailPlainText() || 'Generate the email preview first.');
   const mailto = `mailto:${cfg.email}?subject=${subject}&body=${body}`;
   window.open(mailto);
+}
+
+// ═══════════════════════════════════════════
+// EMAILJS — ACTUAL EMAIL SENDING
+// ═══════════════════════════════════════════
+// To set up: go to emailjs.com, create free account, then:
+// 1. Add an email service (Gmail, Outlook, etc.) — copy the Service ID
+// 2. Create a template with variables: {{to_email}}, {{subject}}, {{message_html}}
+// 3. Go to Account → copy your Public Key
+// Fill in the 3 values below:
+
+const EMAILJS_PUBLIC_KEY = ''; // e.g. 'abc123XYZ'
+const EMAILJS_SERVICE_ID = ''; // e.g. 'service_gmail'
+const EMAILJS_TEMPLATE_ID = ''; // e.g. 'template_monthly'
+
+function isEmailJSConfigured() {
+  return EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID;
+}
+
+function sendEmailNow() {
+  // Generate the preview first so we have content
+  generateEmailPreview();
+  const cfg = getEmailSettings();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const currentMonth = months[TODAY.getMonth()];
+  const currentYear = TODAY.getFullYear();
+  const subject = `${cfg.practiceName} — ${currentMonth} ${currentYear} Monthly Checklist`;
+  const emailContent = document.getElementById('emailContent');
+
+  if (!emailContent) {
+    showEmailStatus('Please wait, generating email...', 'warning');
+    return;
+  }
+
+  // If EmailJS is configured, send via EmailJS
+  if (isEmailJSConfigured()) {
+    const btn = document.getElementById('sendEmailBtn');
+    btn.disabled = true;
+    btn.innerHTML = '&#9203; Sending...';
+    showEmailStatus('Sending email...', 'info');
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: cfg.email,
+      subject: subject,
+      message_html: emailContent.innerHTML,
+    }, EMAILJS_PUBLIC_KEY)
+    .then(function() {
+      btn.disabled = false;
+      btn.innerHTML = '&#128231; Send This Month\'s Email';
+      showEmailStatus('Email sent to ' + cfg.email + '!', 'success');
+      localStorage.setItem('sp_last_email_sent', new Date().toISOString());
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '&#128231; Send This Month\'s Email';
+      showEmailStatus('Failed to send. Try "Open in Email App" instead. (' + (err.text || err) + ')', 'error');
+    });
+  } else {
+    // Fallback: open mailto with everything pre-filled
+    sendViaMailto();
+    showEmailStatus('Email app opened — click Send in your email app to deliver it.', 'info');
+  }
+}
+
+function showEmailStatus(msg, type) {
+  const el = document.getElementById('emailSendStatus');
+  el.style.display = 'block';
+  const colors = {
+    success: { bg: '#E8F5E9', color: '#2E7D32', border: '#A5D6A7' },
+    error: { bg: '#FFEBEE', color: '#C62828', border: '#EF9A9A' },
+    info: { bg: '#E3F2FD', color: '#1565C0', border: '#90CAF9' },
+    warning: { bg: '#FFF3E0', color: '#E65100', border: '#FFCC80' },
+  };
+  const c = colors[type] || colors.info;
+  el.style.background = c.bg;
+  el.style.color = c.color;
+  el.style.border = '1px solid ' + c.border;
+  el.textContent = msg;
+  if (type === 'success') {
+    setTimeout(() => { el.style.display = 'none'; }, 8000);
+  }
 }
 
 // ═══════════════════════════════════════════
