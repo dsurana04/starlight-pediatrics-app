@@ -874,6 +874,29 @@ tr:hover td { background: var(--sp-warm); }
 .visit-type-badge.phone { background:#F3E5F5;color:#7B1FA2; }
 .visit-type-badge.other { background:var(--sp-warm);color:var(--sp-muted); }
 
+/* Patient Journey Timeline */
+.journey-timeline { position:relative;padding-left:40px; }
+.journey-timeline::before { content:'';position:absolute;left:18px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--sp-navy),var(--sp-gold),var(--sp-mint),var(--sp-sky),var(--sp-rose));border-radius:2px; }
+.journey-stage { position:relative;padding:16px 0;margin-bottom:0; }
+.journey-stage:last-child { padding-bottom:0; }
+.journey-node { position:absolute;left:-40px;top:18px;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;z-index:1;box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.journey-stage-card { background:white;border-radius:12px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--sp-border);transition:all 0.2s; }
+.journey-stage-card:hover { box-shadow:var(--shadow-lg);border-color:var(--sp-gold); }
+.journey-age { font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px; }
+.journey-title { font-size:15px;font-weight:700;color:var(--sp-navy);margin-bottom:6px; }
+.journey-emails { display:flex;flex-direction:column;gap:8px; }
+.journey-email { background:var(--sp-bg);border:1px solid var(--sp-border);border-radius:8px;padding:10px 12px; }
+.journey-email-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:4px; }
+.journey-email-name { font-weight:700;font-size:13px;color:var(--sp-navy); }
+.journey-email-cat { font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600; }
+.journey-email-cat.onboarding { background:#E8F5E9;color:#2E7D32; }
+.journey-email-cat.wellness { background:#E3F2FD;color:#1565C0; }
+.journey-email-cat.billing { background:#FFF3E0;color:#E65100; }
+.journey-email-cat.general { background:#F3E5F5;color:#7B1FA2; }
+.journey-email-cat.review { background:#FFF8E1;color:#F57F17; }
+.journey-email-preview { font-size:12px;color:var(--sp-muted);line-height:1.6;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+.journey-email-actions { display:flex;gap:4px; }
+
 /* ── Home Visit Checklist ── */
 .hv-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sp-border); }
 .hv-item label { font-size:13px;flex:1;margin:0;text-transform:none;letter-spacing:0;font-weight:500;color:var(--sp-text); }
@@ -1400,12 +1423,14 @@ tr:hover td { background: var(--sp-warm); }
   </div>
   <div id="msgReviewBanner"></div>
   <div class="tab-row" style="margin-bottom:16px;">
-    <div class="tab active" onclick="setMsgTab(this,'reminders')">Smart Reminders</div>
+    <div class="tab active" onclick="setMsgTab(this,'journey')">Patient Journey</div>
+    <div class="tab" onclick="setMsgTab(this,'reminders')">Smart Reminders</div>
     <div class="tab" onclick="setMsgTab(this,'templates')">Template Library</div>
     <div class="tab" onclick="setMsgTab(this,'reviews')">Google Reviews</div>
     <div class="tab" onclick="setMsgTab(this,'log')">Email Log</div>
   </div>
-  <div id="msgRemindersSection"></div>
+  <div id="msgJourneySection"></div>
+  <div id="msgRemindersSection" style="display:none;"></div>
   <div id="msgTemplatesSection" style="display:none;"></div>
   <div id="msgReviewsSection" style="display:none;"></div>
   <div id="msgLogSection" style="display:none;"></div>
@@ -1998,6 +2023,143 @@ const DEFAULT_TEMPLATES = [
   { id: 't11', name: 'Seasonal Check-In', category: 'general', body: 'Hi {{parent_name}}! Just checking in to see how {{patient_name}} is doing. Remember, as a Starlight family you have direct access to Dr. P — text or call anytime, no need to wait for an appointment!' },
   // Review Request
   { id: 't12', name: 'Google Review Request', category: 'review', body: 'Hi {{parent_name}}! We love having {{patient_name}} as part of the Starlight family. If you\'ve had a positive experience, would you mind leaving us a quick Google review? It helps other families find us and means the world to our small practice. Here\'s the link: {{google_review_link}} Thank you so much!' },
+];
+
+// Patient Journey — maps age milestones to email touchpoints
+// Each stage has: ageLabel, title, description, icon, color, linkedTemplates (by id or name match)
+const PATIENT_JOURNEY_STAGES = [
+  {
+    ageLabel: 'Day 1',
+    title: 'Welcome to Starlight',
+    desc: 'Family signs up — send the welcome email immediately. Set expectations, share contact info, and make them feel at home.',
+    icon: '&#127775;',
+    color: '#245C7B',
+    templateIds: ['t2', 't9'],
+    tierLabel: 'Orion Plan — $295/mo',
+  },
+  {
+    ageLabel: 'Day 3–5',
+    title: 'First Week Check-In',
+    desc: 'Newborn is settling in at home. Reach out to check on feeding, sleep, and parent comfort. This is what makes DPC special.',
+    icon: '&#128118;',
+    color: '#4D8E7F',
+    templateIds: ['t7'],
+  },
+  {
+    ageLabel: '2 Weeks',
+    title: 'Schedule First Wellness Visit',
+    desc: 'Time for the first in-office visit. Check weight gain, feeding, jaundice, and address all parent questions.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t8'],
+  },
+  {
+    ageLabel: '2 Months',
+    title: '2-Month Wellness Check',
+    desc: 'Major milestone — first vaccines, growth check. Send reminder 1 week before the visit window.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1', 't6'],
+  },
+  {
+    ageLabel: '3 Months',
+    title: 'Plan Change: Orion → Lyra',
+    desc: 'Baby transitions from Orion ($295) to Lyra ($225). Notify parent of billing change. Great time to ask for a Google review!',
+    icon: '&#128176;',
+    color: '#BB9973',
+    templateIds: ['t3', 't12'],
+    tierLabel: 'Lyra Plan — $225/mo',
+  },
+  {
+    ageLabel: '4 Months',
+    title: '4-Month Wellness Check',
+    desc: 'Second round of vaccines, growth tracking, developmental milestones. Send wellness reminder.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '6 Months',
+    title: '6-Month Wellness Check',
+    desc: 'Halfway through the first year! Discuss solid foods introduction, sleep patterns, and milestones.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '9 Months',
+    title: '9-Month Wellness Check',
+    desc: 'Developmental screening, mobility check-in. Baby is likely crawling — discuss safety proofing.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '1 Year',
+    title: 'First Birthday + Plan Change',
+    desc: 'Happy birthday! Transitions from Lyra ($225) to Sirius ($175). Send birthday message + billing notice. Celebrate the milestone!',
+    icon: '&#127874;',
+    color: '#B0616F',
+    templateIds: ['t5', 't3', 't1'],
+    tierLabel: 'Sirius Plan — $175/mo',
+  },
+  {
+    ageLabel: '15 Months',
+    title: '15-Month Wellness Check',
+    desc: 'Walking, first words. Important vaccine catch-up window. Behavioral and language assessment.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '18 Months',
+    title: '18-Month Wellness Check',
+    desc: 'Toddler developmental screening. M-CHAT autism screening recommended at this visit.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '2 Years',
+    title: '2-Year Wellness Check + Birthday',
+    desc: 'Second birthday! Full developmental assessment. Send birthday message and wellness reminder.',
+    icon: '&#127874;',
+    color: '#B0616F',
+    templateIds: ['t5', 't1'],
+  },
+  {
+    ageLabel: '2.5 Years',
+    title: '30-Month Wellness Check',
+    desc: 'Last of the frequent wellness visits. After this, annual checks begin.',
+    icon: '&#129658;',
+    color: '#3A7FA3',
+    templateIds: ['t1'],
+  },
+  {
+    ageLabel: '3+ Years',
+    title: 'Annual Check-Ins',
+    desc: 'Annual wellness checks and birthday messages. Send seasonal check-in to stay connected. Great time for review request if not yet done.',
+    icon: '&#128197;',
+    color: '#4D8E7F',
+    templateIds: ['t5', 't11', 't12'],
+  },
+  {
+    ageLabel: '4 Years',
+    title: 'Plan Change: Sirius → Pegasus',
+    desc: 'Transitions from Sirius ($175) to Pegasus ($150). Notify parent of billing change ahead of time.',
+    icon: '&#128176;',
+    color: '#BB9973',
+    templateIds: ['t3'],
+    tierLabel: 'Pegasus Plan — $150/mo',
+  },
+  {
+    ageLabel: 'Ongoing',
+    title: 'Missed Appointments & Payment Reminders',
+    desc: 'These templates fire as needed — when a family misses an appointment or a payment is overdue.',
+    icon: '&#128276;',
+    color: '#B0616F',
+    templateIds: ['t4', 't10'],
+  },
 ];
 
 function loadMessageTemplates() {
@@ -3779,7 +3941,7 @@ function saveHomeVisit() {
 function setMsgTab(el, tab) {
   document.querySelectorAll('#page-messages .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['reminders', 'templates', 'reviews', 'log'].forEach(t => {
+  ['journey', 'reminders', 'templates', 'reviews', 'log'].forEach(t => {
     const el = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1) + 'Section');
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
@@ -3967,6 +4129,78 @@ function renderMessages() {
   // Load Google Review link input
   const linkInput = document.getElementById('googleReviewLinkInput');
   if (linkInput) linkInput.value = localStorage.getItem('sp_google_review_link') || '';
+
+  // ─── PATIENT JOURNEY TIMELINE ───
+  const samplePatient = active[0] || patients[0] || { firstName: 'Baby', lastName: 'Name', parent: 'Parent', dob: '2026-01-01' };
+
+  document.getElementById('msgJourneySection').innerHTML = `
+    <div class="card" style="margin-bottom:16px;padding:20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <h2 style="font-size:18px;font-weight:800;color:var(--sp-navy);margin:0;">Patient Communication Journey</h2>
+      </div>
+      <p style="font-size:13px;color:var(--sp-muted);margin-bottom:6px;">
+        Every email Dr. P sends, mapped from newborn to childhood. Click <strong>Edit</strong> on any template to customize the message in your own voice.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:0;">
+        <span style="font-size:11px;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#4D8E7F;display:inline-block;"></span> Onboarding</span>
+        <span style="font-size:11px;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#3A7FA3;display:inline-block;"></span> Wellness</span>
+        <span style="font-size:11px;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#BB9973;display:inline-block;"></span> Billing</span>
+        <span style="font-size:11px;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#B0616F;display:inline-block;"></span> Birthday / General</span>
+        <span style="font-size:11px;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:#F57F17;display:inline-block;"></span> Review Request</span>
+      </div>
+    </div>
+
+    <div class="journey-timeline">
+      ${PATIENT_JOURNEY_STAGES.map(stage => {
+        // Find linked templates
+        const linkedTemplates = stage.templateIds
+          .map(id => messageTemplates.find(t => t.id === id))
+          .filter(Boolean);
+
+        return `
+          <div class="journey-stage">
+            <div class="journey-node" style="background:${stage.color};color:white;">${stage.icon}</div>
+            <div class="journey-stage-card">
+              <div class="journey-age" style="color:${stage.color};">${stage.ageLabel}</div>
+              <div class="journey-title">${stage.title}</div>
+              ${stage.tierLabel ? `<div style="display:inline-block;font-size:11px;padding:3px 10px;border-radius:6px;background:linear-gradient(135deg,#1A4A63,var(--sp-navy));color:white;font-weight:600;margin-bottom:8px;">${stage.tierLabel}</div>` : ''}
+              <p style="font-size:13px;color:var(--sp-muted);line-height:1.6;margin-bottom:10px;">${stage.desc}</p>
+
+              ${linkedTemplates.length ? `
+                <div class="journey-emails">
+                  ${linkedTemplates.map(t => `
+                    <div class="journey-email">
+                      <div class="journey-email-header">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                          <span class="journey-email-cat ${t.category}">${t.category}</span>
+                          <span class="journey-email-name">${t.name}</span>
+                        </div>
+                        <div class="journey-email-actions">
+                          <button class="btn btn-secondary btn-sm" onclick="openTemplateEditor('${t.id}')" style="font-size:10px;padding:2px 8px;">&#9998; Edit</button>
+                        </div>
+                      </div>
+                      <div class="journey-email-preview">${t.body}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              ` : '<p style="font-size:12px;color:var(--sp-rose);font-style:italic;">No templates linked — create one!</p>'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="card" style="margin-top:20px;padding:16px;background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border-left:3px solid var(--sp-gold);">
+      <h3 style="font-size:14px;font-weight:700;color:var(--sp-navy);margin-bottom:6px;">&#128161; How this works</h3>
+      <ul style="font-size:13px;color:var(--sp-text);line-height:1.8;padding-left:18px;margin:0;">
+        <li>This timeline shows every email touchpoint from birth to childhood</li>
+        <li>Click <strong>Edit</strong> on any template to change the wording in your voice</li>
+        <li>The <strong>Smart Reminders</strong> tab tells you which messages to send <em>right now</em> based on your actual patients</li>
+        <li>Use <strong>{{parent_name}}</strong>, <strong>{{patient_name}}</strong>, etc. — they auto-fill for each patient</li>
+        <li>New templates you create will appear in the <strong>Template Library</strong> tab</li>
+      </ul>
+    </div>
+  `;
 
   // ─── REVIEW BANNER ───
   const stats = getReviewStats();
