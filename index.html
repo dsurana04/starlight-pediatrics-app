@@ -1065,7 +1065,7 @@ th.sorted .sort-arrow { opacity:1;color:var(--sp-gold); }
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
+          <thead id="patientTableHead">
             <tr>
               <th onclick="sortPatients('name')">Patient Name</th>
               <th onclick="sortPatients('dob')">DOB</th>
@@ -2531,6 +2531,11 @@ function sortPatients(field) {
   renderPatientTable();
 }
 
+function updateFollowUp(id, dateVal) {
+  const p = patients.find(x => x.id === id);
+  if (p) { p.dueDate = dateVal; savePatients(); }
+}
+
 function renderPatientTable() {
   const search = document.getElementById('patientSearch').value.toLowerCase();
   let list = patients.filter(p => {
@@ -2556,6 +2561,10 @@ function renderPatientTable() {
       case 'plan': va = (getTier(a.dob)||{}).name||'z'; vb = (getTier(b.dob)||{}).name||'z'; break;
       case 'wellness': { const wa = getNextWellness(a.dob); const wb = getNextWellness(b.dob); va = wa ? wa.date.getTime() : 9999999999999; vb = wb ? wb.date.getTime() : 9999999999999; break; }
       case 'change': { const ca = getNextTierChange(a.dob); const cb = getNextTierChange(b.dob); va = ca ? ca.date.getTime() : 9999999999999; vb = cb ? cb.date.getTime() : 9999999999999; break; }
+      case 'phone': va = a.phone || 'zzz'; vb = b.phone || 'zzz'; break;
+      case 'email': va = a.email || 'zzz'; vb = b.email || 'zzz'; break;
+      case 'stage': va = a.pipelineStage || 'zzz'; vb = b.pipelineStage || 'zzz'; break;
+      case 'followup': va = a.dueDate || 'zzz'; vb = b.dueDate || 'zzz'; break;
       default: va = a.firstName; vb = b.firstName;
     }
     if (va < vb) return -1 * sortDir;
@@ -2563,8 +2572,52 @@ function renderPatientTable() {
     return 0;
   });
 
+  // Dynamic headers based on filter
+  const isProspectView = patientFilter === 'prospect';
+  const thead = document.getElementById('patientTableHead');
+  if (isProspectView) {
+    thead.innerHTML = `<tr>
+      <th onclick="sortPatients('name')">Name</th>
+      <th onclick="sortPatients('phone')">Phone</th>
+      <th onclick="sortPatients('email')">Email</th>
+      <th onclick="sortPatients('dob')">Due Date / DOB</th>
+      <th onclick="sortPatients('stage')">Stage</th>
+      <th onclick="sortPatients('followup')">Follow-Up Date</th>
+      <th>Actions</th>
+    </tr>`;
+  } else {
+    thead.innerHTML = `<tr>
+      <th onclick="sortPatients('name')">Patient Name</th>
+      <th onclick="sortPatients('dob')">DOB</th>
+      <th onclick="sortPatients('age')">Age</th>
+      <th onclick="sortPatients('plan')">Plan</th>
+      <th onclick="sortPatients('fee')">Monthly Fee</th>
+      <th onclick="sortPatients('wellness')">Next Wellness</th>
+      <th onclick="sortPatients('change')">Plan Change</th>
+      <th>Actions</th>
+    </tr>`;
+  }
+
   const tbody = document.getElementById('patientTableBody');
   tbody.innerHTML = list.map(p => {
+    if (isProspectView) {
+      const stageLabels = { 'inquiry': 'Inquiry', 'meet-and-greet': 'Meet & Greet', 'scheduled-visit': 'Scheduled Visit', 'ready-to-enroll': 'Ready to Enroll' };
+      const stageBadge = stageLabels[p.pipelineStage] || p.pipelineStage || '—';
+      return `
+      <tr>
+        <td><strong style="cursor:pointer;color:var(--sp-navy);" onclick="openPatientDetail('${p.id}')">${p.firstName} ${p.lastName}</strong></td>
+        <td>${p.phone || '<span style="color:var(--sp-muted);">—</span>'}</td>
+        <td>${p.email ? `<a href="mailto:${p.email}" style="color:var(--sp-navy);">${p.email}</a>` : '<span style="color:var(--sp-muted);">—</span>'}</td>
+        <td>${p.dob ? fmtDate(parseDate(p.dob)) : '—'}</td>
+        <td><span class="badge-plan badge-prospect">${stageBadge}</span></td>
+        <td><input type="date" value="${p.dueDate || ''}" onchange="updateFollowUp('${p.id}', this.value)" style="padding:4px 8px;border:1px solid var(--sp-border);border-radius:6px;font-size:13px;color:var(--sp-text);background:white;cursor:pointer;" /></td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="openEditPatient('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePatient('${p.id}')" style="margin-left:4px;">&#128465;</button>
+        </td>
+      </tr>`;
+    }
+
     const tier = getTier(p.dob);
     const fee = getMonthlyFee(p);
     const nextWell = getNextWellness(p.dob);
@@ -2581,7 +2634,7 @@ function renderPatientTable() {
         </td>
         <td>${p.dob ? fmtDate(parseDate(p.dob)) : '—'}</td>
         <td>${ageString(p.dob)}</td>
-        <td>${tier ? `<span class="badge-plan badge-${tier.badge}">${tier.name}</span>` : (p.status === 'prospect' ? '<span class="badge-plan badge-prospect">Prospect</span>' : '—')}</td>
+        <td>${tier ? `<span class="badge-plan badge-${tier.badge}">${tier.name}</span>` : '—'}</td>
         <td><strong>${fee ? fmtMoney(fee) : '—'}</strong></td>
         <td>${nextWell ? fmtDate(nextWell.date) + ' <span style="font-size:11px;color:var(--sp-muted);">(' + nextWell.label + ')</span>' : '—'}</td>
         <td>${nextChange ? `<span class="action-due ${isChangeUrgent ? 'urgent' : 'upcoming'}">${fmtDate(nextChange.date)} &#8594; ${fmtMoney(nextChange.to)}</span>` : '<span style="color:var(--sp-muted);font-size:12px;">None</span>'}</td>
