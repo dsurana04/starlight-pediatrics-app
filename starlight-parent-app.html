@@ -165,19 +165,6 @@
     border: 3px solid rgba(255,255,255,0.2);
   }
 
-  .quick-actions {
-    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;
-    margin: 0 20px 14px; position: relative; z-index: 5;
-  }
-  .quick-action {
-    background: white; border-radius: 14px; padding: 14px 8px;
-    text-align: center; box-shadow: var(--shadow); cursor: pointer;
-    transition: transform 0.15s;
-  }
-  .quick-action:active { transform: scale(0.95); }
-  .quick-action .qa-icon { font-size: 24px; margin-bottom: 4px; }
-  .quick-action .qa-label { font-size: 10px; font-weight: 800; color: var(--navy); }
-
   .home-next-appt {
     display: flex; align-items: center; gap: 14px;
     background: var(--gold-light); border: 1px solid var(--gold);
@@ -489,6 +476,19 @@
   .rx-refill-btn:active { transform: scale(0.95); }
   .rx-refill-btn.requested { background: var(--mint-light); color: var(--mint); pointer-events: none; }
 
+  /* ── FAB ── */
+  .fab {
+    position: absolute; bottom: 96px; right: 20px; z-index: 90;
+    width: 56px; height: 56px; border-radius: 50%; border: none;
+    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+    color: var(--navy-deep); font-size: 24px; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(201,162,39,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .fab:active { transform: scale(0.9); }
+  .fab.hidden { display: none; }
+
   /* ── Success Toast ── */
   .toast {
     position: absolute; top: 60px; left: 20px; right: 20px; padding: 16px 20px;
@@ -533,26 +533,7 @@
       <div class="home-age">8 years old &middot; Pegasus Plan</div>
     </div>
 
-    <div class="quick-actions" style="margin-top:-6px;">
-      <div class="quick-action" onclick="goTo('messagesScreen')">
-        <div class="qa-icon">&#x1F4AC;</div>
-        <div class="qa-label">Message<br>Dr. P</div>
-      </div>
-      <div class="quick-action" onclick="goTo('bookVisitScreen')">
-        <div class="qa-icon">&#x1F4C5;</div>
-        <div class="qa-label">Book<br>Visit</div>
-      </div>
-      <div class="quick-action" onclick="goTo('sendPhotoScreen')">
-        <div class="qa-icon">&#x1F4F7;</div>
-        <div class="qa-label">Send<br>Photo</div>
-      </div>
-      <div class="quick-action" onclick="goTo('refillRxScreen')">
-        <div class="qa-icon">&#x1F48A;</div>
-        <div class="qa-label">Refill<br>Rx</div>
-      </div>
-    </div>
-
-    <div class="content">
+    <div class="content" style="margin-top:-6px;position:relative;z-index:5;">
       <div class="home-next-appt">
         <div class="appt-icon">&#x1F4C5;</div>
         <div class="appt-info">
@@ -622,7 +603,10 @@
   <!-- ════════════ GROWTH CHARTS ════════════ -->
   <div class="screen" id="growthScreen">
     <div class="page-header">
-      <h1>Growth Charts</h1>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <h1>Growth Charts</h1>
+      </div>
       <div class="subtitle">Riya Surana &middot; 8 years old</div>
     </div>
 
@@ -806,8 +790,17 @@
     </div>
 
     <div class="msg-input-bar">
-      <input class="msg-input" placeholder="Message Dr. Prajapati...">
-      <button class="msg-send-btn">&#x2191;</button>
+      <button onclick="document.getElementById('msgPhoto').click()" style="width:36px;height:36px;border-radius:50%;border:none;background:var(--gold-light);color:var(--gold);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#x1F4F7;</button>
+      <input type="file" id="msgPhoto" accept="image/*" capture="environment" style="display:none;" onchange="attachPhoto(this)">
+      <input class="msg-input" id="msgInput" placeholder="Message Dr. Prajapati...">
+      <button class="msg-send-btn" onclick="sendMessage()">&#x2191;</button>
+    </div>
+    <div id="photoPreview" style="display:none;position:absolute;bottom:56px;left:16px;right:16px;padding:8px;background:white;border-top:1px solid var(--border);z-index:11;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div id="previewThumb" style="width:48px;height:48px;border-radius:8px;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:20px;">&#x1F4F7;</div>
+        <div style="flex:1;font-size:12px;font-weight:700;color:var(--navy);">Photo attached</div>
+        <span onclick="removePhoto()" style="cursor:pointer;font-size:16px;color:var(--muted);">&#x2715;</span>
+      </div>
     </div>
 
   </div>
@@ -881,37 +874,89 @@
 
   </div>
 
-  <!-- ════════════ MORE (Visits, Immunizations, Wellness, Docs) ════════════ -->
-  <div class="screen" id="moreScreen">
+  <!-- ════════════ MEDICAL HUB ════════════ -->
+  <div class="screen" id="medicalScreen">
     <div class="page-header">
-      <h1>More</h1>
+      <h1>Medical</h1>
       <div class="subtitle">Riya Surana's complete health record</div>
     </div>
 
     <div class="content">
-      <div class="profile-item" onclick="goTo('visitsScreen')">
-        <div class="profile-icon">&#x1FA7A;</div>
-        <div class="profile-label">Visit History</div>
-        <div class="profile-arrow">&#x203A;</div>
-      </div>
-      <div class="profile-item" onclick="goTo('wellnessScreen')">
-        <div class="profile-icon">&#x2705;</div>
-        <div class="profile-label">Wellness Checks</div>
-        <div class="profile-arrow">&#x203A;</div>
-      </div>
-      <div class="profile-item" onclick="goTo('immScreen')">
-        <div class="profile-icon">&#x1F489;</div>
-        <div class="profile-label">Immunizations</div>
-        <div class="profile-arrow">&#x203A;</div>
-      </div>
-      <div class="profile-item" onclick="goTo('docsScreen')">
-        <div class="profile-icon">&#x1F4C4;</div>
-        <div class="profile-label">Documents & Records</div>
-        <div class="profile-arrow">&#x203A;</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('growthScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x1F4C8;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Growth Charts</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;">Height, weight, BMI</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('visitsScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x1FA7A;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Visit History</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;">8 visits on record</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('immScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x1F489;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Immunizations</div>
+          <div style="font-size:11px;color:var(--mint);font-weight:700;margin-top:2px;">&#x2713; Fully vaccinated</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('refillRxScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x1F48A;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Prescriptions</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;">2 active Rx</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('wellnessScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x2705;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Wellness Checks</div>
+          <div style="font-size:11px;color:var(--gold);font-weight:700;margin-top:2px;">Next: Apr 8, 2026</div>
+        </div>
+        <div class="card" style="margin:0;cursor:pointer;text-align:center;padding:20px 14px;" onclick="goTo('docsScreen')">
+          <div style="font-size:28px;margin-bottom:6px;">&#x1F4C4;</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep);">Documents</div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:2px;">Labs, forms, letters</div>
+        </div>
       </div>
 
-      <div class="section-divider" style="margin-top:12px;">Account</div>
+      <div class="card" style="border-left:4px solid var(--mint);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:24px;">&#x1F6A8;</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:800;color:var(--navy-deep);">Allergies</div>
+            <div style="font-size:14px;font-weight:700;color:var(--mint);">No known allergies</div>
+          </div>
+        </div>
+      </div>
 
+      <div class="card" style="border-left:4px solid var(--sky);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:24px;">&#x1F9EC;</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:800;color:var(--navy-deep);">Blood Type</div>
+            <div style="font-size:14px;font-weight:700;color:var(--sky);">O Positive</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--gold);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:24px;">&#x1F4CB;</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:800;color:var(--navy-deep);">Primary Care</div>
+            <div style="font-size:14px;font-weight:700;color:var(--gold);">Dr. Yogini Prajapati, MD</div>
+            <div style="font-size:11px;color:var(--muted);font-weight:600;">Starlight Pediatrics &middot; Austin, TX</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════ MORE ════════════ -->
+  <div class="screen" id="moreScreen">
+    <div class="page-header">
+      <h1>More</h1>
+      <div class="subtitle">Account & settings</div>
+    </div>
+
+    <div class="content">
       <div class="profile-item">
         <div class="profile-icon">&#x1F464;</div>
         <div class="profile-label">Family Profile</div>
@@ -923,8 +968,18 @@
         <div class="profile-arrow">&#x203A;</div>
       </div>
       <div class="profile-item">
+        <div class="profile-icon">&#x1F4B3;</div>
+        <div class="profile-label">Insurance & Payment</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item">
         <div class="profile-icon">&#x1F3E5;</div>
         <div class="profile-label">About Starlight Pediatrics</div>
+        <div class="profile-arrow">&#x203A;</div>
+      </div>
+      <div class="profile-item">
+        <div class="profile-icon">&#x2753;</div>
+        <div class="profile-label">Help & Support</div>
         <div class="profile-arrow">&#x203A;</div>
       </div>
       <div class="profile-item" onclick="goTo('loginScreen')" style="margin-top:12px;">
@@ -940,7 +995,7 @@
   <div class="screen" id="visitsScreen">
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
         <h1>Visit History</h1>
       </div>
       <div class="subtitle">All visits for Riya Surana</div>
@@ -1036,7 +1091,7 @@
   <div class="screen" id="immScreen">
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
         <h1>Immunizations</h1>
       </div>
       <div class="subtitle">CDC recommended schedule &middot; All up to date</div>
@@ -1138,7 +1193,7 @@
   <div class="screen" id="wellnessScreen">
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
         <h1>Wellness Checks</h1>
       </div>
       <div class="subtitle">AAP recommended well-child schedule</div>
@@ -1244,7 +1299,7 @@
   <div class="screen" id="docsScreen">
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('moreScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
         <h1>Documents</h1>
       </div>
       <div class="subtitle">Records, forms, and lab results</div>
@@ -1365,71 +1420,12 @@
     </div>
   </div>
 
-  <!-- ════════════ SEND PHOTO ════════════ -->
-  <div class="screen" id="sendPhotoScreen">
-    <div class="toast" id="photoToast"><span class="toast-icon">&#x1F4F8;</span>Photo sent to Dr. Prajapati!</div>
-    <div class="page-header">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('homeScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
-        <h1>Send Photo</h1>
-      </div>
-      <div class="subtitle">Share a photo with Dr. Prajapati</div>
-    </div>
-    <div class="content">
-      <div class="card" style="text-align:center;padding:24px;cursor:pointer;border:2px dashed var(--border);" onclick="document.getElementById('photoUpload').click()">
-        <div style="font-size:40px;margin-bottom:8px;">&#x1F4F7;</div>
-        <div style="font-size:14px;font-weight:800;color:var(--navy);">Take or Upload Photo</div>
-        <div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:4px;">Tap to open camera or gallery</div>
-        <input type="file" id="photoUpload" accept="image/*" style="display:none;">
-      </div>
-
-      <div class="card-title" style="margin-top:4px;">Recent Photos</div>
-      <div class="photo-grid">
-        <div class="photo-card" onclick="togglePhoto(this)">
-          <div class="photo-placeholder" style="background:linear-gradient(135deg, #FFE4E1, #FFB4A2);">
-            <div class="pp-icon">&#x1F48E;</div>
-            <div class="pp-text">Throat</div>
-          </div>
-          <div class="photo-label">Sore Throat<div class="photo-date">Feb 18, 2026</div></div>
-        </div>
-        <div class="photo-card" onclick="togglePhoto(this)">
-          <div class="photo-placeholder" style="background:linear-gradient(135deg, #E8F2EF, #B5D8CC);">
-            <div class="pp-icon">&#x1F9B4;</div>
-            <div class="pp-text">Knee</div>
-          </div>
-          <div class="photo-label">Scraped Knee<div class="photo-date">Jan 22, 2026</div></div>
-        </div>
-        <div class="photo-card" onclick="togglePhoto(this)">
-          <div class="photo-placeholder" style="background:linear-gradient(135deg, #FBF5E0, #E8D5A0);">
-            <div class="pp-icon">&#x1F9B7;</div>
-            <div class="pp-text">Teeth</div>
-          </div>
-          <div class="photo-label">Loose Tooth<div class="photo-date">Dec 10, 2025</div></div>
-        </div>
-        <div class="photo-card" onclick="togglePhoto(this)">
-          <div class="photo-placeholder" style="background:linear-gradient(135deg, #E8E4F2, #C5B3E6);">
-            <div class="pp-icon">&#x1F441;&#xFE0F;</div>
-            <div class="pp-text">Eye</div>
-          </div>
-          <div class="photo-label">Pink Eye Check<div class="photo-date">Nov 3, 2025</div></div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:14px;">
-        <div class="card-title">Message to Dr. P</div>
-        <textarea class="note-textarea" placeholder="Describe what you'd like Dr. P to look at...">Hi Dr. P, can you take a look at this and let me know if we need to come in?</textarea>
-      </div>
-
-      <button class="btn-primary" onclick="submitPhoto()">Send to Dr. Prajapati</button>
-    </div>
-  </div>
-
   <!-- ════════════ REFILL RX ════════════ -->
   <div class="screen" id="refillRxScreen">
     <div class="toast" id="rxToast"><span class="toast-icon">&#x1F48A;</span>Refill request submitted!</div>
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-        <span onclick="goTo('homeScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
+        <span onclick="goTo('medicalScreen')" style="cursor:pointer;font-size:20px;color:var(--sky);">&#x2190;</span>
         <h1>Prescriptions</h1>
       </div>
       <div class="subtitle">Riya Surana's medications</div>
@@ -1501,10 +1497,13 @@
     </div>
   </div>
 
+  <!-- ════════════ FAB: Message Dr. P ════════════ -->
+  <button class="fab hidden" id="msgFab" onclick="goTo('messagesScreen')">&#x1F4AC;</button>
+
   <!-- ════════════ SHARED TAB BAR ════════════ -->
   <div class="tab-bar" id="mainTabBar">
     <div class="tab active" data-screen="homeScreen" onclick="goTo('homeScreen')"><div class="tab-icon">&#x1F3E0;</div>Home<div class="tab-dot"></div></div>
-    <div class="tab" data-screen="growthScreen" onclick="goTo('growthScreen')"><div class="tab-icon">&#x1F4C8;</div>Growth</div>
+    <div class="tab" data-screen="medicalScreen" onclick="goTo('medicalScreen')"><div class="tab-icon">&#x1FA7A;</div>Medical</div>
     <div class="tab" data-screen="messagesScreen" onclick="goTo('messagesScreen')"><div class="tab-icon">&#x1F4AC;</div>Messages</div>
     <div class="tab" data-screen="billingScreen" onclick="goTo('billingScreen')"><div class="tab-icon">&#x1F4B3;</div>Billing</div>
     <div class="tab" data-screen="moreScreen" onclick="goTo('moreScreen')"><div class="tab-icon">&#x2022;&#x2022;&#x2022;</div>More</div>
@@ -1516,17 +1515,17 @@
 // Map sub-screens to their parent tab
 const tabMap = {
   homeScreen: 'homeScreen',
-  growthScreen: 'growthScreen',
+  medicalScreen: 'medicalScreen',
+  growthScreen: 'medicalScreen',
+  visitsScreen: 'medicalScreen',
+  immScreen: 'medicalScreen',
+  wellnessScreen: 'medicalScreen',
+  docsScreen: 'medicalScreen',
+  refillRxScreen: 'medicalScreen',
   messagesScreen: 'messagesScreen',
   billingScreen: 'billingScreen',
   moreScreen: 'moreScreen',
-  visitsScreen: 'moreScreen',
-  wellnessScreen: 'moreScreen',
-  immScreen: 'moreScreen',
-  docsScreen: 'moreScreen',
-  bookVisitScreen: 'homeScreen',
-  sendPhotoScreen: 'homeScreen',
-  refillRxScreen: 'homeScreen'
+  bookVisitScreen: 'homeScreen'
 };
 
 function doLogin() {
@@ -1539,10 +1538,19 @@ function goTo(screenId) {
   document.getElementById(screenId).scrollTop = 0;
 
   const tabBar = document.getElementById('mainTabBar');
+  const fab = document.getElementById('msgFab');
   if (screenId === 'loginScreen') {
     tabBar.classList.remove('visible');
+    fab.classList.add('hidden');
   } else {
     tabBar.classList.add('visible');
+    // Hide FAB on Messages screen (already there) and login
+    const hideFabOn = ['messagesScreen', 'loginScreen'];
+    if (hideFabOn.includes(screenId)) {
+      fab.classList.add('hidden');
+    } else {
+      fab.classList.remove('hidden');
+    }
   }
 
   const parentTab = tabMap[screenId] || 'homeScreen';
@@ -1578,13 +1586,37 @@ function submitBooking() {
   setTimeout(() => goTo('homeScreen'), 1800);
 }
 
-// ── Send Photo ──
-function togglePhoto(el) {
-  el.classList.toggle('selected');
+// ── Messages: Photo + Send ──
+let hasPhoto = false;
+function attachPhoto(input) {
+  if (input.files && input.files[0]) {
+    hasPhoto = true;
+    document.getElementById('photoPreview').style.display = 'block';
+  }
 }
-function submitPhoto() {
-  showToast('photoToast');
-  setTimeout(() => goTo('messagesScreen'), 1800);
+function removePhoto() {
+  hasPhoto = false;
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('msgPhoto').value = '';
+}
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text && !hasPhoto) return;
+  const thread = document.querySelector('.msg-thread');
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble parent';
+  let html = '<div class="msg-sender">Deepak</div>';
+  if (hasPhoto) html += '<div style="background:var(--gold-light);border-radius:10px;padding:10px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;">&#x1F4F7; Photo attached</div>';
+  if (text) html += text;
+  else html += 'Sent a photo';
+  bubble.innerHTML = html;
+  thread.appendChild(bubble);
+  input.value = '';
+  removePhoto();
+  // scroll to bottom
+  const scroller = thread.closest('[style*="overflow"]') || thread.parentElement;
+  setTimeout(() => scroller.scrollTop = scroller.scrollHeight, 50);
 }
 
 // ── Refill Rx ──

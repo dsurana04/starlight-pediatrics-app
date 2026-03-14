@@ -594,3 +594,96 @@ When making changes:
 | 2026-03-13 | Nurture tab in Messages: per-prospect step tracker, Preview & Send, Pause/Resume |
 | 2026-03-13 | Stage-aware nurture: steps auto-skip when prospect advances past applicable stages |
 | 2026-03-13 | New nurture templates auto-merge into existing localStorage |
+| 2026-03-14 | Parent Mobile App prototype: login, home, medical hub, messages, billing, book visit, prescriptions |
+| 2026-03-14 | Deployed parent app to https://starlight-parent-app.netlify.app |
+| 2026-03-14 | Business plan deployed to https://starlight-md-plan.netlify.app |
+
+---
+
+## Parent Mobile App (Prototype)
+
+**File:** `starlight-parent-app.html`
+**Live:** [starlight-parent-app.netlify.app](https://starlight-parent-app.netlify.app)
+
+### Overview
+
+iPhone-frame (390x844px) interactive prototype for the parent-facing portal. This is the patient experience that Atlas.md completely lacks — parents can see their child's full health record, message Dr. P directly, book visits, and manage billing from their phone.
+
+Built for demo patient **Riya Surana** (DOB 10/1/2017, 8 years old, Pegasus Plan $150/mo).
+
+### Navigation
+
+**Bottom Tab Bar (5 tabs):**
+| Tab | Screen | Description |
+|-----|--------|-------------|
+| Home | Dashboard | Greeting, next appointment, recent activity, growth snapshot, membership card |
+| Medical | Hub (6 cards) | Growth Charts, Visit History, Immunizations, Prescriptions, Wellness Checks, Documents |
+| Messages | Chat thread | iMessage-style conversation with Dr. Prajapati, camera/photo attach, real-time send |
+| Billing | Membership | Plan card, included benefits, 6-month payment history, savings calculator |
+| More | Account | Family Profile, Notifications, Insurance & Payment, About, Help & Support, Sign Out |
+
+**Floating Action Button:** Gold message bubble (bottom-right) appears on all screens except Messages — one-tap access to Dr. P.
+
+### Medical Hub Sub-Screens
+
+| Screen | Back → | Content |
+|--------|--------|---------|
+| Growth Charts | Medical | Height/weight/BMI stats, CDC percentile chart (girls 2-20), 7 data points, growth history table |
+| Visit History | Medical | 8 visits (well-child, sick, phone consult) with color-coded type badges and clinical summaries |
+| Immunizations | Medical | Full CDC schedule: HepB, DTaP (5), IPV (4), MMR (2), Varicella (2), PCV13 (4), Hib (3), RV (2), HepA (2), Flu (3yr). Upcoming: Tdap, HPV, MenACWY |
+| Prescriptions | Medical | Active Rx (Amoxicillin 250mg, Children's Ibuprofen), past Rx, pharmacy on file, "Request Refill" button |
+| Wellness Checks | Medical | AAP well-child schedule: 10 completed (12mo through 7yr), 1 upcoming (8yr Apr 2026) |
+| Documents | Medical | Lab results (strep, CBC, lead), school forms, immunization record, return-to-school letter, sports clearance |
+
+### Quick Actions from Home
+
+| Action | Screen | Description |
+|--------|--------|-------------|
+| Book Visit | bookVisitScreen | Visit type picker (Well-Child / Sick / Sports Physical), April calendar with day selection, 9 time slots, notes field, confirmation toast |
+
+### Messages Features
+
+- iMessage-style bubbles (navy = parent, white = doctor)
+- Pre-loaded conversation: strep throat scenario (Feb 2026) + wellness check scheduling (Mar 2026)
+- **Camera button** in input bar — tap to attach photo from camera/gallery
+- Photo preview strip with remove option
+- Live message sending — new bubbles appear in thread
+- Date separators between conversation days
+
+### Screens Summary
+
+| # | Screen ID | Type |
+|---|-----------|------|
+| 1 | loginScreen | Login with email/password + Face ID |
+| 2 | homeScreen | Home dashboard |
+| 3 | medicalScreen | Medical records hub (6-card grid) |
+| 4 | growthScreen | Growth charts + history |
+| 5 | visitsScreen | Visit history timeline |
+| 6 | immScreen | Immunization record (CDC) |
+| 7 | refillRxScreen | Prescriptions + refill requests |
+| 8 | wellnessScreen | Wellness check timeline |
+| 9 | docsScreen | Documents & lab results |
+| 10 | messagesScreen | Chat with Dr. P |
+| 11 | billingScreen | Membership & payments |
+| 12 | moreScreen | Account & settings |
+| 13 | bookVisitScreen | Appointment booking flow |
+
+### Technical Details
+
+- Single HTML file, no dependencies (except Google Fonts: Nunito)
+- Vanilla CSS + JS, no framework
+- All screens use `position: absolute` with shared fixed tab bar
+- Screen transitions via `goTo(screenId)` with tab bar active state management
+- Toast notifications for confirmations (booking, refill requests)
+- Brand: Navy `#1B3A4B`, Gold `#C9A227`, Mint `#4D8E7F`, Rose `#B0616F`, BG `#F6F3F0`
+
+### Competitive Advantage vs Atlas.md
+
+Atlas.md has **zero** parent-facing mobile experience. Parents cannot:
+- View growth charts or immunization records
+- Message their doctor from a mobile app
+- Book appointments online
+- See billing/membership details
+- Access lab results or documents
+
+This prototype demonstrates the full parent experience that Starlight.MD delivers out of the box.
